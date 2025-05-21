@@ -78,7 +78,7 @@ class Reader(torch.nn.Module):
                 truncation=True,
                 padding=True, 
                 return_tensors="pt",
-        )
+        ).cuda()
         outputs = self.model(**inputs)
 
         if isinstance(outputs, list):
