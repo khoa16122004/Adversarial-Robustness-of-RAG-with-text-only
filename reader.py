@@ -79,7 +79,8 @@ class Reader(torch.nn.Module):
                 padding=True, 
                 return_tensors="pt",
         )
-        print("Input ids: ", input_ids.shape, "Attention mask: ", attention_mask.shape)
+        print("Input ids: ", input_ids.shape) 
+        print("Attention mask: ", attention_mask.shape)
         outputs = self.model.generate(input_ids=input_ids.to(self.model.device), attention_mask=attention_mask.to(self.model.device), **self.generate_kwargs)
         outputs = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
 
