@@ -148,18 +148,13 @@ if __name__ == "__main__":
     answers = ['2025', "He can't become a researcher", "a cat and a dog"]
     
     pred = reader.generate(question, contexts)
-    print("Prediction: ", pred)
     scores = []
+    print("Prediction: ", pred)
     for ans in answers:
-        score = reader(question, contexts, ans)[0]
+        score = reader(question, contexts, ans)
         scores.append(score)
-        print("Score for '{}': {:.6f}".format(ans, score))
-
-    # Chuẩn hóa thành xác suất
-    probs = np.array(scores)
-    probs = probs / probs.sum()
-
-    # Tính entropy
-    entropy = -np.sum(probs * np.log(probs + 1e-12))  # thêm epsilon tránh log(0)
-    print("Entropy of answer distribution: {:.6f}".format(entropy))
-
+    
+    score_normalize = scores / sum(scores)
+    print("Score: ", score_normalize)
+        
+    
