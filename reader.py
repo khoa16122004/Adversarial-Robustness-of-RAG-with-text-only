@@ -72,19 +72,20 @@ class Reader(torch.nn.Module):
         """
         
         inputs = [self.template.format(q=question, d=text) for text in contexts]
-        inputs = self.tokenizer(
-                inputs,
-                max_length=512,
-                truncation=True,
-                padding=True, 
-                return_tensors="pt",
-        )
-        outputs = self.model(**inputs)
-
-        if isinstance(outputs, list):
-            return [o.split("Answer:")[-1].strip() for o in outputs]
+        inputs, attention_mask = self.tokenizer(
+                                    inputs,
+                                    max_length=512,
+                                    truncation=True,
+                                    padding=True, 
+                                    return_tensors="pt",
+                                )
+        outputs = self.model.generate(input_ids=inputs.to(self.model.device), attention_mask=attention_mask.to(self.model.device), **self.generate_kwargs)
+        preds = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
+        
+        if isinstance(preds, list):
+            return [o.split("Answer:")[-1].strip() for o in preds]
         else:
-            return outputs.split("Answer:")[-1].strip()
+            return preds.split("Answer:")[-1].strip()
         
         
     def _cal_label_prob(self, probs, labels):
