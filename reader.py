@@ -138,7 +138,7 @@ if __name__ == "__main__":
     
     pred = reader.generate(question, contexts)
     print("Prediction: ", pred)
-    
-    scores = reader(question, contexts, answers)
-    print("Scores: ", scores)
+    for ans in answers:
+        scores = reader(question, contexts, ans)
+        print("Scores: ", scores)
 
