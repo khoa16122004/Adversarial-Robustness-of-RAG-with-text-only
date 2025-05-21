@@ -5,7 +5,7 @@ import os
 import json
 cls_mapping = {
     "Llama-7b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-7b-chat-hf", "meta-llama"),
-    "Llama-13b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-13b-chat-hf"),
+    "Llama-13b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-13b-chat-hf", "meta-llama"),
     "Mistral-7b": (MistralForCausalLM, AutoTokenizer, True, "Mistral-7B-Instruct-v0.2"),
     "vicuna-7b": (LlamaForCausalLM, LlamaTokenizer, True, "vicuna-7b-v1.5"),
     "vicuna-13b": (LlamaForCausalLM, LlamaTokenizer, True, "vicuna-13b-v1.5"),
@@ -29,7 +29,7 @@ class Reader(torch.nn.Module):
         self.model_name = model_name
         with open(templates[model_name], "r") as f:
             self.template = json.load(f)
-        model_cls, tokenizer_cls, self.is_decoder, hf_name, prefix = cls_mapping(os.path.join())
+        model_cls, tokenizer_cls, self.is_decoder, hf_name, prefix = cls_mapping(os.path.join(prefix, hf_name))
         self.model = model_cls.from_pretrained(os.path.join(prefix, hf_name)).cuda()
         self.tokenizer = tokenizer_cls.from_pretrained(os.path.join(prefix, hf_name))
         self.generate_kwargs = dict(
