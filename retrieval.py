@@ -53,7 +53,7 @@ class Retriever(torch.nn.Module):
             embedding = self.q_encoder(**contexts)
         
         embedding = torch.nn.functional.normalize(embedding, dim=-1)    
-        return self.q_encoder(**contexts)
+        return embedding
 
     
 class DPRC(DPRContextEncoder):
