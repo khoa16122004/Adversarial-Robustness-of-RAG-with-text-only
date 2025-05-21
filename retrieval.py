@@ -34,7 +34,7 @@ class Retriever(torch.nn.Module):
         query_ids = self.tokenizer(queries, **self.tokenizer_kwargs).to(self.q_encoder.device)
         context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs).to(self.d_encoder.device)
 
-        query_embeddings = self.encode(query_ids, mode="query")     # [B, D]
+        query_embeddings = self.encode(query_ids, mode="context")     # [B, D]
         context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
 
         # Cosine similarity (batch-wise)
