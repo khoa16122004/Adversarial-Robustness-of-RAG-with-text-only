@@ -1,6 +1,8 @@
 import torch
 from transformers import BertModel, DPRContextEncoder, DPRQuestionEncoder, AutoTokenizer
 from utils import set_seed_everything
+import numpy as np
+
 
 class Retriever(torch.nn.Module):
     def __init__(self, model_name):
@@ -89,4 +91,4 @@ if __name__ == "__main__":
         "bird"
     ]
     scores = retriever(queries, contexts)
-    print(scores)
+    print(scores / scores.sum())

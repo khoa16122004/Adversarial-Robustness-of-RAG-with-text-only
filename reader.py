@@ -154,7 +154,7 @@ if __name__ == "__main__":
         score = reader(question, contexts, ans)
         scores.append(score)
     
-    score_normalize = np.array(scores) / sum(scores)
+    score_normalize = np.array(scores) / np.array(scores).sum()
     print("Score: ", score_normalize)
         
     
