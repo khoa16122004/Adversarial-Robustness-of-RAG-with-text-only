@@ -29,7 +29,7 @@ class Reader(torch.nn.Module):
         self.model_name = model_name
         with open(templates[model_name], "r") as f:
             self.template = json.load(f)
-        model_cls, tokenizer_cls, self.is_decoder, hf_name, prefix = cls_mapping(os.path.join(prefix, hf_name))
+        model_cls, tokenizer_cls, self.is_decoder, hf_name, prefix = cls_mapping(model_name)
         self.model = model_cls.from_pretrained(os.path.join(prefix, hf_name)).cuda()
         self.tokenizer = tokenizer_cls.from_pretrained(os.path.join(prefix, hf_name))
         self.generate_kwargs = dict(
