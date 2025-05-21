@@ -35,7 +35,7 @@ class Retriever(torch.nn.Module):
         context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs).to(self.d_encoder.device)
 
         query_embeddings = self.encode(query_ids, mode="query")     # [B, D]
-        context_embeddings = self.encode(context_ids, mode="query")  # [B, D]
+        context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
 
         # Cosine similarity (batch-wise)
         scores = torch.matmul(query_embeddings, context_embeddings.T)
@@ -81,7 +81,7 @@ class Contriever(BertModel):
 
 
 if __name__ == "__main__":
-    retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
+    retriever = Retriever("facebook/dpr-question_encoder-multiset-base")
     queries = ["What is the name of the dog"]
     contexts = [
         "the dog name is Max",
