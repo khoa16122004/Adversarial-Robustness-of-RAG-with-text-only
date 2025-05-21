@@ -84,11 +84,9 @@ class Contriever(BertModel):
 
 if __name__ == "__main__":
     retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
-    queries = ["What is the name of the dog"]
-    contexts = [
-        "the dog name is Max",
-        "cat",
-        "bird"
-    ]
-    scores = retriever(queries, contexts)
+    question = "When Khoa become researcher?"
+    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
+                "Khoa enjoys hiking in the mountains during his free time.",
+                "Recently, he adopted a cat and named it Pixel."]
+    scores = retriever(question, contexts)
     print(scores / scores.sum())
