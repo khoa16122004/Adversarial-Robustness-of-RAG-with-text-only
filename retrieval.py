@@ -81,11 +81,11 @@ class Contriever(BertModel):
 
 
 if __name__ == "__main__":
-    retriever = Retriever("facebook/dpr-question_encoder-multiset-base")
+    retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
     queries = ["What is the name of the dog"]
     contexts = [
         "the dog name is Max",
-        "the d0g name is Max",
+        "the d0g nAme is Max",
     ]
     scores = retriever(queries, contexts)
     print(scores)
