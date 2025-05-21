@@ -93,6 +93,10 @@ class Reader(torch.nn.Module):
         for prob, label in zip(probs, labels):
             mask = label > 0
             prob, label = prob[mask], label[mask]
+            softmax = torch.nn.functional.softmax(prob, dim=-1) 
+            max_probs, _ = torch.max(softmax, dim=1)  # (n,)
+            print("Max probs per token:", max_probs.tolist())
+
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
 
