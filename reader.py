@@ -95,9 +95,7 @@ class Reader(torch.nn.Module):
             prob, label = prob[mask], label[mask]
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-
-
-            avg_nll = torch.sum(nll, dim=0)
+            avg_nll = torch.mean(nll)  # Sửa: lấy mean thay vì sum
             result.append(float(torch.exp(-avg_nll)))
         return result
 
