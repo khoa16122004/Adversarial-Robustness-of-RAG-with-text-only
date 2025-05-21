@@ -84,7 +84,7 @@ if __name__ == "__main__":
     retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
     queries = ["What is the name of the dog"]
     contexts = [
-        "The dog's name is Max",
+        "dog names",
         "The cat is named Whiskers",
         "The bird is called Tweety"
     ]
