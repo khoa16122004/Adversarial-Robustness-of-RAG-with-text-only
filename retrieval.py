@@ -23,7 +23,7 @@ class Retriever(torch.nn.Module):
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             d_encoder = Contriever.from_pretrained(self.c_name).to("cuda")
             q_encoder = d_encoder
-        elif "dpr" in self.model_name:
+        elif "dpr" in self.q_name:
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             d_encoder = DPRC.from_pretrained(self.c_name).to("cuda")
             q_encoder = DPRQ.from_pretrained(self.q_name).to("cuda")
