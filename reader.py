@@ -32,6 +32,7 @@ class Reader(torch.nn.Module):
         model_cls, tokenizer_cls, self.is_decoder, hf_name, prefix = cls_mapping[model_name]
         self.model = model_cls.from_pretrained(os.path.join(prefix, hf_name)).cuda()
         self.tokenizer = tokenizer_cls.from_pretrained(os.path.join(prefix, hf_name))
+        self.tokenizer.pad_token = self.tokenizer.eos_token
         self.generate_kwargs = dict(
             max_new_tokens=30,
             return_dict_in_generate=True,
