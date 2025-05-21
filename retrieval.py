@@ -35,11 +35,13 @@ class Retriever(torch.nn.Module):
         """
         queries and contexts are input ids
         """
-        queries.to(self.q_encoder.device)
-        contexts.to(self.q_encoder.device)
+        query_ids = self.tokenizer(queries, **self.tokenizer_kwargs)
+        context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs)
+        query_ids.to(self.q_encoder.device)
+        context_ids.to(self.q_encoder.device)
 
-        query_embeddings = self.encode(queries, mode="query")
-        context_embeddings = self.encode(contexts, mode="context")
+        query_embeddings = self.encode(query_ids, mode="query")
+        context_embeddings = self.encode(context_ids, mode="context")
       
         scores = [q @ c for q, c in zip(query_embeddings, context_embeddings)]
         return scores
@@ -53,12 +55,6 @@ class Retriever(torch.nn.Module):
         embedding = torch.nn.functional.normalize(embedding, dim=-1)    
         return self.q_encoder(**contexts)
 
-    def tokenizer(self, contexts):
-        """
-        queries and contexts are strings
-        """
-        input_ids = self.tokenizer(contexts, **self.tokenizer_kwargs)
-        return input_ids
     
 class DPRC(DPRContextEncoder):
     def forward(self, **kwargs):
