@@ -19,7 +19,7 @@ class Retriever(torch.nn.Module):
         }
 
     def load_retriever(self):
-        if "contriever" in self.model_name:
+        if "contriever" in self.q_name:
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             d_encoder = Contriever.from_pretrained(self.c_name).to("cuda")
             q_encoder = d_encoder
