@@ -64,7 +64,7 @@ class Reader(torch.nn.Module):
         scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
     
-    def generate(self, question, contexts): # text generation
+    def get_answer(self, question, contexts): # text generation
         
         """
         question: str
@@ -72,23 +72,24 @@ class Reader(torch.nn.Module):
         """
         
         inputs = [self.template.format(q=question, d=text) for text in contexts]
-        input_ids, attention_mask = self.tokenizer(
+        input_ids = self.tokenizer(
                 inputs,
                 max_length=512,
                 truncation=True,
                 padding=True, 
                 return_tensors="pt",
         )
-        print("Input ids: ", input_ids.shape) 
-        print("Attention mask: ", attention_mask.shape)
-        outputs = self.model.generate(input_ids=input_ids.to(self.model.device), attention_mask=attention_mask.to(self.model.device), **self.generate_kwargs)
-        outputs = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
-
+        print("Input ids: ", input_ids) 
+        outputs = self.generate(**input_ids)
         if isinstance(outputs, list):
             return [o.split("Answer:")[-1].strip() for o in outputs]
         else:
             return outputs.split("Answer:")[-1].strip()
-        
+    
+    def generate(self, input_ids, attention_mask):
+        outputs = self.model.generate(input_ids=input_ids.to(self.model.device), attention_mask=attention_mask.to(self.model.device), **self.generate_kwargs)
+        preds = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
+        return preds
         
     def _cal_label_prob(self, probs, labels):
         # probs: (B, N, C)  -- B: batch size, N: seq len, C: num classes
