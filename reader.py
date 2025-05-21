@@ -3,6 +3,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForCausa
 from transformers import LlamaForCausalLM, LlamaTokenizer, MistralForCausalLM
 import os
 import json
+import numpy as np
 cls_mapping = {
     "Llama-7b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-7b-chat-hf", "meta-llama"),
     "Llama-13b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-13b-chat-hf", "meta-llama"),
@@ -148,7 +149,17 @@ if __name__ == "__main__":
     
     pred = reader.generate(question, contexts)
     print("Prediction: ", pred)
+    scores = []
     for ans in answers:
-        scores = reader(question, contexts, ans)
-        print("Scores: ", scores)
+        score = reader(question, contexts, ans)[0]
+        scores.append(score)
+        print("Score for '{}': {:.6f}".format(ans, score))
+
+    # Chuẩn hóa thành xác suất
+    probs = np.array(scores)
+    probs = probs / probs.sum()
+
+    # Tính entropy
+    entropy = -np.sum(probs * np.log(probs + 1e-12))  # thêm epsilon tránh log(0)
+    print("Entropy of answer distribution: {:.6f}".format(entropy))
 
