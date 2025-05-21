@@ -52,7 +52,7 @@ class Retriever(torch.nn.Module):
         elif mode == "query":
             embedding = self.q_encoder(**contexts)
         
-        embedding = torch.nn.functional.normalize(embedding, dim=-1)    
+        # embedding = torch.nn.functional.normalize(embedding, dim=-1)    
         return embedding
 
     
