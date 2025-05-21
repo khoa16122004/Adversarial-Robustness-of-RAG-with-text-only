@@ -64,7 +64,7 @@ class Reader(torch.nn.Module):
         scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
     
-    def get_answer(self, question, contexts): # text generation
+    def generate(self, question, contexts): # text generation
         
         """
         question: str
