@@ -20,11 +20,11 @@ class Retriever(torch.nn.Module):
 
     def load_retriever(self):
         if "contriever" in self.q_name:
-            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            d_encoder = Contriever.from_pretrained(self.c_name).to("cuda")
-            q_encoder = d_encoder
+            tokenizer = AutoTokenizer.from_pretrained(self.q_name)
+            q_encoder = Contriever.from_pretrained(self.c_name).to("cuda")
+            d_encoder = q_encoder
         elif "dpr" in self.q_name:
-            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+            tokenizer = AutoTokenizer.from_pretrained(self.q_name)
             d_encoder = DPRC.from_pretrained(self.c_name).to("cuda")
             q_encoder = DPRQ.from_pretrained(self.q_name).to("cuda")
         else:
