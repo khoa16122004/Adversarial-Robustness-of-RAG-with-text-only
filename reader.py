@@ -14,12 +14,12 @@ cls_mapping = {
 
 
 templates = {
-    "Llama-7b": "reader_tempalte/Llama.json",
-    "Llama-13b": "reader_tempalte/Llama.json",
-    "Mistral-7b": "reader_tempalte/Mistral.json",
-    "vicuna-7b": "reader_tempalte/vicuna.json",
-    "vicuna-13b": "reader_tempalte/vicuna.json",
-    "gemma-7b": "reader_tempalte/gemma.json"
+    "Llama-7b": "reader_template/Llama.json",
+    "Llama-13b": "reader_template/Llama.json",
+    "Mistral-7b": "reader_template/Mistral.json",
+    "vicuna-7b": "reader_template/vicuna.json",
+    "vicuna-13b": "reader_template/vicuna.json",
+    "gemma-7b": "reader_template/gemma.json"
 }
 
 
