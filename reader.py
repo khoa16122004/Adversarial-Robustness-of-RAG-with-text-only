@@ -78,7 +78,7 @@ class Reader(torch.nn.Module):
                 truncation=True,
                 padding=True, 
                 return_tensors="pt",
-        ).cuda()
+        )
         outputs = self.model(**inputs)
 
         if isinstance(outputs, list):
@@ -90,7 +90,9 @@ class Reader(torch.nn.Module):
     def _cal_label_prob(self, probs, labels):
         # probs: (B, N, C)  -- B: batch size, N: seq len, C: num classes
         # labels: (B, N)
-
+        probs = probs.cuda()
+        labels = labels.cuda()
+        
         mask = labels > 0                                # (B, N)
         masked_probs = probs[mask]                       # (total_valid_positions, C)
         masked_labels = labels[mask]                     # (total_valid_positions)
