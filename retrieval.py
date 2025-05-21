@@ -85,8 +85,8 @@ if __name__ == "__main__":
     queries = ["What is the name of the dog"]
     contexts = [
         "the dog name is Max",
-        "cat"
-        "bird",
+        "cat",
+        "bird"
     ]
     scores = retriever(queries, contexts)
     print(scores)
