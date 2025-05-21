@@ -101,7 +101,7 @@ class Reader(torch.nn.Module):
         masked_labels = labels[mask]                     # (total_valid_positions)
 
         log_softmax = torch.nn.functional.log_softmax(masked_probs, dim=-1)
-        nll = -log_softmax[torch.arange(masked_labels.shape[0]), masked_labels]  # (total_valid_positions,)
+        nll = -log_softmax[torch.arange(masked_labels.shape[0], device=masked_labels.device), masked_labels]  # (total_valid_positions,)
 
         # Now group back per sample to get average NLL per sample
         # Step 1: build a mapping from flat index -> batch index
