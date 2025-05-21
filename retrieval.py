@@ -82,7 +82,7 @@ class Contriever(BertModel):
 
 if __name__ == "__main__":
     retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
-    queries = ["What is the name of the dog"] * 3
+    queries = ["What is the name of the dog"]
     contexts = [
         "The dog's name is Max",
         "The cat is named Whiskers",
