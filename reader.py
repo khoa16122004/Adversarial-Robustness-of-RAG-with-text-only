@@ -105,7 +105,7 @@ class Reader(torch.nn.Module):
 
         # Now group back per sample to get average NLL per sample
         # Step 1: build a mapping from flat index -> batch index
-        batch_idx = torch.arange(labels.shape[0]).unsqueeze(1).expand_as(labels)  # (B, N)
+        batch_idx = torch.arange(labels.shape[0], device=labels.device).unsqueeze(1).expand_as(labels)  # (B, N)
         masked_batch_idx = batch_idx[mask]  # (total_valid_positions,)
 
         total_nll = torch.zeros(labels.shape[0], device=probs.device)
