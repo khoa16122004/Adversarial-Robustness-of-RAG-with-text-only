@@ -93,15 +93,11 @@ class Reader(torch.nn.Module):
         for prob, label in zip(probs, labels):
             mask = label > 0
             prob, label = prob[mask], label[mask]
-            softmax = torch.nn.functional.softmax(prob, dim=-1) 
-            max_probs, _ = torch.max(softmax, dim=1)  # (n,)
-            print("Max probs per token:", max_probs.tolist())
-
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
 
 
-            avg_nll = torch.sum(nll, dim=0) / float(label.shape[0])
+            avg_nll = torch.sum(nll, dim=0)
             result.append(float(torch.exp(-avg_nll)))
         return result
 
