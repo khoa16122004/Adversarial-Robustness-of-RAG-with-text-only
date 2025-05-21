@@ -52,7 +52,7 @@ class Retriever(torch.nn.Module):
         elif mode == "query":
             embedding = self.q_encoder(**contexts)
         
-        # embedding = torch.nn.functional.normalize(embedding, dim=-1)    
+        embedding = torch.nn.functional.normalize(embedding, dim=-1)    
         return embedding
 
     
@@ -77,6 +77,6 @@ class Contriever(BertModel):
 if __name__ == "__main__":
     retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
     queries = ["What is the name of the dog"] * 3
-    contexts = ["What is the name of the dog", "The bird is called Tweety"]
+    contexts = ["The dog's name is Max", "The cat is named Whiskers", "The bird is called Tweety"]
     scores = retriever(queries, contexts)
     print(scores)
