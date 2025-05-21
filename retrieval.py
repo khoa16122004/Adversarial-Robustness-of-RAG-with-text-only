@@ -5,10 +5,11 @@ import numpy as np
 
 
 class Retriever(torch.nn.Module):
-    def __init__(self, model_name):
+    def __init__(self, q_name, c_name):
         super().__init__()
         set_seed_everything(222520691)
-        self.model_name = model_name
+        self.q_name = q_name
+        self.c_name = c_name
         self.tokenizer, self.d_encoder, self.q_encoder = self.load_retriever()
         self.tokenizer_kwargs = {
             "max_length": 512,
@@ -20,12 +21,12 @@ class Retriever(torch.nn.Module):
     def load_retriever(self):
         if "contriever" in self.model_name:
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            d_encoder = Contriever.from_pretrained(self.model_name).to("cuda")
+            d_encoder = Contriever.from_pretrained(self.c_name).to("cuda")
             q_encoder = d_encoder
         elif "dpr" in self.model_name:
             tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            d_encoder = DPRC.from_pretrained(self.model_name).to("cuda")
-            q_encoder = DPRQ.from_pretrained(self.model_name).to("cuda")
+            d_encoder = DPRC.from_pretrained(self.c_name).to("cuda")
+            q_encoder = DPRQ.from_pretrained(self.q_name).to("cuda")
         else:
             raise ValueError("Unsupported model name")
         d_encoder.eval()
@@ -37,7 +38,7 @@ class Retriever(torch.nn.Module):
         context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs).to(self.d_encoder.device)
 
         query_embeddings = self.encode(query_ids, mode="query")     # [B, D]
-        context_embeddings = self.encode(context_ids, mode="query")  # [B, D]
+        context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
 
         # Cosine similarity (batch-wise)
         scores = torch.matmul(query_embeddings, context_embeddings.T)
@@ -83,7 +84,8 @@ class Contriever(BertModel):
 
 
 if __name__ == "__main__":
-    retriever = Retriever("facebook/dpr-ctx_encoder-single-nq-base")
+    retriever = Retriever("dpr-question_encoder-multiset-base", 
+                          "facebook/dpr-ctx_encoder-multiset-base")
     question = "When Khoa become researcher?"
     contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
                 "Khoa enjoys hiking in the mountains during his free time. Recently, he adopted a cat and named it Pixel.",
