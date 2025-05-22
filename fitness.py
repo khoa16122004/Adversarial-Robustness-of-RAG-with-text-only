@@ -43,8 +43,8 @@ class WeightedSUm:
         self.retri_clean_reuslt = self.retriever(question, [original_text])
         self.reader_clean_result = self.reader(question, [original_text], answer)
         
-        print(self.retri_clean_reuslt, self.reader_clean_result)
-        raise
+        # print(self.retri_clean_reuslt, self.reader_clean_result)
+        # raise
         
         self.retriever_weight = retriever_weight
         self.reader_weight = reader_weight
@@ -52,9 +52,9 @@ class WeightedSUm:
     
     def __call__(self, question, contexts, answer):
         
-        retrieval_result = self.retriever(question, contexts)
-        reader_result = self.reader(question, contexts, answer)
-        weighted_result = self.retriever_weight * retrieval_result + -self.reader_weight * reader_result
+        retrieval_result = self.retriever(question, contexts) / self.retri_clean_reuslt
+        reader_result = self.reader_clean_result / self.reader(question, contexts, answer)
+        weighted_result = self.retriever_weight * retrieval_result + self.reader_weight * reader_result
         return weighted_result, retrieval_result, reader_result
 
 
