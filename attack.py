@@ -20,8 +20,8 @@ def main(args):
 
     fitness = WeightedSUm(
         retriever_name=args.retriever_name,
-        question_encoder_name=args.q_name,
-        context_encoder_name=args.c_name,
+        q_name=args.q_name,
+        c_name=args.c_name,
         retriever_weight=args.retriever_weight,
         reader_weight=args.reader_weight
     )
