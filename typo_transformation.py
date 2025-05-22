@@ -92,7 +92,7 @@ class ComboTypoTransformation(BaseTypoTransformation):
             assert len(chosen_indices) == num_words_to_swap
             
             for idx in chosen_indices:
-                print(words[idx])
+                
                 typo_candidates = self.get_replacement_words(words[idx])
                 assert not typo_candidates
                 replace_word = random.choice(typo_candidates)
