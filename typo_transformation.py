@@ -88,9 +88,7 @@ class ComboTypoTransformation(BaseTypoTransformation):
         per_words_indices = []
         for _ in range(pop_size):
             chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
-            new_words = []
-            assert len(chosen_indices) == num_words_to_swap
-            
+            new_words = []            
             for idx in chosen_indices:
                 
                 typo_candidates = self.get_replacement_words(words[idx])
@@ -114,4 +112,4 @@ class ComboTypoTransformation(BaseTypoTransformation):
     
 if __name__ == "__main__":
     transformation = ComboTypoTransformation()
-    print(transformation.get_replacement_words("hello"))
+    print(transformation.get_replacement_words("quick"))
