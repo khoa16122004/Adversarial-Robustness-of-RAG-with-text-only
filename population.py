@@ -87,7 +87,7 @@ class Population:
         words, indices = ind.get_modified()
         if not indices:
             return copy.deepcopy(ind)
-        if random.random() < mutation_prob:
+        if random.random() < 1:
             mutate_idx = random.choice(indices)
             print("Mutate index: ", mutate_idx)
             word_pos = indices.index(mutate_idx)
