@@ -10,7 +10,7 @@ class Individual:
         self.attacked_text = AttackedText(original_text)
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
-        self.original_splits = original_text.split()
+        # self.original_splits = original_text.split()
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
@@ -34,6 +34,7 @@ class Population:
         self.indices_to_modify = indices_to_modify
         self.pct_words_to_swap = pct_words_to_swap # percentage words / sentence to swap
         self.individuals = self._initialize_population()
+        self.original_splits = self.original_text.split()
 
     def _initialize_population(self):
         num_words_to_swap = max(int(self.pct_words_to_swap * len(self.indices_to_modify)), 1)
@@ -93,7 +94,7 @@ class Population:
             print("Mutate index: ", mutate_idx)
             word_pos = indices.index(mutate_idx)
             # original_words = self.original_text.split()
-            typo_candidates = self.transformation.get_replacement_words(ind.original_splits[mutate_idx])
+            typo_candidates = self.transformation.get_replacement_words(self.original_splits[mutate_idx])
             if not typo_candidates:
                 return copy.deepcopy(ind)
             new_word = random.choice(typo_candidates)
