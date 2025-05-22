@@ -80,12 +80,7 @@ class InnerSwapTypoTransformation(BaseTypoTransformation):
         return list(set(words))
 
 class ComboTypoTransformation(BaseTypoTransformation):
-    """Tổng hợp tất cả các kiểu typo."""
-
     def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
-        """
-        Sinh ra pop_size mẫu, mỗi mẫu chọn random một kiểu typo và các từ để thay đổi.
-        """
         random.seed(seed)
         np.random.seed(seed)
         typo_classes = [
@@ -98,7 +93,6 @@ class ComboTypoTransformation(BaseTypoTransformation):
         per_words = []
         per_words_indices = []
         for _ in range(pop_size):
-            # Chọn random các vị trí để thay đổi
             if len(indices_to_modify) < num_words_to_swap:
                 chosen_indices = indices_to_modify
             else:
