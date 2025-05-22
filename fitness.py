@@ -44,3 +44,4 @@ if __name__ == "__main__":
                         "facebook/dpr-ctx_encoder-multiset-base")
     retriever_scores = fitness(question, contexts)
     print(retriever_scores)
+    print(reader_scores)
