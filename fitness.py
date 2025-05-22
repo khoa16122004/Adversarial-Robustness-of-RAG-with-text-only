@@ -1,6 +1,6 @@
 from reader import Reader
 from retrieval import Retriever
-
+import numpy as np
 class FitnessReader:
     def __init__(self, reader_name, original_answer: str):
         self.reader = Reader(reader_name)
@@ -18,15 +18,17 @@ class FitnessRetriever:
         return self.retriever(*args, **kwargs)
 
 class FitnessDual:
-    def __init__(self, retriever_name, reader_name):
-        self.reader = Reader(reader_name)
+    def __init__(self, retriever_name, q_name, c_name):
+        self.reader = Reader(q_name, c_name)
         self.retriever = Retriever(retriever_name)
 
     def __call__(self, questions, contexts, answer):
         
         retrieval_result = self.retriever(questions, contexts)
         reader_result = self.reader(questions, contexts, answer)
-        return retrieval_result, reader_result
+        stacked_result = np.stack([retrieval_result, reader_result], axis=1)
+
+        return stacked_result
     
     def weighted_sum(self, retrieval_result, reader_result, w, h):
         return w * retrieval_result + h * reader_result
@@ -45,3 +47,7 @@ if __name__ == "__main__":
     retriever_scores = fitness(question, contexts)
     print(retriever_scores)
     print(reader_scores)
+    
+    fitness = FitnessDual("Llama-7b", 
+                            "facebook/dpr-question_encoder-multiset-base", 
+                            "facebook/dpr-ctx_encoder-multiset-base") 
