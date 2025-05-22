@@ -93,20 +93,18 @@ class ComboTypoTransformation(BaseTypoTransformation):
         per_words = []
         per_words_indices = []
         for _ in range(pop_size):
-            if len(indices_to_modify) < num_words_to_swap:
-                chosen_indices = indices_to_modify
-            else:
-                chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
+            chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
             new_words = []
+            assert len(chosen_indices) == num_words_to_swap
+            
             for idx in chosen_indices:
                 typo_cls = random.choice(typo_classes)
                 typo_candidates = typo_cls.get_replacement_words(words[idx])
-                if typo_candidates:
-                    replace_word = random.choice(typo_candidates)
-                    if not replace_word:
-                        print("Typo candidate is empty: ", typo_candidates)
-                        raise
-                    new_words.append(random.choice(typo_candidates))
+                replace_word = random.choice(typo_candidates)
+                if not replace_word:
+                    print("Typo candidate is empty: ", typo_candidates)
+                    raise
+                new_words.append(random.choice(typo_candidates))
             per_words.append(new_words)
             per_words_indices.append(chosen_indices)
         return per_words, per_words_indices
