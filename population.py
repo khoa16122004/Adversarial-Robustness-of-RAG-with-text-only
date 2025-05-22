@@ -18,8 +18,6 @@ class Individual:
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
             return self.attacked_text.text
-        print(self.modified_indices)
-        print(self.replacement_words)
         return self.attacked_text.replace_words_at_indices(self.modified_indices, self.replacement_words).text
 
     def set_modified(self, words, indices):
@@ -94,7 +92,6 @@ class Population:
             return copy.deepcopy(ind)
         if random.random() < mutation_prob:
             mutate_idx = random.choice(indices)
-            print("Mutate index: ", mutate_idx)
             word_pos = indices.index(mutate_idx)
             # original_words = self.original_text.split()
             typo_candidates = self.transformation.get_replacement_words(self.original_splits[mutate_idx])
