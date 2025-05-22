@@ -11,12 +11,8 @@ def main(args):
     set_seed_everything(22520691)
     
     question = "When Khoa become researcher?"
-    original_text = (
-        "Khoa developed a strong passion for artificial intelligence during his university years. "
-        "After graduating with honors, he decided to pursue a career in research. "
-        "In 2025, Khoa officially became a researcher at a leading technology institute. "
-        "Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."
-    )
+    original_text = "Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."
+
     answer = "2025"
     
     
