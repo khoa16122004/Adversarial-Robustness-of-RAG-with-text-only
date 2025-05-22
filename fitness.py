@@ -41,7 +41,7 @@ class WeightedSUm:
         self.retriever = Retriever(q_name, c_name)
         self.original_text = original_text
         self.retri_clean_reuslt = self.retriever(question, [original_text])
-        self.target_text = self.target_text
+        self.target_text = target_text
         
         # print(self.retri_clean_reuslt, self.reader_clean_result)
         # raise
