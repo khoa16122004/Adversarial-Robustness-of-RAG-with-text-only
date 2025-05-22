@@ -41,6 +41,8 @@ class Population:
             num_words_to_swap,
             self.pop_size
         )
+        print(per_words)
+        print(per_words_indices)
         individuals = []
         for w, i in zip(per_words, per_words_indices):
             ind = Individual(self.original_text, w, i)
@@ -101,7 +103,8 @@ def test_population():
 
     # Dùng transformation thực tế
     transformation = ComboTypoTransformation()
-    population = Population(original_text, pop_size, transformation, indices_to_modify, pct_words_to_swap=0.3)
+    population = Population(original_text, pop_size, transformation, 
+                            indices_to_modify, pct_words_to_swap=0.3)
 
     print("Initial population:")
     for ind in population.individuals:
