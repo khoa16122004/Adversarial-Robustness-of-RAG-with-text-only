@@ -85,7 +85,7 @@ class Population:
         return Individual(self.original_text, child1_words, child1_indices), \
             Individual(self.original_text, child2_words, child2_indices)
 
-    def mutation(self, ind: Individual, mutation_prob=0.4):
+    def mutation(self, ind: Individual, mutation_prob=0.9):
         words, indices = ind.get_modified()
         if not indices:
             return copy.deepcopy(ind)
