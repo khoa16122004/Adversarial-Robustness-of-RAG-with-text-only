@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument("--reader_weight", type=float, default=0.5, help="Weight for reader")
     parser.add_argument("--n_iter", type=int, default=10, help="Number of GA iterations")
     parser.add_argument("--tournament_size", type=int, default=4, help="Tournament size")
-    parser.add_argument("--pop_size", type=int, default=20, help="Population size")
+    parser.add_argument("--pop_size", type=int, default=4, help="Population size")
     
     parser.add_argument("--pct_words_to_swap", type=float, default=0.3, help="Percentage of words to swap")
     args = parser.parse_args()
