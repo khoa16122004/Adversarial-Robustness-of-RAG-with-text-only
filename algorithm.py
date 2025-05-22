@@ -1,5 +1,4 @@
 from population import Population
-from fitness import Fitness
 from individual import Individual
 import torch
 import random
@@ -13,12 +12,12 @@ from utils import set_seed_everything
 set_seed_everything(222520691)
 
 class GA:
-    def __init__(self, n_iter: int, 
-                 population: 'Population', 
-                 fitness: 'Fitness',
-                 tourament_size: int,
-                 question: str,
-                 answer: str):
+    def __init__(self, n_iter, 
+                 population, 
+                 fitness,
+                 tourament_size,
+                 question,
+                 answer):
         self.n_iter = n_iter
         self.pop = population
         self.tourament_size = tourament_size

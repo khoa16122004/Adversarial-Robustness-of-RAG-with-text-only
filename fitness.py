@@ -1,6 +1,8 @@
 from reader import Reader
 from retrieval import Retriever
 import numpy as np
+
+
 class FitnessReader:
     def __init__(self, reader_name, original_answer: str):
         self.reader = Reader(reader_name)
