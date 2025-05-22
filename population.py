@@ -54,12 +54,12 @@ class Population:
         words1, indices1 = ind1.get_modified()
         words2, indices2 = ind2.get_modified()
 
-        maintain_indices = list(set(indices1) & set(indices2))
-        ind1_only = list(set(indices1) - set(maintain_indices))
-        ind2_only = list(set(indices2) - set(maintain_indices))
+        maintain_indices = list(set(indices1) & set(indices2)) # union
+        ind1_only = list(set(indices1) - set(maintain_indices)) # 1\union
+        ind2_only = list(set(indices2) - set(maintain_indices)) # 2\union
 
-        cross_num = int((len(indices1) - len(maintain_indices)) * crossover_prob)
-        maintain_num = len(indices1) - len(maintain_indices) - cross_num
+        cross_num = int(len(ind1_only)) * crossover_prob # chỉ riêng 1 * crossover_prob
+        maintain_num = len(ind1_only) - cross_num
 
         if len(ind2_only) >= cross_num and len(ind1_only) >= maintain_num:
             maintain_indices += random.sample(ind1_only, k=maintain_num)
@@ -107,14 +107,16 @@ def test_population():
     population = Population(original_text, pop_size, transformation, 
                             indices_to_modify, pct_words_to_swap=0.3)
 
-    print("Initial population:")
-    for ind in population.individuals:
-        print(ind.get_perturbed_text())
+    # print("Initial population:")
+    # for ind in population.individuals:
+    #     print(ind.get_perturbed_text())
 
-    # # Thử crossover
-    # child = population.crossover(population.individuals[0], population.individuals[1])
-    # print("\nCrossover result:")
-    # print(child.get_perturbed_text())
+    # Thử crossover
+    print(population.individuals[0].get_perturbed_text())
+    print(population.individuals[1].get_perturbed_text())
+    child = population.crossover(population.individuals[0], population.individuals[1])
+    print("\nCrossover result:")
+    print(child.get_perturbed_text())
 
     # # Thử mutation
     # mutated = population.mutation(population.individuals[0])
