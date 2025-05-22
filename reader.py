@@ -42,7 +42,7 @@ class Reader(torch.nn.Module):
             return_dict_in_generate=True,
             output_hidden_states=True,
             output_scores=True,
-            do_sample=False  # <-- rõ ràng greedy decoding
+            do_sample=False  # greedy decoding
         )
         if self.is_decoder:
             self.tokenizer.padding_side = "left"
