@@ -1,5 +1,4 @@
-from population import Population
-from individual import Individual
+from population import Population, Individual
 import torch
 import random
 from torchvision.utils import save_image
