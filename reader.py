@@ -151,7 +151,7 @@ class Reader(torch.nn.Module):
 if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
     question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion foy artificial intelligence during his university rs.. Aftwr graduating dith honors, he ddcided to pursue aa career in r4search.. In 2025, Khoa officilaly became a researcher at a leadinf techno,ogy institute. Since then, he's has contributed to several groundbreaking projects is puter vision ane natural lengvich processing."]
+    contexts = ["Khoa developed at strong pwssion for artificial intelligence duribg his univers9ty years. After graduatinb wifh honors, h decided to pursue e career in research. In 2025, Ihoa officiall7 became a researcher at a leading technolegy institute. Since then, he has contrihuted to several groundbreaking projcets in computer vksion and natoural language processing."]
     answers = ['2025', "dont know"]
     
     pred = reader.generate(question, contexts)
