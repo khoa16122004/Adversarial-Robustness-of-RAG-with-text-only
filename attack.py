@@ -32,7 +32,7 @@ def main(args):
         n_iter=args.n_iter,
         population=population,
         fitness=fitness,
-        tournament_size=args.tourament_size,
+        tournament_size=args.tournament_size,
         question=question,
         answer=answer
     )
