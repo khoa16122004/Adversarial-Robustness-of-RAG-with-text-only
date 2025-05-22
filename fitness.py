@@ -49,5 +49,8 @@ if __name__ == "__main__":
     print(reader_scores)
     
     fitness = FitnessDual("Llama-7b", 
-                            "facebook/dpr-question_encoder-multiset-base", 
-                            "facebook/dpr-ctx_encoder-multiset-base") 
+                          "facebook/dpr-question_encoder-multiset-base", 
+                          "facebook/dpr-ctx_encoder-multiset-base") 
+    
+    dual_scores = fitness(question, contexts, answers)
+    print(dual_scores)
