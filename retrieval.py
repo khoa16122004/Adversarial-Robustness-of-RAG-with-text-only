@@ -41,7 +41,7 @@ class Retriever(torch.nn.Module):
         context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
         print(query_embeddings.shape, context_embeddings.shape)
         # Cosine similarity (batch-wise)
-        scores = torch.matmul(query_embeddings, context_embeddings.T).unsqueeze(0)
+        scores = torch.matmul(query_embeddings, context_embeddings.T).squeeze(0)
         return scores.detach().cpu().numpy()
 
     def encode(self, inputs, mode="context"):
