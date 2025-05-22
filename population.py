@@ -104,6 +104,7 @@ def test_population():
     original_text = "The quick brown fox jumps over the lazy dog."
     print(original_text)
     indices_to_modify = list(range(len(original_text.split())))
+    print(indices_to_modify)
     pop_size = 5
 
     transformation = DummyTransformation()
