@@ -36,12 +36,12 @@ class FitnessDual:
 class WeightedSUm:
     def __init__(self, retriever_name, q_name, c_name,
                  retriever_weight, reader_weight,
-                 question, original_text, answer):
+                 question, original_text, answer, target_answer="dont know"):
         self.reader = Reader(retriever_name)
         self.retriever = Retriever(q_name, c_name)
         self.original_text = original_text
         self.retri_clean_reuslt = self.retriever(question, [original_text])
-        self.reader_clean_result = self.reader(question, [original_text], answer)
+        self.target_text = self.target_text
         
         # print(self.retri_clean_reuslt, self.reader_clean_result)
         # raise
@@ -53,7 +53,7 @@ class WeightedSUm:
     def __call__(self, question, contexts, answer):
         
         retrieval_result = self.retriever(question, contexts) / self.retri_clean_reuslt
-        reader_result =  self.reader(question, contexts, answer) / self.reader_clean_result
+        reader_result = self.reader(question, contexts, self.target_text) / self.reader(question, contexts, answer)
         weighted_result = self.retriever_weight * retrieval_result + self.reader_weight * reader_result
         return weighted_result, retrieval_result, reader_result
 
