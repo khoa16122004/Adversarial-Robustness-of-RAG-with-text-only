@@ -134,7 +134,7 @@ class Reader(torch.nn.Module):
             label_ids = label_ids[:, :min_len]
 
         outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
-        scores = np.aself._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
         scores = scores * 100
 
         return scores
