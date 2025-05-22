@@ -24,7 +24,7 @@ class GA:
         self.question = question
         self.answer = answer
 
-    def tournament_selection_indices(self, fitness_array: np.ndarray, tournament_size: int = 4):
+    def tournament_selection(self, fitness_array: np.ndarray, tournament_size: int = 4):
         selected_indices = []
         for j in range(0, len(fitness_array), tournament_size):
             group_fitness = fitness_array[j : j + tournament_size]
