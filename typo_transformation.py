@@ -81,6 +81,38 @@ class InnerSwapTypoTransformation(BaseTypoTransformation):
 
 class ComboTypoTransformation(BaseTypoTransformation):
     """Tổng hợp tất cả các kiểu typo."""
+
+    def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
+        """
+        Sinh ra pop_size mẫu, mỗi mẫu chọn random một kiểu typo và các từ để thay đổi.
+        """
+        random.seed(seed)
+        np.random.seed(seed)
+        typo_classes = [
+            KeyboardTypoTransformation(),
+            NaturalTypoTransformation(),
+            TruncateTypoTransformation(),
+            InnerSwapTypoTransformation()
+        ]
+        words = original_text.split()
+        per_words = []
+        per_words_indices = []
+        for _ in range(pop_size):
+            # Chọn random các vị trí để thay đổi
+            if len(indices_to_modify) < num_words_to_swap:
+                chosen_indices = indices_to_modify
+            else:
+                chosen_indices = random.sample(indices_to_modify, num_words_to_swap)
+            new_words = words.copy()
+            for idx in chosen_indices:
+                typo_cls = random.choice(typo_classes)
+                typo_candidates = typo_cls.get_replacement_words(words[idx])
+                if typo_candidates:
+                    new_words[idx] = random.choice(typo_candidates)
+            per_words.append(new_words)
+            per_words_indices.append(chosen_indices)
+        return per_words, per_words_indices
+
     def get_replacement_words(self, word):
         words = []
         words += KeyboardTypoTransformation().get_replacement_words(word)
@@ -88,3 +120,7 @@ class ComboTypoTransformation(BaseTypoTransformation):
         words += TruncateTypoTransformation().get_replacement_words(word)
         words += InnerSwapTypoTransformation().get_replacement_words(word)
         return list(set(words))
+    
+if __name__ == "__main__":
+    transformation = ComboTypoTransformation()
+    print(transformation.get_replacement_words("hello"))
