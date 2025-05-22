@@ -61,6 +61,7 @@ class WeightedSUm:
         print(a)
         print(b)
         print(a/b)
+        print("context: ", contexts)
         reader_result = a / b
         weighted_result = self.retriever_weight * retrieval_result + self.reader_weight * reader_result
         return weighted_result, retrieval_result, reader_result
