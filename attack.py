@@ -3,9 +3,13 @@ from algorithm import GA
 from population import create_population, Population, Individual
 from fitness import WeightedSUm
 import numpy as np
+from utils import set_seed_everything
 
 
 def main(args):
+    
+    set_seed_everything(22520691)
+    
     question = "When Khoa become researcher?"
     original_text = (
         "Khoa developed a strong passion for artificial intelligence during his university years. "
