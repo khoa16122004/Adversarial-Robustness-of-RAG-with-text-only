@@ -44,7 +44,7 @@ class Reader(torch.nn.Module):
             output_scores=True,
             do_sample=False,  # greedy decoding
             top_p=None,
-            temperature=None,
+            temperature =None,
             
         )
         if self.is_decoder:
@@ -162,6 +162,6 @@ if __name__ == "__main__":
         scores.append(score)
     print(scores[1] / scores[0])
     score_normalize = np.array(scores) / np.array(scores).sum()
-    print("Score: ", score_normalize)
+    print("Score: ", scores)
         
     
