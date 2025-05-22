@@ -14,12 +14,12 @@ class GA:
     def __init__(self, n_iter, 
                  population, 
                  fitness,
-                 tourament_size,
+                 tournament_size,
                  question,
                  answer):
         self.n_iter = n_iter
         self.pop = population
-        self.tourament_size = tourament_size
+        self.tournament_size = tournament_size
         self.fitness = fitness
         self.question = question
         self.answer = answer
