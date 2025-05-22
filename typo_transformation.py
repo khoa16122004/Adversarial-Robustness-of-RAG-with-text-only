@@ -1,0 +1,90 @@
+import os
+import copy
+import random
+import numpy as np
+
+class BaseTypoTransformation:
+    def __init__(self):
+        self.typos = {}
+        self.NN = {}
+        natural_path = os.path.join("noise", "en.natural")
+        key_path = os.path.join("noise", "en.key")
+        if os.path.exists(natural_path):
+            for line in open(natural_path):
+                line = line.strip().split()
+                self.typos[line[0]] = line[1:]
+        if os.path.exists(key_path):
+            for line in open(key_path):
+                line = line.split()
+                self.NN[line[0]] = line[1:]
+
+    def get_replacement_words(self, word):
+        raise NotImplementedError("Implement in subclass")
+
+class KeyboardTypoTransformation(BaseTypoTransformation):
+    def get_replacement_words(self, word):
+        words = []
+        chars = list(word)
+        for i, char in enumerate(chars):
+            if char in self.NN:
+                for w in self.NN[char.lower()]:
+                    replace_word = copy.deepcopy(chars)
+                    replace_word[i] = w
+                    words.append(''.join(replace_word))
+            elif char.lower() in self.NN:
+                for w in self.NN[char.lower()]:
+                    replace_word = copy.deepcopy(chars)
+                    replace_word[i] = w.upper()
+                    words.append(''.join(replace_word))
+        return list(set(words))
+
+class NaturalTypoTransformation(BaseTypoTransformation):
+    def get_replacement_words(self, word):
+        return self.typos.get(word, [])
+
+class TruncateTypoTransformation(BaseTypoTransformation):
+    def get_replacement_words(self, word, minlen=3, cutoff=3):
+        words = []
+        chars = list(word)
+        tmp_cutoff = cutoff
+        while len(chars) > minlen and tmp_cutoff > 0:
+            chars = chars[:-1]
+            tmp_cutoff -= 1
+            words.append(''.join(chars))
+        chars = list(word)
+        tmp_cutoff = cutoff
+        while len(chars) > minlen and tmp_cutoff > 0:
+            chars = chars[1:]
+            tmp_cutoff -= 1
+            words.append(''.join(chars))
+        return words
+
+class InnerSwapTypoTransformation(BaseTypoTransformation):
+    def get_replacement_words(self, word):
+        def __shuffle_string__(_word, _seed=42):
+            chars = list(_word)
+            if _seed is not None:
+                np.random.seed(_seed)
+            np.random.shuffle(chars)
+            return ''.join(chars)
+        words = []
+        if len(word) <= 3:
+            return words
+        tries = 0
+        min_perturb = min(int(len(word)*0.4),2)
+        while tries < 5:
+            tries += 1
+            start = random.randrange(1, len(word)-min_perturb+1)
+            first, mid, last = word[0:start], word[start:start+min_perturb], word[start+min_perturb:]
+            words.append(first + __shuffle_string__(mid) + ''.join(last))
+        return list(set(words))
+
+class ComboTypoTransformation(BaseTypoTransformation):
+    """Tổng hợp tất cả các kiểu typo."""
+    def get_replacement_words(self, word):
+        words = []
+        words += KeyboardTypoTransformation().get_replacement_words(word)
+        words += NaturalTypoTransformation().get_replacement_words(word)
+        words += TruncateTypoTransformation().get_replacement_words(word)
+        words += InnerSwapTypoTransformation().get_replacement_words(word)
+        return list(set(words))

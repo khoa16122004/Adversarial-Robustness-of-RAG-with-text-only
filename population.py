@@ -1,6 +1,7 @@
 import random
 import copy
 from textattack.shared import AttackedText
+from typo_transformation import ComboTypoTransformation
 
 class Individual:
     def __init__(self, original_text, 
@@ -14,7 +15,6 @@ class Individual:
         if not self.modified_indices or not self.replacement_words:
             return self.attacked_text.text
         
-        print(self.modified_indices, self.replacement_words)
         return self.attacked_text.replace_words_at_indices(self.modified_indices, self.replacement_words).text
 
     def set_modified(self, words, indices):
@@ -94,20 +94,13 @@ class Population:
             return copy.deepcopy(ind)
         
 def test_population():
-    class DummyTransformation:
-        def get_perturbed_sequences(self, attacked_text, indices_to_modify, num_words_to_swap, pop_size):
-            # Tạo các hoán vị giả lập cho demo
-            per_words = [["foo"] * num_words_to_swap for _ in range(pop_size)]
-            per_words_indices = [random.sample(indices_to_modify, num_words_to_swap) for _ in range(pop_size)]
-            return per_words, per_words_indices
-
     original_text = "The quick brown fox jumps over the lazy dog."
-    print(original_text)
     indices_to_modify = list(range(len(original_text.split())))
     print(indices_to_modify)
     pop_size = 5
 
-    transformation = DummyTransformation()
+    # Dùng transformation thực tế
+    transformation = ComboTypoTransformation()
     population = Population(original_text, pop_size, transformation, indices_to_modify, pct_words_to_swap=0.3)
 
     print("Initial population:")
