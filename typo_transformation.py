@@ -99,6 +99,7 @@ class ComboTypoTransformation(BaseTypoTransformation):
             
             for idx in chosen_indices:
                 typo_cls = random.choice(typo_classes)
+                print(words[idx])
                 typo_candidates = typo_cls.get_replacement_words(words[idx])
                 assert not typo_candidates
                 replace_word = random.choice(typo_candidates)
