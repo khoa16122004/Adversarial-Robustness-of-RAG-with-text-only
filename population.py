@@ -36,7 +36,7 @@ class Population:
     def _initialize_population(self):
         num_words_to_swap = max(int(self.pct_words_to_swap * len(self.indices_to_modify)), 1)
         per_words, per_words_indices = self.transformation.get_perturbed_sequences(
-            AttackedText(self.original_text),
+            self.original_text,
             self.indices_to_modify,
             num_words_to_swap,
             self.pop_size
