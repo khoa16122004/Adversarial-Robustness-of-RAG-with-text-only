@@ -102,6 +102,10 @@ class ComboTypoTransformation(BaseTypoTransformation):
                 typo_cls = random.choice(typo_classes)
                 typo_candidates = typo_cls.get_replacement_words(words[idx])
                 if typo_candidates:
+                    replace_word = random.choice(typo_candidates)
+                    if not replace_word:
+                        print("Typo candidate is empty: ", typo_candidates)
+                        raise
                     new_words.append(random.choice(typo_candidates))
             per_words.append(new_words)
             per_words_indices.append(chosen_indices)
