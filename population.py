@@ -111,15 +111,15 @@ def test_population():
     for ind in population.individuals:
         print(ind.get_perturbed_text())
 
-    # Thử crossover
-    child = population.crossover(population.individuals[0], population.individuals[1])
-    print("\nCrossover result:")
-    print(child.get_perturbed_text())
+    # # Thử crossover
+    # child = population.crossover(population.individuals[0], population.individuals[1])
+    # print("\nCrossover result:")
+    # print(child.get_perturbed_text())
 
-    # Thử mutation
-    mutated = population.mutation(population.individuals[0])
-    print("\nMutation result:")
-    print(mutated.get_perturbed_text())
+    # # Thử mutation
+    # mutated = population.mutation(population.individuals[0])
+    # print("\nMutation result:")
+    # print(mutated.get_perturbed_text())
 
 if __name__ == "__main__":
     test_population()
