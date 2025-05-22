@@ -42,8 +42,6 @@ class Population:
             num_words_to_swap,
             self.pop_size
         )
-        print(per_words)
-        print(per_words_indices)
         individuals = []
         for w, i in zip(per_words, per_words_indices):
             ind = Individual(self.original_text, w, i)
