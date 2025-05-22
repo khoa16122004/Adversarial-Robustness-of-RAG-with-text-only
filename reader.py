@@ -44,7 +44,7 @@ class Reader(torch.nn.Module):
             output_scores=True,
             do_sample=False,  # greedy decoding
             top_p=None,
-            temparature=None,
+            temperature=None,
             
         )
         if self.is_decoder:
