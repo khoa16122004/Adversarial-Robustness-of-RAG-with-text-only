@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 "cat"]
     answers = '2025'
     reader_scores = fitness(question, contexts, answers)
-    fitness = Reader("facebook/dpr-question_encoder-multiset-base", 
-                     "facebook/dpr-ctx_encoder-multiset-base")
+    fitness = Retriever("facebook/dpr-question_encoder-multiset-base", 
+                        "facebook/dpr-ctx_encoder-multiset-base")
     retriever_scores = fitness(question, contexts)
     print(retriever_scores)
