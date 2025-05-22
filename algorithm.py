@@ -79,6 +79,10 @@ class GA:
                 best_score1 = current_best_score1
                 best_score2 = current_best_score2
 
+            print("Best fitness: ", current_best_fitness)
+            print("Best score1: ", current_best_score1)
+            print("Best score2: ", current_best_score2)
+            
             pool_indices = np.arange(len(pool))
             selected_pool_index_parts = []
             for _ in range(self.tournament_size // 2):
