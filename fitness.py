@@ -55,7 +55,11 @@ class WeightedSUm:
     def __call__(self, question, contexts, answer):
         
         retrieval_result = self.retriever(question, contexts) / self.retri_clean_reuslt
-        reader_result = self.reader(question, contexts, self.target_text) / self.reader(question, contexts, answer)
+        
+        a = self.reader(question, contexts, self.target_text)
+        b = self.reader(question, contexts, self.answer)
+        print(a, b)
+        reader_result = a / b
         weighted_result = self.retriever_weight * retrieval_result + self.reader_weight * reader_result
         return weighted_result, retrieval_result, reader_result
 
