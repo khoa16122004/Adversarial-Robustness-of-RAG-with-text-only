@@ -42,7 +42,7 @@ class Retriever(torch.nn.Module):
 
         # Cosine similarity (batch-wise)
         scores = torch.matmul(query_embeddings, context_embeddings.T)
-        return scores
+        return scores.detach().cpu().numpy()
 
     def encode(self, inputs, mode="context"):
         with torch.no_grad():

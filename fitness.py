@@ -11,7 +11,7 @@ class FitnessReader:
 
 class FitnessRetriever:
     def __init__(self, retriever_name):
-        self.retriever = Retriever(retriever_name)
+        self.retriever = Retriever(**retriever_name)
 
     def __call__(self, *args, **kwargs):
         # Gọi retriever với args phù hợp
@@ -39,6 +39,7 @@ if __name__ == "__main__":
                 "dog",
                 "cat"]
     answers = '2025'
-    scores = fitness(question, contexts, answers)
-    
-    print(scores)
+    reader_scores = fitness(question, contexts, answers)
+    fitness = Reader(("facebook/dpr-question_encoder-multiset-base", "facebook/dpr-ctx_encoder-multiset-base"))
+    retriever_scores = fitness(question, contexts)
+    print(retriever_scores)
