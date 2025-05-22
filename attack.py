@@ -44,7 +44,7 @@ def main(args):
     )
 
     ga.solve_rule()
-    best_individual = ga.pop.individuals.get_perubed_text()[0]
+    best_individual = ga.best_individual
     adv_output = fitness.reader.generate(question, [best_individual])
     
     print("Best perturbed text: ", best_individual)
