@@ -97,7 +97,7 @@ class Reader(torch.nn.Module):
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
             avg_nll = torch.mean(nll)  # Sửa: lấy mean thay vì sum
             result.append(float(torch.exp(-avg_nll)))
-        return result
+        return np.array(result)
 
         
     # def _cal_label_prob(self, probs, labels):
@@ -134,7 +134,7 @@ class Reader(torch.nn.Module):
             label_ids = label_ids[:, :min_len]
 
         outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        scores = np.aself._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
         scores = scores * 100
 
         return scores
