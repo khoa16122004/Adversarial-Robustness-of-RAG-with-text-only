@@ -90,9 +90,8 @@ class ComboTypoTransformation(BaseTypoTransformation):
             chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
             new_words = []            
             for idx in chosen_indices:
-                
+                print(words[idx])
                 typo_candidates = self.get_replacement_words(words[idx])
-                assert not typo_candidates
                 replace_word = random.choice(typo_candidates)
                 if not replace_word:
                     print("Typo candidate is empty: ", typo_candidates)
