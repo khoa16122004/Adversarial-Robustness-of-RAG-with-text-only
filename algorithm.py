@@ -79,19 +79,19 @@ class GA:
                 best_score1 = current_best_score1
                 best_score2 = current_best_score2
 
-            pool_indices = list(range(len(pool)))
-            selected_pool_index = []
-
-            for i in range(self.tournament_size // 2):
-                random.shuffle(pool_indices)
-                shuffled_fitness = pool_fitness_weighted[pool_indices]
-                selected_in_shuffle = self.tournament_selection(shuffled_fitness)
-                selected_pool_index.append(pool_indices[selected_in_shuffle])
+            pool_indices = np.arange(len(pool))
+            selected_pool_index_parts = []
+            for _ in range(self.tournament_size // 2):
+                np.random.shuffle(pool_indices)
+                selected = self.tournament_selection(pool_fitness_weighted[pool_indices])
+                selected_pool_index_parts.append(pool_indices[selected])
+            selected_pool_index = np.concatenate(selected_pool_index_parts)
 
             P = [pool[i] for i in selected_pool_index]
             P_fitness_weighted = pool_fitness_weighted[selected_pool_index]
             P_score1 = pool_score1[selected_pool_index]
             P_score2 = pool_score2[selected_pool_index]
+            print("Len Population: ", len(P))
 
         self.pop.individuals = P
 
