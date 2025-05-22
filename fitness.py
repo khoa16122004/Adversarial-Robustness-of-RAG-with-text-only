@@ -35,12 +35,21 @@ class FitnessDual:
     
 class WeightedSUm:
     def __init__(self, retriever_name, q_name, c_name,
-                 retriever_weight, reader_weight):
+                 retriever_weight, reader_weight,
+                 question, original_text):
         self.reader = Reader(retriever_name)
         self.retriever = Retriever(q_name, c_name)
+        self.original_text = original_text
+        self.retri_clean_reuslt = self.retriever(question, [original_text])
+        self.reader_clean_result = self.reader(question, [original_text], answer)
+        
+        print(self.retri_clean_reuslt, self.reader_clean_result)
+        raise
         
         self.retriever_weight = retriever_weight
         self.reader_weight = reader_weight
+    
+    
     def __call__(self, question, contexts, answer):
         
         retrieval_result = self.retriever(question, contexts)
