@@ -4,6 +4,9 @@ from transformers import LlamaForCausalLM, LlamaTokenizer, MistralForCausalLM
 import os
 import json
 import numpy as np
+from utils import set_seed_everything
+set_seed_everything(222520691)
+
 cls_mapping = {
     "Llama-7b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-7b-chat-hf", "meta-llama"),
     "Llama-13b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-13b-chat-hf", "meta-llama"),
@@ -141,20 +144,20 @@ class Reader(torch.nn.Module):
     
 
 
-if __name__ == "__main__":
-    reader = Reader(model_name="Llama-7b")
-    question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."]
-    answers = ['2025', "He can't become a researcher", "a cat and a dog"]
+# if __name__ == "__main__":
+#     reader = Reader(model_name="Llama-7b")
+#     question = "When Khoa become researcher?"
+#     contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."]
+#     answers = ['2025', "He can't become a researcher", "a cat and a dog"]
     
-    pred = reader.generate(question, contexts)
-    scores = []
-    print("Prediction: ", pred)
-    for ans in answers:
-        score = reader(question, contexts, ans)
-        scores.append(score)
+#     pred = reader.generate(question, contexts)
+#     scores = []
+#     print("Prediction: ", pred)
+#     for ans in answers:
+#         score = reader(question, contexts, ans)
+#         scores.append(score)
     
-    score_normalize = np.array(scores) / np.array(scores).sum()
-    print("Score: ", score_normalize)
+#     score_normalize = np.array(scores) / np.array(scores).sum()
+#     print("Score: ", score_normalize)
         
     

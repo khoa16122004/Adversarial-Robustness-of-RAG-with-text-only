@@ -2,6 +2,8 @@ import os
 import copy
 import random
 import numpy as np
+from utils import set_seed_everything
+set_seed_everything(222520691)
 
 class BaseTypoTransformation:
     def __init__(self):

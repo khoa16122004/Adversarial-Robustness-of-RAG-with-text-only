@@ -22,35 +22,48 @@ class FitnessDual:
         self.reader = Reader(retriever_name)
         self.retriever = Retriever(q_name, c_name)
 
-    def __call__(self, questions, contexts, answer):
+    def __call__(self, question, contexts, answer):
         
-        retrieval_result = self.retriever(questions, contexts)
-        reader_result = self.reader(questions, contexts, answer)
+        retrieval_result = self.retriever(question, contexts)
+        reader_result = self.reader(question, contexts, answer)
         stacked_result = np.stack([retrieval_result, reader_result], axis=1)
 
         return stacked_result
     
-    def weighted_sum(self, retrieval_result, reader_result, w, h):
-        return w * retrieval_result + h * reader_result
+    
+class WeightedSUm:
+    def __init__(self, retriever_name, q_name, c_name,
+                 retriever_weight, reader_weight):
+        self.reader = Reader(retriever_name)
+        self.retriever = Retriever(q_name, c_name)
+        
+        self.retriever_weight = retriever_weight
+        self.reader_weight = reader_weight
+    def __call__(self, question, contexts, answer):
+        
+        retrieval_result = self.retriever(question, contexts)
+        reader_result = self.reader(question, contexts, answer)
+        weighted_result = self.retriever_weight * retrieval_result + -self.reader_weight * reader_result
+        return weighted_result, retrieval_result, reader_result
 
 
-if __name__ == "__main__":
-    fitness = Reader(model_name="Llama-7b")
-    question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
-                "dog",
-                "cat"]
-    answers = '2025'
-    reader_scores = fitness(question, contexts, answers)
-    fitness = Retriever("facebook/dpr-question_encoder-multiset-base", 
-                        "facebook/dpr-ctx_encoder-multiset-base")
-    retriever_scores = fitness(question, contexts)
-    print(retriever_scores)
-    print(reader_scores)
+# if __name__ == "__main__":
+#     fitness = Reader(model_name="Llama-7b")
+#     question = "When Khoa become researcher?"
+#     contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
+#                 "dog",
+#                 "cat"]
+#     answers = '2025'
+#     reader_scores = fitness(question, contexts, answers)
+#     fitness = Retriever("facebook/dpr-question_encoder-multiset-base", 
+#                         "facebook/dpr-ctx_encoder-multiset-base")
+#     retriever_scores = fitness(question, contexts)
+#     print(retriever_scores)
+#     print(reader_scores)
     
-    fitness = FitnessDual("Llama-7b", 
-                          "facebook/dpr-question_encoder-multiset-base", 
-                          "facebook/dpr-ctx_encoder-multiset-base") 
+#     fitness = FitnessDual("Llama-7b", 
+#                           "facebook/dpr-question_encoder-multiset-base", 
+#                           "facebook/dpr-ctx_encoder-multiset-base") 
     
-    dual_scores = fitness(question, contexts, answers)
-    print(dual_scores)
+#     dual_scores = fitness(question, contexts, answers)
+#     print(dual_scores)

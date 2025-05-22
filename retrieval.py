@@ -1,13 +1,13 @@
 import torch
 from transformers import BertModel, DPRContextEncoder, DPRQuestionEncoder, AutoTokenizer
-from utils import set_seed_everything
 import numpy as np
 
+from utils import set_seed_everything
+set_seed_everything(222520691)
 
 class Retriever(torch.nn.Module):
     def __init__(self, q_name, c_name):
         super().__init__()
-        set_seed_everything(222520691)
         self.q_name = q_name
         self.c_name = c_name
         self.tokenizer, self.d_encoder, self.q_encoder = self.load_retriever()
@@ -82,12 +82,12 @@ class Contriever(BertModel):
             raise NotImplementedError("Unsupported pooling method")
 
 
-if __name__ == "__main__":
-    retriever = Retriever("facebook/dpr-question_encoder-multiset-base", 
-                          "facebook/dpr-ctx_encoder-multiset-base")
-    question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
-                "dog",
-                "cat"]
-    scores = retriever(question, contexts)
-    print(scores / scores.sum())
+# if __name__ == "__main__":
+#     retriever = Retriever("facebook/dpr-question_encoder-multiset-base", 
+#                           "facebook/dpr-ctx_encoder-multiset-base")
+#     question = "When Khoa become researcher?"
+#     contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
+#                 "dog",
+#                 "cat"]
+#     scores = retriever(question, contexts)
+#     print(scores / scores.sum())
