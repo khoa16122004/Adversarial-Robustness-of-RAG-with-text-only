@@ -99,7 +99,6 @@ class Population:
 def test_population():
     original_text = "The quick brown fox jumps over the lazy dog."
     indices_to_modify = list(range(len(original_text.split())))
-    print(indices_to_modify)
     pop_size = 5
 
     # Dùng transformation thực tế
@@ -112,8 +111,8 @@ def test_population():
     #     print(ind.get_perturbed_text())
 
     # Thử crossover
-    print(population.individuals[0].get_perturbed_text())
-    print(population.individuals[1].get_perturbed_text())
+    print("First: ", population.individuals[0].get_perturbed_text())
+    print("Second: ", population.individuals[1].get_perturbed_text())
     child = population.crossover(population.individuals[0], population.individuals[1])
     print("\nCrossover result:")
     print(child.get_perturbed_text())
