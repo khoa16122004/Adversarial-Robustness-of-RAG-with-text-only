@@ -47,6 +47,7 @@ def main(args):
     best_individual = ga.best_individual.get_perturbed_text()
     adv_output = fitness.reader.generate(question, [best_individual])
     origial_output = fitness.reader.generate(question, [original_text])
+    print(fitness(question, [best_individual], answer))
     print("Best perturbed text: ", best_individual)
     print("Adversarial output: ", adv_output)
     print("original output: ", origial_output)
