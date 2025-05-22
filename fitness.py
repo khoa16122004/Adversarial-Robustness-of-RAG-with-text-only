@@ -1,7 +1,9 @@
 from reader import Reader
 from retrieval import Retriever
 import numpy as np
+from utils import set_seed_everything
 
+set_seed_everything(222520691)
 
 class FitnessReader:
     def __init__(self, reader_name, original_answer: str):
