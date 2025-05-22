@@ -102,6 +102,7 @@ def test_population():
             return per_words, per_words_indices
 
     original_text = "The quick brown fox jumps over the lazy dog."
+    print(original_text)
     indices_to_modify = list(range(len(original_text.split())))
     pop_size = 5
 
