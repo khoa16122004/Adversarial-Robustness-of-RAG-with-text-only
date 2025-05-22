@@ -19,8 +19,8 @@ class FitnessRetriever:
 
 class FitnessDual:
     def __init__(self, retriever_name, q_name, c_name):
-        self.reader = Reader(q_name, c_name)
-        self.retriever = Retriever(retriever_name)
+        self.reader = Reader(retriever_name)
+        self.retriever = Retriever(q_name, c_name)
 
     def __call__(self, questions, contexts, answer):
         
