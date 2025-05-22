@@ -123,8 +123,9 @@ def test_population():
     # Thử crossover
     print("First: ", population.individuals[0].get_perturbed_text())
     print("Second: ", population.individuals[1].get_perturbed_text())
-    child = population.crossover(population.individuals[0], population.individuals[1])
+    child1, child2 = population.crossover(population.individuals[0], population.individuals[1])
     print("\nCrossover result:")
+    print(child1.get_perturbed_text())
     print(child.get_perturbed_text())
 
     # # Thử mutation
