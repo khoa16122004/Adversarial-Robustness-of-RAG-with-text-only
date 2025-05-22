@@ -108,6 +108,6 @@ class ComboTypoTransformation(BaseTypoTransformation):
         words += InnerSwapTypoTransformation().get_replacement_words(word)
         return list(set(words))
     
-if __name__ == "__main__":
-    transformation = ComboTypoTransformation()
-    print(transformation.get_replacement_words("quick"))
+# if __name__ == "__main__":
+#     transformation = ComboTypoTransformation()
+#     print(transformation.get_replacement_words("quick"))

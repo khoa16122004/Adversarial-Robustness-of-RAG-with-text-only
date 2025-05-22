@@ -54,26 +54,36 @@ class Population:
         words1, indices1 = ind1.get_modified()
         words2, indices2 = ind2.get_modified()
 
-        maintain_indices = list(set(indices1) & set(indices2)) # union
-        ind1_only = list(set(indices1) - set(maintain_indices)) # 1\union
-        ind2_only = list(set(indices2) - set(maintain_indices)) # 2\union
+        set1, set2 = set(indices1), set(indices2)
+        giao_set = set1 & set2
+        print("Giao set: ", giao_set)
+        ind1_only = list(set1 - giao_set)
+        ind2_only = list(set2 - giao_set)
+        num_change = max(len(indices1), len(indices2))
 
-        cross_num = int(len(ind1_only)) * crossover_prob # chỉ riêng 1 * crossover_prob
-        maintain_num = len(ind1_only) - cross_num
+        num_cross = int(crossover_prob * (num_change - len(giao_set)))
+       
 
-        if len(ind2_only) >= cross_num and len(ind1_only) >= maintain_num:
-            maintain_indices += random.sample(ind1_only, k=maintain_num)
-            maintain_words = [words1[indices1.index(idx)] for idx in maintain_indices]
+        if num_cross == 0:
+            return copy.deepcopy(ind1), copy.deepcopy(ind2)
 
-            cross_indices = random.sample(ind2_only, k=cross_num)
-            cross_words = [words2[indices2.index(idx)] for idx in cross_indices]
+        cross1 = random.sample(ind1_only, min(num_cross, len(ind1_only)))
+        cross2 = random.sample(ind2_only, min(num_cross, len(ind2_only)))
 
-            child_indices = maintain_indices + cross_indices
-            child_words = maintain_words + cross_words
-            return Individual(self.original_text, child_words, child_indices)
-        else:
-            # Nếu không crossover được thì trả về bản sao ind1
-            return copy.deepcopy(ind1)
+        child1_indices = list(giao_set) + [i for i in ind1_only if i not in cross1] + cross2
+        print(child1_indices)
+        child1_words = [words1[indices1.index(i)] for i in giao_set] + \
+                    [words1[indices1.index(i)] for i in ind1_only if i not in cross1] + \
+                    [words2[indices2.index(i)] for i in cross2]
+
+        child2_indices = list(giao_set) + [i for i in ind2_only if i not in cross2] + cross1
+        print(child2_indices)
+        child2_words = [words2[indices2.index(i)] for i in giao_set] + \
+                    [words2[indices2.index(i)] for i in ind2_only if i not in cross2] + \
+                    [words1[indices1.index(i)] for i in cross1]
+
+        return Individual(self.original_text, child1_words, child1_indices), \
+            Individual(self.original_text, child2_words, child2_indices)
 
     def mutation(self, ind: Individual, mutation_prob=0.4):
         words, indices = ind.get_modified()
