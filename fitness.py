@@ -2,7 +2,7 @@ from reader import Reader
 from retrieval import Retriever
 
 class FitnessReader:
-    def __init__(self, reader_name):
+    def __init__(self, reader_name, original_answer: str):
         self.reader = Reader(reader_name)
 
     def __call__(self, question, contexts, answer):
@@ -35,7 +35,9 @@ class FitnessDual:
 if __name__ == "__main__":
     fitness = Reader(model_name="Llama-7b")
     question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."]
+    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
+                "dog",
+                "cat"]
     answers = '2025'
     scores = fitness(question, contexts, answers)
     
