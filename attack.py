@@ -44,8 +44,11 @@ def main(args):
     )
 
     ga.solve_rule()
-
-    print("Best perturbed text: ", ga.pop.individuals[0].get_perturbed_text())
+    best_individual = ga.pop.individuals.get_perubed_text()[0]
+    adv_output = fitness.reader.generate(question, [best_individual])
+    
+    print("Best perturbed text: ", best_individual)
+    print("Adversarial output: ", adv_output)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
