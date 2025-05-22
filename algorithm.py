@@ -72,7 +72,8 @@ class GA:
             current_best_individual = pool[current_best_idx]
             current_best_score1 = pool_score1[current_best_idx]
             current_best_score2 = pool_score2[current_best_idx]
-
+            print("Current answer: ", self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()]))
+            
             if best_fitness is None or current_best_fitness > best_fitness:
                 best_fitness = current_best_fitness
                 best_individual = current_best_individual
