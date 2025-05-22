@@ -25,7 +25,10 @@ def main(args):
         q_name=args.q_name,
         c_name=args.c_name,
         retriever_weight=args.retriever_weight,
-        reader_weight=args.reader_weight
+        reader_weight=args.reader_weight,
+        question=question,
+        original_text=original_text,
+        
     )
 
     population = create_population(original_text, args)
