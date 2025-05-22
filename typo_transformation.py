@@ -83,12 +83,6 @@ class ComboTypoTransformation(BaseTypoTransformation):
     def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
         random.seed(seed)
         np.random.seed(seed)
-        typo_classes = [
-            KeyboardTypoTransformation(),
-            NaturalTypoTransformation(),
-            TruncateTypoTransformation(),
-            InnerSwapTypoTransformation()
-        ]
         words = original_text.split()
         per_words = []
         per_words_indices = []
@@ -98,10 +92,8 @@ class ComboTypoTransformation(BaseTypoTransformation):
             assert len(chosen_indices) == num_words_to_swap
             
             for idx in chosen_indices:
-                typo_cls = random.choice(typo_classes)
-                print(typo_cls)
                 print(words[idx])
-                typo_candidates = typo_cls.get_replacement_words(words[idx])
+                typo_candidates = self.get_replacement_words(words[idx])
                 assert not typo_candidates
                 replace_word = random.choice(typo_candidates)
                 if not replace_word:
