@@ -44,9 +44,9 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
     parser.add_argument("--attack", type=str, default="ga", help="Attack method")
-    parser.add_argument("--retriever_name", default="Llama-7b", type=str, required=True, help="Retriever model name")
-    parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, required=True, help="Question encoder name")
-    parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, required=True, help="Context encoder name")
+    parser.add_argument("--retriever_name", default="Llama-7b", type=str, help="Retriever model name")
+    parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, help="Question encoder name")
+    parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
     parser.add_argument("--retriever_weight", type=float, default=0.5, help="Weight for retriever")
     parser.add_argument("--reader_weight", type=float, default=0.5, help="Weight for reader")
     parser.add_argument("--n_iter", type=int, default=10, help="Number of GA iterations")
