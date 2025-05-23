@@ -54,6 +54,8 @@ class Reader(torch.nn.Module):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         labels = [answer] * len(inputs)
         
+        print("Len inputs: ", len(inputs))
+        
         input_embeddings = self.tokenizer(
             inputs,
             max_length=512,
