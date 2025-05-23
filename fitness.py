@@ -42,10 +42,10 @@ class WeightedSUm:
         self.reader = Reader(reader_name)
         self.retriever = Retriever(q_name, c_name)
         self.original_text = original_text
-        self.retri_clean_reuslt = self.retriever(question, [original_text])
-        self.reader_clean_result = self.reader(question, [original_text], answer)
-        print("Original retri-score: ", self.retri_clean_reuslt)
-        print("Original reader-score: ", self.reader_clean_result)
+        # self.retri_clean_reuslt = self.retriever(question, [original_text])
+        # self.reader_clean_result = self.reader(question, [original_text], answer)
+        # print("Original retri-score: ", self.retri_clean_reuslt)
+        # print("Original reader-score: ", self.reader_clean_result)
         
         self.target_text = target_text
         self.answer = answer
