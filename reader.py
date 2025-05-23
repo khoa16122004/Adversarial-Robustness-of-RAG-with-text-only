@@ -98,11 +98,11 @@ class Reader(torch.nn.Module):
     def _cal_label_prob(self, probs, labels):
         result = []
         for prob, label in zip(probs, labels):
-            mask = (label > 0) & (label != self.tokenizer.pad_token_id)            
+            mask = label > 0
             prob, label = prob[mask], label[mask]
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-            avg_nll = torch.mean(nll) 
+            avg_nll = torch.mean(nll, dim=-1) 
             result.append(float(torch.exp(-avg_nll)))
         return np.array(result)
 
