@@ -146,14 +146,16 @@ class Reader(torch.nn.Module):
         #     min_len = min(input_ids.shape[1], label_ids.shape[1])
         #     input_ids = input_ids[:, :min_len]
         #     label_ids = label_ids[:, :min_len]
-        print("Input ids shape: ", input_ids > 0)
-        raise
+        # raise
 
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
             attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
-            labels=label_ids.to(self.model.device)
-        )  
+            # labels=label_ids.to(self.model.device)
+        )
+        print("Input ids shape: ", outputs.keys)
+        raise
+  
         scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
         scores = scores * 100
 
