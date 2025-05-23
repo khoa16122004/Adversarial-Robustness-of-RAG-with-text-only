@@ -157,8 +157,8 @@ class Reader(torch.nn.Module):
             attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
             # labels=label_ids.to(self.model.device)
         )
-        print("Input ids shape: ", input_ids)
-        print("Input ids shape: ", torch.argmax(outputs.logits, dim=-1))
+        print("label ids: ", label_ids)
+        print("Input ids: ", torch.argmax(outputs.logits, dim=-1))
         
         raise
   
