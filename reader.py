@@ -97,8 +97,6 @@ class Reader(torch.nn.Module):
     
     def _cal_label_prob(self, probs, labels):
         result = []
-        print("Probs: ", probs)
-        print("Lab : ", labels)
         for prob, label in zip(probs, labels):
             mask = label > 0
             prob, label = prob[mask], label[mask]
@@ -137,8 +135,8 @@ class Reader(torch.nn.Module):
     #     return torch.exp(avg_nll).tolist()
     
     def get_scores(self, input_ids, label_ids):
-        if input_ids.shape[1] != label_ids.shape[1]:
-            min_len = min(input_ids.shape[1], label_ids.shape[1])
+        if input_ids.shape[2] != label_ids.shape[2]:
+            min_len = min(input_ids.shape[2], label_ids.shape[2])
             input_ids = input_ids[:, :min_len]
             label_ids = label_ids[:, :min_len]
 
