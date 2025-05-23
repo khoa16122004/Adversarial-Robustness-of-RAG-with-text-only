@@ -53,23 +53,28 @@ class Reader(torch.nn.Module):
     def forward(self, question, contexts, answer): # logits scores
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         labels = [answer] * len(inputs)
-        input_labels = inputs + labels
-        # print("Contexts: ", contexts)
-        # print("Len inputs: ", len(inputs))
+        print("Contexts: ", contexts)
+        print("Len inputs: ", len(inputs))
         
-        cat_embeddings = self.tokenizer(
-            input_labels,
+        input_embeddings = self.tokenizer(
+            inputs,
             max_length=512,
             truncation=True,
             padding=True, 
             return_tensors="pt",
         )
-
+        label_embeddings = self.tokenizer(
+            labels, 
+            max_length=512,
+            truncation=True,
+            padding=True, 
+            return_tensors="pt",
+        )
         
-        print("First inputids: ", cat_embeddings.input_ids[:len(inputs)].shape)
-        print("Second inputids: ", cat_embeddings.input_ids[len(inputs):].shape)
+        print("First inputids: ", input_embeddings.input_ids.shape)
+        print("Second inputids: ", label_embeddings.input_ids.shape)
         
-        scores = self.get_scores(cat_embeddings.input_ids[:len(inputs)], cat_embeddings.input_ids[len(inputs):])
+        scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
     
     def generate(self, question, contexts): # text generation
@@ -101,19 +106,56 @@ class Reader(torch.nn.Module):
             mask = label > 0
             prob, label = prob[mask], label[mask]
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
-            # from IPython import embed; embed(); exit(0)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-            avg_nll = torch.sum(nll, dim=0) * -1
-            result.append(float(torch.exp(avg_nll / float(label.shape[0]))))
+            avg_nll = torch.mean(nll)
+            result.append(float(torch.exp(-avg_nll)))
         return np.array(result)
+
+        
+    # def _cal_label_prob(self, probs, labels):
+    #     # probs: (B, N, C)  -- B: batch size, N: seq len, C: num classes
+    #     # labels: (B, N)
+    #     probs = probs.cuda()
+    #     labels = labels.cuda()
+        
+    #     mask = labels > 0                                # (B, N)
+    #     masked_probs = probs[mask]                       # (total_valid_positions, C)
+    #     masked_labels = labels[mask]                     # (total_valid_positions)
+
+    #     log_softmax = torch.nn.functional.log_softmax(masked_probs, dim=-1)
+    #     nll = -log_softmax[torch.arange(masked_labels.shape[0], device=masked_labels.device), masked_labels]  # (total_valid_positions,)
+
+    #     # Now group back per sample to get average NLL per sample
+    #     # Step 1: build a mapping from flat index -> batch index
+    #     batch_idx = torch.arange(labels.shape[0]).unsqueeze(1).expand_as(labels)  # (B, N)
+    #     masked_batch_idx = batch_idx[mask]  # (total_valid_positions,)
+
+    #     total_nll = torch.zeros(labels.shape[0], device=probs.device)
+    #     count = torch.zeros(labels.shape[0], device=probs.device)
+
+    #     total_nll.scatter_add_(0, masked_batch_idx, nll)
+    #     count.scatter_add_(0, masked_batch_idx, torch.ones_like(nll))
+
+    #     avg_nll = total_nll / count
+    #     return torch.exp(avg_nll).tolist()
     
     def get_scores(self, input_ids, label_ids):
-        outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device)) * 10**6
+        print("Input ids shape: ", input_ids.shape)
+        print("Label ids shape: ", label_ids.shape)
+        if input_ids.shape[1] != label_ids.shape[1]:
+            min_len = min(input_ids.shape[1], label_ids.shape[2])
+            input_ids = input_ids[:, :min_len]
+            label_ids = label_ids[:, :min_len]
+
+        outputs = self.model(
+            input_ids=input_ids.to(self.model.device),
+            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
+            labels=label_ids.to(self.model.device)
+        )  
+        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        scores = scores * 100
+
         return scores
-    
-    def get_tokenizer(self):
-        return self.tokenizer        
     
 
 
