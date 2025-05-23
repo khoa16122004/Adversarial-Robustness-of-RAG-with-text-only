@@ -143,7 +143,7 @@ class Reader(torch.nn.Module):
         print("Input ids shape: ", input_ids.shape)
         print("Label ids shape: ", label_ids.shape)
         if input_ids.shape[1] != label_ids.shape[1]:
-            min_len = min(input_ids.shape[2], label_ids.shape[2])
+            min_len = min(input_ids.shape[1], label_ids.shape[1])
             input_ids = input_ids[:, :min_len]
             label_ids = label_ids[:, :min_len]
 
