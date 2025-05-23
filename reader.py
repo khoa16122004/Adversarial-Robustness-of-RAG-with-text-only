@@ -146,7 +146,7 @@ class Reader(torch.nn.Module):
         #     min_len = min(input_ids.shape[1], label_ids.shape[1])
         #     input_ids = input_ids[:, :min_len]
         #     label_ids = label_ids[:, :min_len]
-        print("Input ids shape: ", torch.argmax(input_ids, dim=-1))
+        print("Input ids shape: ", input_ids > 0)
         raise
 
         outputs = self.model(
