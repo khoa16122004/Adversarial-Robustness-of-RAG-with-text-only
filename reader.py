@@ -121,10 +121,11 @@ class Reader(torch.nn.Module):
             input_ids=input_ids.to(self.model.device),
             attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
             # labels=label_ids.to(self.model.device)
-        )[:, : -label_ids.shape[1], :]
+        )
+        output_logits = outputs.logits[:, :-input_ids.shape[1], :]
         print(outputs.shape)
-        print("Outputs logits shape: ", outputs.logits.shape)
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        print("Outputs logits shape: ", output_logits.shape)
+        scores = self._cal_label_prob(output_logits, label_ids.to(self.model.device))
         scores = scores * 100
 
         return scores
