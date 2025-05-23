@@ -172,6 +172,9 @@ class Reader(torch.nn.Module):
             )
             label_ids = torch.cat([label_ids, padding], dim=1)
 
+        print("Input ids shape: ", input_ids.shape)
+        print("Label ids shape: ", label_ids.shape)
+        
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
             attention_mask=(input_ids != pad_id).to(self.model.device),
