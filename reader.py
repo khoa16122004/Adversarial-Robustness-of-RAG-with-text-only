@@ -76,49 +76,49 @@ class Reader(torch.nn.Module):
         
         scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
+    
+    def generate(self, question, contexts): # text generation
         
-        def generate(self, question, contexts): # text generation
-            
-            """
-            question: str
-            contexts: list of str
-            """
-            
-            inputs = [self.template.format(q=question, d=text) for text in contexts]
-            input_ids = self.tokenizer(
-                    inputs,
-                    max_length=512,
-                    truncation=True,
-                    padding=True, 
-                    return_tensors="pt",
-            )
-            outputs = self.model.generate(input_ids=input_ids.input_ids.to(self.model.device), attention_mask=input_ids.attention_mask.to(self.model.device), **self.generate_kwargs)
-            outputs = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
+        """
+        question: str
+        contexts: list of str
+        """
+        
+        inputs = [self.template.format(q=question, d=text) for text in contexts]
+        input_ids = self.tokenizer(
+                inputs,
+                max_length=512,
+                truncation=True,
+                padding=True, 
+                return_tensors="pt",
+        )
+        outputs = self.model.generate(input_ids=input_ids.input_ids.to(self.model.device), attention_mask=input_ids.attention_mask.to(self.model.device), **self.generate_kwargs)
+        outputs = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
 
-            if isinstance(outputs, list):
-                return [o.split("Answer:")[-1].strip() for o in outputs]
-            else:
-                return outputs.split("Answer:")[-1].strip()
-        
-        def _cal_label_prob(self, probs, labels):
-            result = []
-            for prob, label in zip(probs, labels):
-                mask = label > 0
-                prob, label = prob[mask], label[mask]
-                log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
-                # from IPython import embed; embed(); exit(0)
-                nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-                avg_nll = torch.sum(nll, dim=0) * -1
-                result.append(float(torch.exp(avg_nll / float(label.shape[0]))))
-            return result
-        
-        def get_scores(self, input_ids, label_ids):
-            outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
-            scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
-            return scores
-        
-        def get_tokenizer(self):
-            return self.tokenizer        
+        if isinstance(outputs, list):
+            return [o.split("Answer:")[-1].strip() for o in outputs]
+        else:
+            return outputs.split("Answer:")[-1].strip()
+    
+    def _cal_label_prob(self, probs, labels):
+        result = []
+        for prob, label in zip(probs, labels):
+            mask = label > 0
+            prob, label = prob[mask], label[mask]
+            log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
+            # from IPython import embed; embed(); exit(0)
+            nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
+            avg_nll = torch.sum(nll, dim=0) * -1
+            result.append(float(torch.exp(avg_nll / float(label.shape[0]))))
+        return result
+    
+    def get_scores(self, input_ids, label_ids):
+        outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
+        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        return scores
+    
+    def get_tokenizer(self):
+        return self.tokenizer        
     
 
 
