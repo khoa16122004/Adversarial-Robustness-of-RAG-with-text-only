@@ -53,28 +53,23 @@ class Reader(torch.nn.Module):
     def forward(self, question, contexts, answer): # logits scores
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         labels = [answer] * len(inputs)
+        input_labels = inputs + labels
         # print("Contexts: ", contexts)
         # print("Len inputs: ", len(inputs))
         
-        input_embeddings = self.tokenizer(
-            inputs,
+        cat_embeddings = self.tokenizer(
+            input_labels,
             max_length=512,
             truncation=True,
             padding=True, 
             return_tensors="pt",
         )
-        label_embeddings = self.tokenizer(
-            labels, 
-            max_length=512,
-            truncation=True,
-            padding=True, 
-            return_tensors="pt",
-        )
+
         
         print("First inputids: ", input_embeddings.input_ids.shape)
         print("Second inputids: ", label_embeddings.input_ids.shape)
         
-        scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
+        scores = self.get_scores(cat_embeddings.input_ids[:len(inputs)], cat_embeddings.input_ids[len(inputs):])
         return scores
     
     def generate(self, question, contexts): # text generation
