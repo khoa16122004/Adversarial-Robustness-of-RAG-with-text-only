@@ -63,7 +63,7 @@ class WeightedSUm:
         reader_scores = reader_result / self.reader_clean_result
         
         weighted_result = self.retriever_weight * retri_scores + self.reader_weight * reader_scores
-        return weighted_result, retrieval_result, reader_result
+        return weighted_result, retri_scores, reader_scores
 
 
 # if __name__ == "__main__":
