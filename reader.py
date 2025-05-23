@@ -142,10 +142,6 @@ class Reader(torch.nn.Module):
     def get_scores(self, input_ids, label_ids):
         print("Input ids shape: ", input_ids.shape)
         print("Label ids shape: ", label_ids.shape)
-        if input_ids.shape[1] != label_ids.shape[1]:
-            min_len = min(input_ids.shape[1], label_ids.shape[2])
-            input_ids = input_ids[:, :min_len]
-            label_ids = label_ids[:, :min_len]
 
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
