@@ -50,6 +50,7 @@ class Reader(torch.nn.Module):
         if self.is_decoder:
             self.tokenizer.padding_side = "left"
     
+    @torch.no_grad()
     def forward(self, question, contexts, answer): # logits scores
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         labels = [answer] * len(inputs)
@@ -77,6 +78,7 @@ class Reader(torch.nn.Module):
         scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
     
+    @torch.no_grad()
     def generate(self, question, contexts): # text generation
         
         """
@@ -100,6 +102,7 @@ class Reader(torch.nn.Module):
         else:
             return outputs.split("Answer:")[-1].strip()
     
+    @torch.no_grad()
     def _cal_label_prob(self, probs, labels):
         result = []
         for prob, label in zip(probs, labels):
@@ -139,6 +142,7 @@ class Reader(torch.nn.Module):
     #     avg_nll = total_nll / count
     #     return torch.exp(avg_nll).tolist()
     
+    @torch.no_grad()
     def get_scores(self, input_ids, label_ids):
         print("Input ids shape: ", input_ids.shape)
         print("Label ids shape: ", label_ids.shape)
