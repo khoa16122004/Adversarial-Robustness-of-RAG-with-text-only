@@ -59,7 +59,6 @@ class WeightedSUm:
         retrieval_result = self.retriever(question, contexts)
         reader_result = self.reader(question, contexts, answer)
         # print("Contexts: ", contexts)
-        print(reader_result.shape)
         retri_scores = self.retri_clean_reuslt / retrieval_result
         reader_scores = reader_result / self.reader_clean_result
         
@@ -92,8 +91,8 @@ if __name__ == "__main__":
                           question, original_text, answer) 
     
     dual_scores = fitness(question, contexts, answer)
-    print(dual_scores)
+    # print(dual_scores)
     
     for context in contexts:
         dual_scores = fitness(question, [context], answer)
-        print(dual_scores)
+        # print(dual_scores)
