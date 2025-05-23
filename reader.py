@@ -105,7 +105,8 @@ class Reader(torch.nn.Module):
             print("log_softmax shape: ", log_softmax.shape)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
             print("nll shape: ", nll.shape)
-            avg_nll = torch.mean(nll, dim=-1) 
+            avg_nll = torch.mean(nll)
+            print(avg_nll.shape) 
             result.append(float(torch.exp(-avg_nll)))
         return np.array(result)
 
