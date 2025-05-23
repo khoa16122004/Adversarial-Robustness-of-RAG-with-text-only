@@ -143,22 +143,7 @@ class Reader(torch.nn.Module):
         print("Input ids shape: ", input_ids.shape)
         print("Label ids shape: ", label_ids.shape)
         
-        # Ensure both tensors have the same sequence length by padding the smaller one
-        max_len = max(input_ids.shape[1], label_ids.shape[1])
-        if input_ids.shape[1] < max_len:
-            padding = torch.full(
-                (input_ids.shape[0], max_len - input_ids.shape[1]),
-                self.tokenizer.pad_token_id,
-                device=input_ids.device
-            )
-            input_ids = torch.cat([input_ids, padding], dim=1)
-        elif label_ids.shape[1] < max_len:
-            padding = torch.full(
-                (label_ids.shape[0], max_len - label_ids.shape[1]),
-                self.tokenizer.pad_token_id,
-                device=label_ids.device
-            )
-            label_ids = torch.cat([label_ids, padding], dim=1)
+
 
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
