@@ -123,7 +123,6 @@ class Reader(torch.nn.Module):
             # labels=label_ids.to(self.model.device)
         )
         output_logits = outputs.logits[:, :-input_ids.shape[1], :]
-        print(outputs.shape)
         print("Outputs logits shape: ", output_logits.shape)
         scores = self._cal_label_prob(output_logits, label_ids.to(self.model.device))
         scores = scores * 100
