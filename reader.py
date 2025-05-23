@@ -99,27 +99,63 @@ class Reader(torch.nn.Module):
             return [o.split("Answer:")[-1].strip() for o in outputs]
         else:
             return outputs.split("Answer:")[-1].strip()
-   
-    def _cal_label_logprob(self, logits, labels):
-        # logits: (B, T, V), labels: (B, T)
-        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
-        label_log_probs = log_probs.gather(2, labels.unsqueeze(-1)).squeeze(-1)
-        mask = (labels != self.tokenizer.pad_token_id)
-        total_log_probs = (label_log_probs * mask).sum(dim=1)
-        return total_log_probs.tolist()  # return list of log probs
+    
+    def _cal_label_prob(self, probs, labels):
+        result = []
+        for prob, label in zip(probs, labels):
+            mask = label > 0
+            prob, label = prob[mask], label[mask]
+            log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
+            nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
+            avg_nll = torch.mean(nll)
+            result.append(float(torch.exp(-avg_nll)))
+        return np.array(result)
 
+        
+    # def _cal_label_prob(self, probs, labels):
+    #     # probs: (B, N, C)  -- B: batch size, N: seq len, C: num classes
+    #     # labels: (B, N)
+    #     probs = probs.cuda()
+    #     labels = labels.cuda()
+        
+    #     mask = labels > 0                                # (B, N)
+    #     masked_probs = probs[mask]                       # (total_valid_positions, C)
+    #     masked_labels = labels[mask]                     # (total_valid_positions)
+
+    #     log_softmax = torch.nn.functional.log_softmax(masked_probs, dim=-1)
+    #     nll = -log_softmax[torch.arange(masked_labels.shape[0], device=masked_labels.device), masked_labels]  # (total_valid_positions,)
+
+    #     # Now group back per sample to get average NLL per sample
+    #     # Step 1: build a mapping from flat index -> batch index
+    #     batch_idx = torch.arange(labels.shape[0]).unsqueeze(1).expand_as(labels)  # (B, N)
+    #     masked_batch_idx = batch_idx[mask]  # (total_valid_positions,)
+
+    #     total_nll = torch.zeros(labels.shape[0], device=probs.device)
+    #     count = torch.zeros(labels.shape[0], device=probs.device)
+
+    #     total_nll.scatter_add_(0, masked_batch_idx, nll)
+    #     count.scatter_add_(0, masked_batch_idx, torch.ones_like(nll))
+
+    #     avg_nll = total_nll / count
+    #     return torch.exp(avg_nll).tolist()
+    
     def get_scores(self, input_ids, label_ids):
-        scores = []
-        for i in range(input_ids.size(0)):
-            input_ = input_ids[i].unsqueeze(0).cuda()
-            label_ = label_ids[i].unsqueeze(0).cuda()
+        print("Input ids shape: ", input_ids.shape)
+        print("Label ids shape: ", label_ids.shape)
+        if input_ids.shape[1] != label_ids.shape[1]:
+            min_len = min(input_ids.shape[2], label_ids.shape[2])
+            input_ids = input_ids[:, :min_len]
+            label_ids = label_ids[:, :min_len]
 
-            full_input = torch.cat([input_, label_[:, :-1]], dim=1)  # exclude last label token
-            with torch.no_grad():
-                logits = self.model(input_ids=full_input).logits[:, -label_.size(1):, :]
-            logp = self._cal_label_logprob(logits, label_)
-            scores.append(logp[0])
-        return np.array(scores)
+        outputs = self.model(
+            input_ids=input_ids.to(self.model.device),
+            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
+            labels=label_ids.to(self.model.device)
+        )  
+        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        scores = scores * 100
+
+        return scores
     
 
 
@@ -127,16 +163,13 @@ if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
     question = "When Khoa become researcher?"
     contexts = ['Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.']
-    answers = ['2025', "dog", "cat"]
+    answers = ['2025', "dont know", 'dog']
     
-    pred = reader.generate(question, contexts)
     scores = []
-    print("Prediction: ", pred)
     for ans in answers:
         score = reader(question, contexts, ans)
         scores.append(score)
-    print(scores[1] / scores[0])
     score_normalize = np.array(scores) / np.array(scores).sum()
-    print("Score: ", score_normalize)
+    print("Score: ", scores)
         
     
