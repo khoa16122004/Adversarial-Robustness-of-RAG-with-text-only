@@ -53,8 +53,8 @@ class Reader(torch.nn.Module):
     def forward(self, question, contexts, answer): # logits scores
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         labels = [answer] * len(inputs)
-        print("Contexts: ", contexts)
-        print("Len inputs: ", len(inputs))
+        # print("Contexts: ", contexts)
+        # print("Len inputs: ", len(inputs))
         
         input_embeddings = self.tokenizer(
             inputs,
@@ -150,8 +150,8 @@ class Reader(torch.nn.Module):
         Returns:
             np.ndarray: Array of scores or probabilities for each input-label pair.
         """
-        print("Input ids shape: ", input_ids.shape)
-        print("Label ids shape: ", label_ids.shape)
+        # print("Input ids shape: ", input_ids.shape)
+        # print("Label ids shape: ", label_ids.shape)
 
         # Ensure both tensors have the same sequence length by padding the smaller one
         max_len = max(input_ids.shape[1], label_ids.shape[1])
