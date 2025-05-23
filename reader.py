@@ -137,6 +137,6 @@ if __name__ == "__main__":
         scores.append(score)
     print(scores[1] / scores[0])
     score_normalize = np.array(scores) / np.array(scores).sum()
-    print("Score: ", scores)
+    print("Score: ", score_normalize)
         
     
