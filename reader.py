@@ -98,7 +98,7 @@ class Reader(torch.nn.Module):
     def _cal_label_prob(self, probs, labels):
         result = []
         for prob, label in zip(probs, labels):
-            mask = label > 0
+            mask = (label > 0) & (label != self.tokenizer.pad_token_id)            
             prob, label = prob[mask], label[mask]
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
@@ -140,7 +140,11 @@ class Reader(torch.nn.Module):
             input_ids = input_ids[:, :min_len]
             label_ids = label_ids[:, :min_len]
 
-        outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
+        outputs = self.model(
+            input_ids=input_ids.to(self.model.device),
+            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
+            labels=label_ids.to(self.model.device)
+        )  
         scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
         scores = scores * 100
 
