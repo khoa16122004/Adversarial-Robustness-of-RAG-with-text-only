@@ -163,7 +163,7 @@ if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
     question = "When Khoa become researcher?"
     contexts = ['Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.']
-    answers = ['2025', "dont know", 'dog']
+    answers = ['2025', "1025", 'dog']
     
     scores = []
     for ans in answers:
