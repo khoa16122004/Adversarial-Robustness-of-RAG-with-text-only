@@ -140,18 +140,58 @@ class Reader(torch.nn.Module):
     #     return torch.exp(avg_nll).tolist()
     
     def get_scores(self, input_ids, label_ids):
+        """
+        Calculate scores or probabilities for the given input and label IDs.
+
+        Args:
+            input_ids (torch.Tensor): Tensor of input token IDs with shape (batch_size, seq_len).
+            label_ids (torch.Tensor): Tensor of label token IDs with shape (batch_size, seq_len).
+
+        Returns:
+            np.ndarray: Array of scores or probabilities for each input-label pair.
+        """
         print("Input ids shape: ", input_ids.shape)
         print("Label ids shape: ", label_ids.shape)
-        
 
+        # Ensure both tensors have the same sequence length by padding the smaller one
+        max_len = max(input_ids.shape[1], label_ids.shape[1])
+        pad_id = self.tokenizer.pad_token_id
 
+        if input_ids.shape[1] < max_len:
+            padding = torch.full(
+                (input_ids.shape[0], max_len - input_ids.shape[1]),
+                pad_id,
+                device=input_ids.device
+            )
+            input_ids = torch.cat([input_ids, padding], dim=1)
+        elif label_ids.shape[1] < max_len:
+            padding = torch.full(
+                (label_ids.shape[0], max_len - label_ids.shape[1]),
+                pad_id,
+                device=label_ids.device
+            )
+            label_ids = torch.cat([label_ids, padding], dim=1)
+
+        # Forward pass through the model
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
-            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
+            attention_mask=(input_ids != pad_id).to(self.model.device),
             labels=label_ids.to(self.model.device)
-        )  
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
-        scores = scores * 100
+        )
+
+        # Extract logits and calculate probabilities
+        logits = outputs.logits  # Shape: (batch_size, seq_len, vocab_size)
+        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
+
+        # Gather log probabilities for the label tokens
+        label_probs = log_probs.gather(2, label_ids.unsqueeze(-1)).squeeze(-1)  # Shape: (batch_size, seq_len)
+
+        # Mask padding tokens and calculate average log probability per sequence
+        mask = label_ids != pad_id
+        seq_log_probs = (label_probs * mask).sum(dim=1) / mask.sum(dim=1)
+
+        # Convert log probabilities to probabilities
+        scores = torch.exp(seq_log_probs).cpu().numpy() * 100  # Scale to percentage
 
         return scores
     
