@@ -105,7 +105,7 @@ class Reader(torch.nn.Module):
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
             avg_nll = torch.sum(nll, dim=0) * -1
             result.append(float(torch.exp(avg_nll / float(label.shape[0]))))
-        return result
+        return np.array(result)
     
     def get_scores(self, input_ids, label_ids):
         outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
