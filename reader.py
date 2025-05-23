@@ -104,7 +104,7 @@ class Reader(torch.nn.Module):
         result = []
         for prob, label in zip(probs, labels):
             mask = label > 0
-            prob, label = prob[mask], label[mask]
+            prob, label = prob[mask].cuda(), label[mask].cuda()
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
             avg_nll = torch.mean(nll)
