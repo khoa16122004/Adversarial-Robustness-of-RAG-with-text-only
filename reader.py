@@ -69,6 +69,9 @@ class Reader(torch.nn.Module):
             return_tensors="pt",
         )
         
+        print("First inputids: ", input_embeddings.input_ids.shape)
+        print("Second inputids: ", label_embeddings.input_ids.shape)
+        
         scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
         return scores
     
