@@ -159,20 +159,20 @@ class Reader(torch.nn.Module):
     
 
 
-if __name__ == "__main__":
-    reader = Reader(model_name="Llama-7b")
-    question = "When Khoa become researcher?"
-    contexts = ['Khoa developed a strong passion fo5 artificial intelligence durkng his university years. After gra duating sith uonors,, he decidrd to pursue a career in researxh.. In 2052,, Khoa off9cially became a researcher ay a lea ding te chn;logy insgitute.. Since fhen,, he has contributed to several groundbreaking projects in compu6er v8sion and na tural language pfocessing..']
-    answers = ['2025', "dont know"]
+# if __name__ == "__main__":
+#     reader = Reader(model_name="Llama-7b")
+#     question = "When Khoa become researcher?"
+#     contexts = ['Khoa developed a strong passion fo5 artificial intelligence durkng his university years. After gra duating sith uonors,, he decidrd to pursue a career in researxh.. In 2052,, Khoa off9cially became a researcher ay a lea ding te chn;logy insgitute.. Since fhen,, he has contributed to several groundbreaking projects in compu6er v8sion and na tural language pfocessing..']
+#     answers = ['2025', "dont know"]
     
-    pred = reader.generate(question, contexts)
-    scores = []
-    print("Prediction: ", pred)
-    for ans in answers:
-        score = reader(question, contexts, ans)
-        scores.append(score)
-    print(scores[1] / scores[0])
-    score_normalize = np.array(scores) / np.array(scores).sum()
-    print("Score: ", scores)
+#     pred = reader.generate(question, contexts)
+#     scores = []
+#     print("Prediction: ", pred)
+#     for ans in answers:
+#         score = reader(question, contexts, ans)
+#         scores.append(score)
+#     print(scores[1] / scores[0])
+#     score_normalize = np.array(scores) / np.array(scores).sum()
+#     print("Score: ", scores)
         
     
