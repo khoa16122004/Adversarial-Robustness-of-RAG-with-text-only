@@ -99,35 +99,27 @@ class Reader(torch.nn.Module):
             return [o.split("Answer:")[-1].strip() for o in outputs]
         else:
             return outputs.split("Answer:")[-1].strip()
-    
-    def _cal_label_prob(self, probs, labels):
-        result = []
-        for prob, label in zip(probs, labels):
-            mask = label > 0
-            prob, label = prob[mask], label[mask]
-            log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
-            nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-            avg_nll = torch.mean(nll)
-            result.append(float(torch.exp(-avg_nll)))
-        return np.array(result)
-    
+   
+    def _cal_label_logprob(self, logits, labels):
+        # logits: (B, T, V), labels: (B, T)
+        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
+        label_log_probs = log_probs.gather(2, labels.unsqueeze(-1)).squeeze(-1)
+        mask = (labels != self.tokenizer.pad_token_id)
+        total_log_probs = (label_log_probs * mask).sum(dim=1)
+        return total_log_probs.tolist()  # return list of log probs
+
     def get_scores(self, input_ids, label_ids):
-        print("Input ids shape: ", input_ids.shape)
-        print("Label ids shape: ", label_ids.shape)
-        
+        scores = []
+        for i in range(input_ids.size(0)):
+            input_ = input_ids[i].unsqueeze(0)
+            label_ = label_ids[i].unsqueeze(0)
 
-
-        outputs = self.model(
-            input_ids=input_ids.to(self.model.device),
-            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
-            # labels=label_ids.to(self.model.device)
-        )
-        output_logits = outputs.logits[:, :-input_ids.shape[1], :]
-        print("Outputs logits shape: ", output_logits.shape)
-        scores = self._cal_label_prob(output_logits, label_ids.to(self.model.device))
-        scores = scores * 100
-
-        return scores
+            full_input = torch.cat([input_, label_[:, :-1]], dim=1)  # exclude last label token
+            with torch.no_grad():
+                logits = self.model(input_ids=full_input).logits[:, -label_.size(1):, :]
+            logp = self._cal_label_logprob(logits, label_)
+            scores.append(logp[0])
+        return np.array(scores)
     
 
 
