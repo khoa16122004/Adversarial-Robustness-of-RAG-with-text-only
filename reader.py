@@ -153,7 +153,7 @@ class Reader(torch.nn.Module):
             attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
             # labels=label_ids.to(self.model.device)
         )
-        print("Input ids shape: ", outputs.keys)
+        print("Input ids shape: ", outputs.logits)
         raise
   
         scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
