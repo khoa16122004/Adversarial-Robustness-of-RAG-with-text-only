@@ -109,7 +109,7 @@ class Reader(torch.nn.Module):
     
     def get_scores(self, input_ids, label_ids):
         outputs = self.model(input_ids=input_ids.to(self.model.device), labels=label_ids.to(self.model.device))
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
+        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device)) * 10**6
         return scores
     
     def get_tokenizer(self):
