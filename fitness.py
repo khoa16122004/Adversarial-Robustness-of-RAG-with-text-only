@@ -92,3 +92,7 @@ if __name__ == "__main__":
     
     dual_scores = fitness(question, contexts, answer)
     print(dual_scores)
+    
+    for context in contexts:
+        dual_scores = fitness(question, [context], answer)
+        print(dual_scores)
