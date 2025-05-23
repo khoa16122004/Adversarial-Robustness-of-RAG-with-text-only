@@ -66,8 +66,8 @@ class Reader(torch.nn.Module):
         )
 
         
-        print("First inputids: ", input_embeddings.input_ids.shape)
-        print("Second inputids: ", label_embeddings.input_ids.shape)
+        print("First inputids: ", cat_embeddings.input_ids[:len(inputs)].shape)
+        print("Second inputids: ", cat_embeddings.input_ids[len(inputs):].shape)
         
         scores = self.get_scores(cat_embeddings.input_ids[:len(inputs)], cat_embeddings.input_ids[len(inputs):])
         return scores
