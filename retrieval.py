@@ -34,14 +34,16 @@ class Retriever(torch.nn.Module):
         return tokenizer, d_encoder, q_encoder
 
     def forward(self, queries, contexts):
-        query_ids = self.tokenizer(queries, **self.tokenizer_kwargs).to(self.q_encoder.device)
-        context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs).to(self.d_encoder.device)
+            query_ids = self.tokenizer(queries, **self.tokenizer_kwargs).to(self.q_encoder.device)
+            context_ids = self.tokenizer(contexts, **self.tokenizer_kwargs).to(self.d_encoder.device)
 
-        query_embeddings = self.encode(query_ids, mode="query")     # [B, D]
-        context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
-        # Cosine similarity (batch-wise)
-        scores = torch.matmul(query_embeddings, context_embeddings.T).squeeze(0)
-        return scores.detach().cpu().numpy()
+            query_embeddings = self.encode(query_ids, mode="query")     # [B, D]
+            context_embeddings = self.encode(context_ids, mode="context")  # [B, D]
+            # Cosine similarity (batch-wise)
+            scores = torch.matmul(query_embeddings, context_embeddings.T).squeeze(0)
+            # Ensure scores are non-negative
+            scores = torch.relu(scores)  # Apply ReLU to make scores non-negative
+            return scores.detach().cpu().numpy()
 
     def encode(self, inputs, mode="context"):
         with torch.no_grad():

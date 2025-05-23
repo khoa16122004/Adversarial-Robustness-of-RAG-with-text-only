@@ -28,7 +28,7 @@ class GA:
         selected_indices = []
         for j in range(0, len(fitness_array), tournament_size):
             group_fitness = fitness_array[j : j + tournament_size]
-            best_in_group = j + np.argmax(group_fitness)  # hoặc np.argmin nếu cần minimize
+            best_in_group = j + np.argmin(group_fitness)  # hoặc np.argmin nếu cần minimize
             selected_indices.append(best_in_group)
         return selected_indices
 
@@ -50,16 +50,16 @@ class GA:
             for _ in range(self.pop.pop_size // 2):
                 parent_idx1, parent_idx2 = random.sample(range(self.pop.pop_size), 2)
                 parent1, parent2 = P[parent_idx1], P[parent_idx2]
-                offspring1, offspring2 = self.pop.crossover(parent1, parent2)
-                offspring1 = self.pop.mutation(offspring1)
-                offspring2 = self.pop.mutation(offspring2)
+                offspring1, offspring2 = self.pop.crossover(parent1, parent2) # crossover
+                offspring1 = self.pop.mutation(offspring1) # mutation
+                offspring2 = self.pop.mutation(offspring2) # mutation
                 O.extend([offspring1, offspring2])
 
             O_fitness_weighted, O_score1, O_score2 = self.fitness(
                 question=self.question,
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
-            )
+            ) #
 
             pool = P + O
             pool_fitness_weighted = np.concatenate([P_fitness_weighted, O_fitness_weighted], axis=0)
@@ -74,7 +74,7 @@ class GA:
             current_best_score2 = pool_score2[current_best_idx]
             # print("Current answer: ", self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()]))
             
-            if best_fitness is None or current_best_fitness > best_fitness:
+            if best_fitness is None or current_best_fitness < best_fitness:
                 best_fitness = current_best_fitness
                 best_individual = current_best_individual
                 best_score1 = current_best_score1
