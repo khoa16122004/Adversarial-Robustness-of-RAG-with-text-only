@@ -154,7 +154,7 @@ class Reader(torch.nn.Module):
             # labels=label_ids.to(self.model.device)
         )
         print("Input ids shape: ", outputs.logits)
-        print("Input ids shape: ", outputs.attention_mask)
+        print("Input ids shape: ", outputs.attentions_mask)
         
         raise
   
