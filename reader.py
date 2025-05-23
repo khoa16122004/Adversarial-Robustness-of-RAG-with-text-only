@@ -97,16 +97,14 @@ class Reader(torch.nn.Module):
     
     def _cal_label_prob(self, probs, labels):
         result = []
+        print("Probs: ", probs)
+        print("Lab : ", labels)
         for prob, label in zip(probs, labels):
             mask = label > 0
             prob, label = prob[mask], label[mask]
-            print("prob shape: ", prob.shape, "label shape: ", label.shape)
             log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
-            print("log_softmax shape: ", log_softmax.shape)
             nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-            print("nll shape: ", nll.shape)
             avg_nll = torch.mean(nll)
-            print(avg_nll.shape) 
             result.append(float(torch.exp(-avg_nll)))
         return np.array(result)
 
