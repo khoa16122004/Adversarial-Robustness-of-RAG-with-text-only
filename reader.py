@@ -172,26 +172,13 @@ class Reader(torch.nn.Module):
             )
             label_ids = torch.cat([label_ids, padding], dim=1)
 
-        # Forward pass through the model
         outputs = self.model(
             input_ids=input_ids.to(self.model.device),
             attention_mask=(input_ids != pad_id).to(self.model.device),
             labels=label_ids.to(self.model.device)
         )
 
-        # Extract logits and calculate probabilities
-        logits = outputs.logits  # Shape: (batch_size, seq_len, vocab_size)
-        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
-
-        # Gather log probabilities for the label tokens
-        label_probs = log_probs.gather(2, label_ids.unsqueeze(-1)).squeeze(-1)  # Shape: (batch_size, seq_len)
-
-        # Mask padding tokens and calculate average log probability per sequence
-        mask = label_ids != pad_id
-        seq_log_probs = (label_probs * mask).sum(dim=1) / mask.sum(dim=1)
-
-        # Convert log probabilities to probabilities
-        scores = torch.exp(seq_log_probs).cpu().numpy() * 100  # Scale to percentage
+        scores = self._cal_label_prob(outputs.logits, label_ids)
 
         return scores
     
