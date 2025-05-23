@@ -67,7 +67,7 @@ class GA:
             pool_score2 = np.concatenate([P_score2, O_score2], axis=0)
 
             # Lấy cá thể tốt nhất dựa trên weighted sum fitness
-            current_best_idx = np.argmax(pool_fitness_weighted)
+            current_best_idx = np.argmin(pool_fitness_weighted)
             current_best_fitness = pool_fitness_weighted[current_best_idx]
             current_best_individual = pool[current_best_idx]
             current_best_score1 = pool_score1[current_best_idx]
