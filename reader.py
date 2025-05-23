@@ -111,8 +111,8 @@ class Reader(torch.nn.Module):
     def get_scores(self, input_ids, label_ids):
         scores = []
         for i in range(input_ids.size(0)):
-            input_ = input_ids[i].unsqueeze(0)
-            label_ = label_ids[i].unsqueeze(0)
+            input_ = input_ids[i].unsqueeze(0).cuda()
+            label_ = label_ids[i].unsqueeze(0).cuda()
 
             full_input = torch.cat([input_, label_[:, :-1]], dim=1)  # exclude last label token
             with torch.no_grad():
