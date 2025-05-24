@@ -181,7 +181,7 @@ class Reader(torch.nn.Module):
         
         # Chuyển đổi log probabilities thành xác suất
         scores = torch.exp(total_log_probs).tolist()
-    
+        
         return scores
     
     @torch.no_grad()
