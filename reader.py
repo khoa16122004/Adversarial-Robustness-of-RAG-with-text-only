@@ -155,7 +155,7 @@ if __name__ == "__main__":
         padding=True, 
         return_tensors="pt",
     )
-    
+    print("Input ids shape: ", input_ids.input_ids.shape)
     outputs = reader.model(input_ids.input_ids.to(reader.model.device), 
                            attention_mask=input_ids.attention_mask.to(reader.model.device))
     
