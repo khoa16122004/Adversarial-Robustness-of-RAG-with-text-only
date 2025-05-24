@@ -164,10 +164,13 @@ if __name__ == "__main__":
     print("logits shape: ", logits.shape)
     
     max_new_token = 30
-    for i in range(max_new_token):
-        logit = logits[:, i, :]
-        predicted_id = torch.argmax(logit, dim=-1).item()
-        print(reader.tokenizer.decode([predicted_id]))
+    for step in range(max_new_token):
+        outputs = reader.model(output_ids)
+        next_token_logits = outputs.logits[:, -1, :]  # lấy logit cho token tiếp theo
+        next_token_id = torch.argmax(next_token_logits, dim=-1).unsqueeze(-1)
+        output_ids = torch.cat([output_ids, next_token_id], dim=-1)
+        decoded = reader.tokenizer.decode(next_token_id.squeeze(), skip_special_tokens=True)
+        print(f"Step {step + 1}: {decoded}")
 
             
     
