@@ -256,7 +256,13 @@ if __name__ == "__main__":
     question = "What is the fastest land animal?"
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
-    scores = reader(question, [context], answer) 
-
-    print(np.argmax(scores / scores.sum()))   
+    scores = []
+    for ans in answer:
+        score = reader(question, [context], ans) 
+        scores.append(score)
+    scores = np.array(scores)
+    scores = scores / scores.sum()
+    
+    print(scores)   
+    print(np.argmax(scores))   
  
