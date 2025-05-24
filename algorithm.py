@@ -212,10 +212,10 @@ class GA:
                 print(f"   Generated answer: Error - {str(e)}")
             
             # Early stopping if success achieved
-            if (self.success_achieved and 
-                iter_idx - self.success_generation >= 10):  # Continue for 10 more generations after success
-                print(f"🎯 Early stopping: Success maintained for 10 generations")
-                break
+            # if (self.success_achieved and 
+            #     iter_idx - self.success_generation >= 10):  # Continue for 10 more generations after success
+            #     print(f"🎯 Early stopping: Success maintained for 10 generations")
+            #     break
             
             # Selection for next generation
             pool_indices = np.arange(len(pool))
