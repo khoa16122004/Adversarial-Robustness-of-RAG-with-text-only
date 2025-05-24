@@ -43,15 +43,17 @@ def main(args):
         answer=answer
     )
 
-    ga.solve_rule()
-    best_individual = ga.best_individual.get_perturbed_text()
-    adv_output = fitness.reader.generate(question, [best_individual])
-    origial_output = fitness.reader.generate(question, [original_text])
-    print(fitness(question, [best_individual], answer))
-    print("Best perturbed text: ", best_individual)
-    print("Adversarial output: ", adv_output)
-    print("original output: ", origial_output)
+    result = ga.solve_rule()
+    print("Best fitness: ", result["best_fitness"])
+    print("Best best_reader_score: ", result["best_reader_score"])
+    print("Best best_retrieval_score: ", result["best_retrieval_score"])
+    print("Best best_individual_text: ", result["best_individual"])
+    
+    adv_output = fitness.reader.generate(question, [result["best_individual"].get_perturbed_text()])[0]
+    print("Adv_output: ", adv_output)
 
+    original_output = fitness.reader.generate(question, [original_text])[0]
+    print("Original output: ", original_output)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
     parser.add_argument("--attack", type=str, default="ga", help="Attack method")
