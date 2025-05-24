@@ -159,6 +159,8 @@ if __name__ == "__main__":
     outputs = reader.model(input_ids.input_ids.to(reader.model.device), 
                            attention_mask=input_ids.attention_mask.to(reader.model.device))
     
-    print(outputs.shape)
-        
+    logits = outputs.logits
+    
+    print("logits shape: ", logits.shape)
+            
     
