@@ -13,7 +13,6 @@ class Individual:
         self.attacked_text = AttackedText(original_text)
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
-        # self.original_splits = original_text.split()
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
@@ -57,7 +56,6 @@ class Population:
 
         set1, set2 = set(indices1), set(indices2)
         giao_set = set1 & set2
-        # print("Giao set: ", giao_set)
         ind1_only = list(set1 - giao_set)
         ind2_only = list(set2 - giao_set)
         num_change = max(len(indices1), len(indices2))
@@ -72,13 +70,11 @@ class Population:
         cross2 = random.sample(ind2_only, min(num_cross, len(ind2_only)))
 
         child1_indices = list(giao_set) + [i for i in ind1_only if i not in cross1] + cross2
-        # print(child1_indices)
         child1_words = [words1[indices1.index(i)] for i in giao_set] + \
                     [words1[indices1.index(i)] for i in ind1_only if i not in cross1] + \
                     [words2[indices2.index(i)] for i in cross2]
 
         child2_indices = list(giao_set) + [i for i in ind2_only if i not in cross2] + cross1
-        # print(child2_indices)
         child2_words = [words2[indices2.index(i)] for i in giao_set] + \
                     [words2[indices2.index(i)] for i in ind2_only if i not in cross2] + \
                     [words1[indices1.index(i)] for i in cross1]
@@ -89,7 +85,6 @@ class Population:
     def mutation(self, ind: Individual, mutation_prob=0.3):
             words, indices = ind.get_modified()
             if random.random() < mutation_prob:
-                # Chọn ngẫu nhiên một index từ toàn bộ indices_to_modify
                 mutate_idx = random.choice(indices)
                 word_pos = indices.index(mutate_idx)
 

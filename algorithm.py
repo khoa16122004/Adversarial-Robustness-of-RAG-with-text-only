@@ -197,8 +197,8 @@ class GA:
             # Print generation info
             print(f"\n📊 Generation {iter_idx}")
             print(f"   Best weighted fitness: {current_best_fitness:.6f}")
-            print(f"   Best reader score: {current_best_score1:.6f}")
-            print(f"   Best retrieval score: {current_best_score2:.6f}")
+            print(f"   Best reader score: {current_best_score2:.6f}")
+            print(f"   Best retrieval score: {current_best_score1:.6f}")
             print(f"   Success criteria met: {current_best_score1 < self.success_threshold and current_best_score2 < self.success_threshold}")
             
             # Optional: print generated answer for debugging
