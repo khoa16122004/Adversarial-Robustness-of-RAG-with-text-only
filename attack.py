@@ -10,10 +10,10 @@ def main(args):
     
     set_seed_everything(22520691)
     
-    question = "What fields has Leo contributed to in his research career?"
-    original_text = "Leo developed a strong passion for artificial intelligence during his university years. H After graduating with honors, he decided to pursue a career in research. In 2025, leo officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."
+    question = "What is the fastest land animal?"
+    original_text = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
 
-    answer = "Computer vision and natural language processing."
+    answer = "Cheetah"
     
     
     population = create_population(original_text, args)
