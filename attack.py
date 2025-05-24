@@ -13,7 +13,7 @@ def main(args):
     question = "What is the fastest land animal?"
     original_text = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
 
-    answer = "Cheetah"
+    answer = "cheetah"
     
     
     population = create_population(original_text, answer, args)

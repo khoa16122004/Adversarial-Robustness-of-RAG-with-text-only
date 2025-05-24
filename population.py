@@ -10,7 +10,7 @@ set_seed_everything(222520691)
 def find_anser(context, answer):
     results = []
     for i in range(len(context.split())):
-        if context.split()[i] == answer:
+        if context.split()[i].lower() == answer.lower():
             results.append(i)
     return results
 
@@ -25,7 +25,7 @@ class Individual:
         self.original_splits = self.original_text.split()
         self.answer = answer
         self.position_answer =  find_anser(original_text, answer)
-        print(self.position_answer)
+        # print(self.position_answer)
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
@@ -99,6 +99,7 @@ class Population:
 
     def mutation(self, ind: Individual, mutation_prob=1):
             words, indices = ind.get_modified( )
+            print("indices: ", indices)
             if random.random() < mutation_prob:
                 new_idx = random.choice([i for i in range(len(self.original_splits)) if i not in ind.position_answer and i not in indices])
                 print("New_index: ", new_idx)
