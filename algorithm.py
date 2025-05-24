@@ -185,7 +185,7 @@ class GA:
                 self.best_score2 = current_best_score2
             
 
-            pop_stats = self.calculate_population_stats(pool_fitness_weighted, pool_score1, pool_score2)
+            # pop_stats = self.calculate_population_stats(pool_fitness_weighted, pool_score1, pool_score2)
             
             # Log generation data
             self.log_generation(
@@ -194,7 +194,7 @@ class GA:
                 best_reader_score=current_best_score2,
                 best_retrieval_score=current_best_score1,
                 best_individual_text=current_best_individual.get_perturbed_text(),
-                population_stats=pop_stats
+                # population_stats=pop_stats
             )
 
             # Print generation info
@@ -409,14 +409,13 @@ class NSGAII:
         
         return selected_indices
 
-    def log_generation(self, generation, best_weighted_fitness, best_reader_score, best_retrieval_score, 
+    def log_generation(self, generation, best_reader_score, best_retrieval_score, 
                       best_individual_text, population_stats, pareto_stats):
         """
         Log generation data including Pareto front statistics
         """
         generation_log = {
             "generation": generation,
-            "best_weighted_fitness": float(best_weighted_fitness),
             "best_reader_score": float(best_reader_score),
             "best_retrieval_score": float(best_retrieval_score),
             "best_individual_text": best_individual_text,
@@ -438,18 +437,11 @@ class NSGAII:
             print(f"   Reader score: {best_reader_score:.6f}")
             print(f"   Retrieval score: {best_retrieval_score:.6f}")
     
-    def calculate_population_stats(self, fitness_weighted, score1, score2):
+    def calculate_population_stats(self, score1, score2):
         """
         Calculate population statistics
         """
         return {
-            "fitness_stats": {
-                "mean": float(np.mean(fitness_weighted)),
-                "std": float(np.std(fitness_weighted)),
-                "min": float(np.min(fitness_weighted)),
-                "max": float(np.max(fitness_weighted)),
-                "median": float(np.median(fitness_weighted))
-            },
             "reader_score_stats": {
                 "mean": float(np.mean(score1)),
                 "std": float(np.std(score1)),
@@ -513,7 +505,9 @@ class NSGAII:
                 "best_fitness": float(self.best_fitness) if self.best_fitness is not None else None,
                 "best_reader_score": float(self.best_score1) if self.best_score1 is not None else None,
                 "best_retrieval_score": float(self.best_score2) if self.best_score2 is not None else None,
-                "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None
+                "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None,
+                "adv_output": self.adv_output if self.adv_output is not None else None,
+                "modified_info": self.best_individual.get_modified() if self.best_individual else None
             },
             "generation_logs": self.generation_logs
         }
@@ -523,12 +517,39 @@ class NSGAII:
         
         print(f"📝 Logs saved to: {self.log_file}")
 
+    
+    def greedy_selection(self, P_score1, P_score2):
+        valid_indices = np.where(P_score1 < 1)[0]
+
+        if len(valid_indices) > 0:
+            min_index = valid_indices[np.argmin(P_score2[valid_indices])]
+        else:
+            min_index = np.argmin(P_score1)
+
+        return min_index
+
+
+    def update_global_best(self, current_best_score1, current_best_score2, current_best_individual):
+        if self.best_score1 is None:
+            self.best_score1 = current_best_score1
+            self.best_score2 = current_best_score2
+            self.best_individual = current_best_individual
+        
+        else:
+            pool_score1 = np.array([self.best_score1, current_best_score1])
+            pool_score2 = np.array([self.best_score2, current_best_score2])
+            
+            if self.greedy_selection(pool_score1, pool_score2) == 1:
+                self.best_score1 = current_best_score1
+                self.best_score2 = current_best_score2
+            
+    
     def solve_rule(self):
         """
         Main NSGA-II evolution loop
         """
         P = self.pop.individuals
-        P_fitness_weighted, P_score1, P_score2 = self.fitness(
+        P_score1, P_score2 = self.fitness(
             question=self.question,
             contexts=[ind.get_perturbed_text() for ind in P],
             answer=self.answer
@@ -552,7 +573,7 @@ class NSGAII:
                 O.extend([offspring1, offspring2])
 
             # Evaluate offspring
-            O_fitness_weighted, O_score1, O_score2 = self.fitness(
+            O_score1, O_score2 = self.fitness(
                 question=self.question,
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
@@ -560,28 +581,19 @@ class NSGAII:
 
             # Create combined pool (P + O)
             pool = P + O
-            pool_fitness_weighted = np.concatenate([P_fitness_weighted, O_fitness_weighted], axis=0)
             pool_score1 = np.concatenate([P_score1, O_score1], axis=0)
             pool_score2 = np.concatenate([P_score2, O_score2], axis=0)
 
-            # Find best individual in current generation (LOWEST weighted fitness = BEST)
-            current_best_idx = np.argmin(pool_fitness_weighted)
-            current_best_fitness = pool_fitness_weighted[current_best_idx]
-            current_best_individual = pool[current_best_idx]
-            current_best_score1 = pool_score1[current_best_idx]  # reader_score
-            current_best_score2 = pool_score2[current_best_idx]  # retrieval_score
             
             # Update global best
-            if self.best_fitness is None or current_best_fitness < self.best_fitness:
-                self.best_fitness = current_best_fitness
-                self.best_individual = current_best_individual
-                self.best_score1 = current_best_score1
-                self.best_score2 = current_best_score2
-
-            # Calculate statistics
-            pop_stats = self.calculate_population_stats(pool_fitness_weighted, pool_score1, pool_score2)
+            current_best_idx = self.greedy_selection(pool_score1, pool_score2)
+            current_best_score1 = pool_score1[current_best_idx]
+            current_best_score2 = pool_score2[current_best_idx]
+            current_best_individual = pool[current_best_idx]
             
-            # Prepare objectives for NSGA-II selection (minimization)
+            # update global test
+            self.update_global_best(current_best_score1, current_best_score2, current_best_individual)
+            
             # score1 = retrieval_score, score2 = reader_score
             objectives = np.column_stack([pool_score1, pool_score2])
             pareto_stats = self.calculate_pareto_stats(objectives)
@@ -589,26 +601,19 @@ class NSGAII:
             # Log generation data
             self.log_generation(
                 generation=iter_idx,
-                best_weighted_fitness=current_best_fitness,
                 best_reader_score=current_best_score2,
                 best_retrieval_score=current_best_score1,
                 best_individual_text=current_best_individual.get_perturbed_text(),
-                population_stats=pop_stats,
                 pareto_stats=pareto_stats
             )
 
             # Print generation info
             print(f"\n📊 Generation {iter_idx}")
-            print(f"   Best weighted fitness: {current_best_fitness:.6f}")
-            print(f"   Best reader score: {current_best_score2:.6f}")
-            print(f"   Best retrieval score: {current_best_score1:.6f}")
             print(f"   Pareto front size: {pareto_stats['pareto_front_size']}")
             print(f"   Total fronts: {pareto_stats['total_fronts']}")
-            print(f"   Success criteria met: {current_best_score1 < self.success_threshold and current_best_score2 < self.success_threshold}")
             
             # Optional: print generated answer for debugging
             try:
-                generated_answer = self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()])
                 if isinstance(generated_answer, list):
                     generated_answer = generated_answer[0] if generated_answer else "No answer"
                 print(f"   Generated answer: '{generated_answer.strip()}'")
@@ -616,10 +621,10 @@ class NSGAII:
                 print(f"   Generated answer: Error - {str(e)}")
             
             # Early stopping if success achieved
-            if (self.success_achieved and 
-                iter_idx - self.success_generation >= 10):  # Continue for 10 more generations after success
-                print(f"🎯 Early stopping: Success maintained for 10 generations")
-                break
+            # if (self.success_achieved and 
+            #     iter_idx - self.success_generation >= 10):  # Continue for 10 more generations after success
+            #     print(f"🎯 Early stopping: Success maintained for 10 generations")
+            #     break
             
             # NSGA-II Selection for next generation
             pool_indices = np.arange(len(pool))
@@ -627,7 +632,6 @@ class NSGAII:
             
             # Update population
             P = [pool[i] for i in selected_indices]
-            P_fitness_weighted = pool_fitness_weighted[selected_indices]
             P_score1 = pool_score1[selected_indices]
             P_score2 = pool_score2[selected_indices]
 
@@ -640,7 +644,6 @@ class NSGAII:
         print(f"   Final success status: {self.success_achieved}")
         if self.success_achieved:
             print(f"   Success achieved at generation: {self.success_generation}")
-        print(f"   Best weighted fitness: {self.best_fitness:.6f}")
         print(f"   Best reader score: {self.best_score1:.6f}")
         print(f"   Best retrieval score: {self.best_score2:.6f}")
         print("="*60)
@@ -651,7 +654,6 @@ class NSGAII:
         return {
             "success": self.success_achieved,
             "success_generation": self.success_generation,
-            "best_fitness": self.best_fitness,
             "best_reader_score": self.best_score1,
             "best_retrieval_score": self.best_score2,
             "best_individual": self.best_individual,
@@ -680,7 +682,7 @@ class NSGAII:
             return []
         
         # Evaluate current population
-        fitness_weighted, score1, score2 = self.fitness(
+        score1, score2 = self.fitness(
             question=self.question,
             contexts=[ind.get_perturbed_text() for ind in self.pop.individuals],
             answer=self.answer
@@ -699,7 +701,6 @@ class NSGAII:
                 "individual": self.pop.individuals[idx],
                 "reader_score": score2[idx],
                 "retrieval_score": score1[idx],
-                "weighted_fitness": fitness_weighted[idx],
                 "text": self.pop.individuals[idx].get_perturbed_text()
             })
         
@@ -721,7 +722,6 @@ class NSGAII:
         print(f"   Success Achieved: {self.success_achieved}")
         if self.success_achieved:
             print(f"   Success Generation: {self.success_generation}")
-        print(f"   Best Weighted Fitness: {self.best_fitness:.6f}")
         print(f"   Best Reader Score: {self.best_score1:.6f}")
         print(f"   Best Retrieval Score: {self.best_score2:.6f}")
         
