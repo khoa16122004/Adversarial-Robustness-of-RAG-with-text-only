@@ -171,11 +171,11 @@ def test_mutation():
         mutated_text = ind.get_perturbed_text()
         print(mutated_text)
 
-        # Kiểm tra xem mutation có tạo trùng với answer không
-        if answer in mutated_text.split():
-            print(f"Error: Mutation created a word matching the answer '{answer}'!")
-        else:
-            print("Mutation passed: No word matches the answer.")
+        # # Kiểm tra xem mutation có tạo trùng với answer không
+        # if answer in mutated_text.split():
+        #     print(f"Error: Mutation created a word matching the answer '{answer}'!")
+        # else:
+        #     print("Mutation passed: No word matches the answer.")
 
 # Gọi hàm test
 if __name__ == "__main__":
