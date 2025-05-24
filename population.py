@@ -87,22 +87,24 @@ class Population:
             Individual(self.original_text, child2_words, child2_indices)
 
     def mutation(self, ind: Individual, mutation_prob=0.3):
-        words, indices = ind.get_modified()
-        if not indices:
-            return copy.deepcopy(ind)
-        if random.random() < mutation_prob:
-            mutate_idx = random.choice(indices)
-            word_pos = indices.index(mutate_idx)
-            # original_words = self.original_text.split()
-            typo_candidates = self.transformation.get_replacement_words(self.original_splits[mutate_idx])
-            if not typo_candidates:
+            words, indices = ind.get_modified()
+            if random.random() < mutation_prob:
+                # Chọn ngẫu nhiên một index từ toàn bộ indices_to_modify
+                mutate_idx = random.choice(indices)
+                word_pos = indices.index(mutate_idx)
+
+                typo_candidates = self.transformation.get_replacement_words(self.original_splits[mutate_idx])
+                if not typo_candidates:
+                    return copy.deepcopy(ind)
+                new_word = random.choice(typo_candidates)
+                new_words = words.copy()
+                if word_pos < len(new_words):
+                    new_words[word_pos] = new_word
+                else:
+                    new_words.append(new_word)
+                return Individual(self.original_text, new_words, indices)
+            else:
                 return copy.deepcopy(ind)
-            new_word = random.choice(typo_candidates)
-            new_words = words.copy()
-            new_words[word_pos] = new_word
-            return Individual(self.original_text, new_words, indices)
-        else:
-            return copy.deepcopy(ind)
 
 def create_population(original_text, args):
     transformation = ComboTypoTransformation()
