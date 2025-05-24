@@ -126,7 +126,6 @@ def main(args):
     print("Original output: ", original_output)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
-    parser.add_argument("--attack", type=str, default="ga", help="Attack method")
     parser.add_argument("--reader_name", default="Llama-7b", type=str, help="Retriever model name")
     parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, help="Question encoder name")
     parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
