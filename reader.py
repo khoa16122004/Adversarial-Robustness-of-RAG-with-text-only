@@ -139,10 +139,8 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
-        # Tạo prompt cho mỗi context
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         
-        # Tokenize prompts và answer
         prompts_ids = self.tokenizer(
             inputs,
             return_tensors="pt",
@@ -153,10 +151,8 @@ class Reader(torch.nn.Module):
         
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
         
-        # Kết hợp prompt và answer cho mỗi context
         full_sequences = torch.cat([prompts_ids.input_ids, answer_ids.repeat(prompts_ids.input_ids.size(0), 1)], dim=1)
         
-        # Tính toán logits từ model
         outputs = self.model(
             input_ids=full_sequences,
             attention_mask=(full_sequences != self.tokenizer.pad_token_id).to(self.model.device)
@@ -166,20 +162,15 @@ class Reader(torch.nn.Module):
         prompt_lengths = prompts_ids.input_ids.shape[1]
         answer_length = answer_ids.shape[1]
         
-        # Trích xuất logits tương ứng với các token của answer
         answer_logits = logits[:, prompt_lengths-1:prompt_lengths-1+answer_length, :]
         
-        # Tính log probabilities
         log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
-        # Lấy log probabilities cho các token thực tế trong answer
         answer_tokens = answer_ids.squeeze(0)
         token_log_probs = log_probs.gather(2, answer_tokens.unsqueeze(0).unsqueeze(0).expand(log_probs.size(0), -1, -1)).squeeze(2)
         
-        # Tính tổng log probabilities cho mỗi context
         total_log_probs = token_log_probs.sum(dim=1)
         
-        # Chuyển đổi log probabilities thành xác suất
         scores = torch.exp(total_log_probs).tolist()
         
         return scores
@@ -229,47 +220,6 @@ class Reader(torch.nn.Module):
         probability = torch.exp(total_log_prob).item()
         
         return probability
-
-    @torch.no_grad()
-    def get_scores(self, input_ids, answer_ids):
-        batch_size = input_ids.shape[0]
-        scores = []
-        
-        for i in range(batch_size):
-            input_seq = input_ids[i:i+1] 
-            answer_seq = answer_ids[i]    
-            
-            
-            answer_seq = answer_seq[answer_seq != self.tokenizer.pad_token_id]
-            
-            if len(answer_seq) == 0: 
-                scores.append(0.0)
-                continue
-            
-            full_seq = torch.cat([
-                input_seq.squeeze(0), 
-                answer_seq
-            ], dim=0).unsqueeze(0)  
-            
-            outputs = self.model(
-                input_ids=full_seq.to(self.model.device),
-                attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
-            )
-            
-            input_len = input_seq.shape[1]  
-            answer_logits = outputs.logits[0, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
-            
-            log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-            
-            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1).cuda()).squeeze(1)  # (answer_len,)
-            
-            avg_log_prob = token_log_probs.mean()
-            prob = torch.exp(avg_log_prob).item()
-            
-            scores.append(prob)
-            
-        
-        return np.array(scores)
 
 
 if __name__ == "__main__":
