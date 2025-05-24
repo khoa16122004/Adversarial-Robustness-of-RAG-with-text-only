@@ -257,16 +257,8 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
     
-    output = reader.generate(question, [context])
-    print(reader(question, [context], answer[0]))
-    scores = []
-    for ans in answer:
-        score = reader(question, [context], ans) 
-        scores.append(score)
-        print(f"Answer: {ans} | Score: {score}")  
-    scores = np.array(scores)
-    scores = scores / scores.sum()
+    output = reader.generate(question, [context]).item()
+    print(output)
     
-    print(scores)   
-    print(np.argmax(scores))    
- 
+    score = reader.calculate_answer_probability(question, context, output)
+    print(score)
