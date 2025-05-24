@@ -115,7 +115,7 @@ def create_population(original_text, answer, args):
     
     indices_to_modify = [
         i for i, word in enumerate(original_words) 
-        if word not in answer_words
+        if word == answer_words
     ]
     
     return Population(
