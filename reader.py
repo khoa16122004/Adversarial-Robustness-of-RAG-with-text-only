@@ -180,7 +180,7 @@ class Reader(torch.nn.Module):
         outputs = self.model(full_sequence)
         logits = outputs.logits[0] 
         prompt_len = prompt_ids.shape[1]
-        answer_logits = logits[prompt_len-1:prompt_len-1+answer_ids.shape[1]]  # (answer_len, vocab_size)
+        answer_logits = logits[prompt_len-1:prompt_len - 1 +answer_ids.shape[1]]  # (answer_len, vocab_size)
         
         log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
