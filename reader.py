@@ -263,6 +263,7 @@ if __name__ == "__main__":
     for ans in answer:
         score = reader(question, [context], ans) 
         scores.append(score)
+        print(f"""Answer: {ans} | Score: {score:.6f}""")  # Print the answer and score)
     scores = np.array(scores)
     scores = scores / scores.sum()
     
