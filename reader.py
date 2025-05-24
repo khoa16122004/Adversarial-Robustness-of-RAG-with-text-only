@@ -286,7 +286,8 @@ if __name__ == "__main__":
         print()
 
     print("Comparing different answers:")
-    test_answers = ["artificial intelligence", 
+    test_answers = ["Computer vision and NLP",
+                    "artificial intelligence", 
                     "Medicine", 
                     "AI", 
                     "Physics"]
