@@ -122,7 +122,8 @@ class GA:
                 "best_fitness": float(self.best_fitness) if self.best_fitness is not None else None,
                 "best_reader_score": float(self.best_score1) if self.best_score1 is not None else None,
                 "best_retrieval_score": float(self.best_score2) if self.best_score2 is not None else None,
-                "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None
+                "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None,
+                "modified_info": self.best_individual.get_modified() if self.best_individual else None
             },
             "generation_logs": self.generation_logs
         }
