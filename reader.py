@@ -283,7 +283,7 @@ class Reader(torch.nn.Module):
             # Create full sequences (prompt + answer)
             batch_full_sequences = []
             for prompt_ids in batch_prompt_ids:
-                full_seq = torch.cat([prompt_ids, answer_tokens], dim=0).cuda()
+                full_seq = torch.cat([prompt_ids.cuda(), answer_tokens], dim=0).cuda()
                 batch_full_sequences.append(full_seq)
             
             # Pad sequences to same length
