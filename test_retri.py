@@ -38,5 +38,5 @@ documents = [
 scores = retriever(question, documents)
 best_idx = np.argmax(scores)
 best_doc = documents[best_idx]
-output = reader.generate(scores, question, [best_doc])
+output = reader.generate(question, [best_doc])
 print(output)
