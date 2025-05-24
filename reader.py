@@ -139,24 +139,49 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
+        # Tạo prompt cho mỗi context
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         
-        prompts_ids = self.tokenizer.encode(inputs, return_tensors="pt").to(self.model.device)
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt") 
-        answers_ids = answer_ids.repeat(prompts_ids.shape[0], 1)
+        # Tokenize prompts và answer
+        prompts_ids = self.tokenizer(
+            inputs,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=512
+        ).to(self.model.device)
         
-        outputs = self.model(prompts_ids, answers_ids)
+        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
+        
+        # Kết hợp prompt và answer cho mỗi context
+        full_sequences = torch.cat([prompts_ids.input_ids, answer_ids.repeat(prompts_ids.input_ids.size(0), 1)], dim=1)
+        
+        # Tính toán logits từ model
+        outputs = self.model(
+            input_ids=full_sequences,
+            attention_mask=(full_sequences != self.tokenizer.pad_token_id).to(self.model.device)
+        )
+        
         logits = outputs.logits
-        answer_logits = logits[:, prompts_ids.shape[1]-1:prompts_ids.shape[1]-1+answer_ids.shape[1]]
+        prompt_lengths = prompts_ids.input_ids.shape[1]
+        answer_length = answer_ids.shape[1]
         
+        # Trích xuất logits tương ứng với các token của answer
+        answer_logits = logits[:, prompt_lengths-1:prompt_lengths-1+answer_length, :]
+        
+        # Tính log probabilities
         log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
-        answer_tokens = answer_ids.squeeze(0)  
-        token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
+        # Lấy log probabilities cho các token thực tế trong answer
+        answer_tokens = answer_ids.squeeze(0)
+        token_log_probs = log_probs.gather(2, answer_tokens.unsqueeze(0).unsqueeze(0).expand(log_probs.size(0), -1, -1)).squeeze(2)
         
-        total_log_prob = token_log_probs.sum()  
-        scores = torch.exp(total_log_prob).item()
+        # Tính tổng log probabilities cho mỗi context
+        total_log_probs = token_log_probs.sum(dim=1)
         
+        # Chuyển đổi log probabilities thành xác suất
+        scores = torch.exp(total_log_probs).tolist()
+    
         return scores
     
     @torch.no_grad()
