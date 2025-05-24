@@ -91,9 +91,7 @@ class Population:
     def mutation(self, ind: Individual, mutation_prob=0.3):
             words, indices = ind.get_modified( )
             if random.random() < mutation_prob:
-                
-    
-                new_idx = random.choice([i for i in range(len(self.original_splits)) if i not in self.position_answer and i not in indices])
+                new_idx = random.choice([i for i in range(len(self.original_splits)) if i not in ind.position_answer and i not in indices])
                 new_words = self.transformation.get_replacement_words(self.original_splits[new_idx])
                 mutate_idx = random.choice(indices)
                 pos_idx = indices.index(mutate_idx)
