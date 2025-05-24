@@ -292,7 +292,7 @@ class Reader(torch.nn.Module):
             
             log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
             
-            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1)).squeeze(1)  # (answer_len,)
+            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1).cuda()).squeeze(1)  # (answer_len,)
             
             avg_log_prob = token_log_probs.mean()
             prob = torch.exp(avg_log_prob).item()
