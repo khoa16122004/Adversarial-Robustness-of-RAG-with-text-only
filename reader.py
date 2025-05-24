@@ -73,7 +73,6 @@ class Reader(torch.nn.Module):
                 logits = outputs.logits
             
             # Get logits for the last token
-            print("Logits shape: ", logits.shape)
             next_token_logits = logits[0, -1, :]  # (vocab_size,)
             
             # Greedy selection: choose token with highest probability
@@ -81,7 +80,7 @@ class Reader(torch.nn.Module):
             
             # Append to generated sequence
             generated = torch.cat([generated, next_token_id], dim=1)
-            print("Generated shape: ", generated.shape)
+            
             # Check for EOS token
             if next_token_id.item() == eos_token_id:
                 print(f"EOS token reached at step {step}")
@@ -177,11 +176,15 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
+        """
+        Tính score cho answer với từng context
+        """
         inputs = [self.template.format(q=question, d=text) for text in contexts]
-        labels = [answer] * len(inputs)
-        print("Contexts: ", contexts)
-        print("Len inputs: ", len(inputs))
+        print("Question:", question)
+        print("Answer:", answer)
+        print("Number of contexts:", len(contexts))
         
+        # Tokenize inputs (prompts)
         input_embeddings = self.tokenizer(
             inputs,
             max_length=512,
@@ -189,18 +192,23 @@ class Reader(torch.nn.Module):
             padding=True, 
             return_tensors="pt",
         )
-        label_embeddings = self.tokenizer(
-            labels, 
-            max_length=512,
+        
+        # Tokenize answer (same answer for all contexts)
+        answer_embeddings = self.tokenizer(
+            [answer] * len(inputs),  # repeat answer for each input
+            max_length=128,  # answer thường ngắn hơn
             truncation=True,
             padding=True, 
             return_tensors="pt",
         )
         
-        print("First inputids: ", input_embeddings.input_ids.shape)
-        print("Second inputids: ", label_embeddings.input_ids.shape)
+        print("Input embeddings shape:", input_embeddings.input_ids.shape)
+        print("Answer embeddings shape:", answer_embeddings.input_ids.shape)
         
-        scores = self.get_scores(input_embeddings.input_ids, label_embeddings.input_ids)
+        # Tính scores
+        scores = self.get_scores(input_embeddings.input_ids, answer_embeddings.input_ids)
+        
+        print("Scores:", scores)
         return scores
     
     @torch.no_grad()
@@ -229,33 +237,114 @@ class Reader(torch.nn.Module):
             return outputs.split("Answer:")[-1].strip()
     
     @torch.no_grad()
-    def _cal_label_prob(self, probs, labels):
-        result = []
-        for prob, label in zip(probs, labels):
-            mask = label > 0
-            prob, label = prob[mask], label[mask]
-            log_softmax = torch.nn.functional.log_softmax(prob, dim=-1)
-            nll = -log_softmax.gather(1, label.unsqueeze(0).transpose(0, 1))
-            avg_nll = torch.mean(nll)
-            result.append(float(torch.exp(-avg_nll)))
-        return np.array(result)
+    def calculate_answer_probability(self, question, context, answer):
+        """
+        Tính xác suất để model sinh ra answer cụ thể cho question+context
+        
+        Args:
+            question: str - câu hỏi
+            context: str - ngữ cảnh  
+            answer: str - câu trả lời cần tính xác suất
+            
+        Returns:
+            float - xác suất từ 0 đến 1
+        """
+        # Format prompt
+        prompt = self.template.format(q=question, d=context)
+        
+        # Tokenize prompt và answer
+        prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
+        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
+        
+        # Tạo full sequence: prompt + answer
+        full_sequence = torch.cat([prompt_ids, answer_ids], dim=1)
+        
+        # Forward pass
+        outputs = self.model(full_sequence)
+        logits = outputs.logits[0]  # (seq_len, vocab_size)
+        
+        # Lấy logits cho phần answer (bỏ prompt)
+        prompt_len = prompt_ids.shape[1]
+        answer_logits = logits[prompt_len-1:prompt_len-1+answer_ids.shape[1]]  # (answer_len, vocab_size)
+        
+        # Tính log probabilities
+        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+        
+        # Lấy log prob của các token trong answer
+        answer_tokens = answer_ids.squeeze(0)  # (answer_len,)
+        token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
+        
+        # Tính probability tổng (geometric mean)
+        total_log_prob = token_log_probs.sum()  # hoặc .mean() nếu muốn average
+        probability = torch.exp(total_log_prob).item()
+        
+        return probability
 
     @torch.no_grad()
-    def get_scores(self, input_ids, label_ids):
-        print("Input ids shape: ", input_ids.shape)
-        print("Label ids shape: ", label_ids.shape)
-
-        outputs = self.model(
-            input_ids=input_ids.to(self.model.device),
-            attention_mask=(input_ids != self.tokenizer.pad_token_id).to(self.model.device),
-        )
-        print("label ids: ", label_ids)
-        print("Input ids: ", torch.argmax(outputs.logits, dim=-1))
+    def get_scores(self, input_ids, answer_ids):
+        """
+        Tính xác suất để model sinh ra answer khi biết input
+        Args:
+            input_ids: tensor chứa input prompt đã tokenize
+            answer_ids: tensor chứa answer đã tokenize
+        Returns:
+            scores: array chứa xác suất cho mỗi sample
+        """
+        batch_size = input_ids.shape[0]
+        scores = []
         
-        scores = self._cal_label_prob(outputs.logits, label_ids.to(self.model.device))
-        scores = scores * 100
-
-        return scores
+        for i in range(batch_size):
+            # Lấy input và answer cho sample thứ i
+            input_seq = input_ids[i:i+1]  # (1, input_len)
+            answer_seq = answer_ids[i]    # (answer_len,)
+            
+            # Loại bỏ padding tokens khỏi answer
+            answer_seq = answer_seq[answer_seq != self.tokenizer.pad_token_id]
+            
+            if len(answer_seq) == 0:  # Nếu answer rỗng
+                scores.append(0.0)
+                continue
+            
+            # Tạo full sequence: input + answer
+            full_seq = torch.cat([
+                input_seq.squeeze(0),  # remove batch dim
+                answer_seq
+            ], dim=0).unsqueeze(0)  # add batch dim back: (1, full_len)
+            
+            # Forward pass qua model
+            outputs = self.model(
+                input_ids=full_seq.to(self.model.device),
+                attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
+            )
+            
+            # Lấy logits cho phần answer (bỏ qua phần input)
+            input_len = input_seq.shape[1]  
+            answer_logits = outputs.logits[0, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
+            
+            # Tính log probability cho từng token trong answer
+            log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+            
+            # Lấy log prob của các token thực tế trong answer
+            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1)).squeeze(1)  # (answer_len,)
+            
+            # Tính average log probability sau đó convert về probability
+            avg_log_prob = token_log_probs.mean()
+            prob = torch.exp(avg_log_prob).item()
+            
+            scores.append(prob)
+            
+            # Debug info
+            print(f"Sample {i}:")
+            print(f"  Input length: {input_len}")
+            print(f"  Answer length: {len(answer_seq)}")
+            print(f"  Answer tokens: {answer_seq.tolist()}")
+            print(f"  Answer text: '{self.tokenizer.decode(answer_seq, skip_special_tokens=True)}'")
+            print(f"  Token log probs: {token_log_probs.tolist()}")
+            print(f"  Average log prob: {avg_log_prob.item():.4f}")
+            print(f"  Final probability: {prob:.6f}")
+            print()
+        
+        return np.array(scores)
 
 
 if __name__ == "__main__":
@@ -268,23 +357,46 @@ if __name__ == "__main__":
         "In 2025, Khoa officially became a researcher at a leading technology institute. "
         "Since then, he has contributed to several groundbreaking projects in computer vision and NLP."
     )
+    answer = "2025"
 
-    # Format prompt using template
-    prompt = reader.template.format(q=question, d=context)
-    print("Prompt:", prompt)
-    print("="*50)
-
-    # Test single greedy decode
-    print("Testing single greedy decode:")
-    generated_answer = reader.greedy_decode(prompt, max_gen_len=50)
-    print("Generated answer:", generated_answer)
-    print("="*50)
-
-    # Test batch greedy decode
-    print("Testing batch greedy decode:")
-    contexts = [context, "Another context about research and AI development."]
-    prompts = [reader.template.format(q=question, d=ctx) for ctx in contexts]
+    print("="*60)
+    print("TESTING ANSWER PROBABILITY CALCULATION")
+    print("="*60)
     
-    batch_answers = reader.greedy_decode_batch(prompts, max_gen_len=30)
-    for i, answer in enumerate(batch_answers):
-        print(f"Answer {i+1}: {answer}")
+    # Test single answer probability
+    prob = reader.calculate_answer_probability(question, context, answer)
+    print(f"Question: {question}")
+    print(f"Context: {context[:100]}...")
+    print(f"Answer: '{answer}'")
+    print(f"Probability: {prob:.8f}")
+    print()
+
+    # Test với multiple contexts
+    contexts = [
+        context,
+        "Khoa started his research career in 2024 after completing his PhD.",
+        "In 2023, Khoa joined the research team and began working on AI projects."
+    ]
+    
+    print("Testing with multiple contexts:")
+    scores = reader.forward(question, contexts, answer)
+    for i, (ctx, score) in enumerate(zip(contexts, scores)):
+        print(f"Context {i+1}: {ctx[:50]}...")
+        print(f"Score: {score:.8f}")
+        print()
+
+    # So sánh với different answers
+    print("Comparing different answers:")
+    test_answers = ["2025", "2024", "2023", "never"]
+    for test_answer in test_answers:
+        prob = reader.calculate_answer_probability(question, context, test_answer)
+        print(f"Answer '{test_answer}': {prob:.8f}")
+    
+    print("="*60)
+    print("TESTING GREEDY GENERATION")  
+    print("="*60)
+    
+    # Test greedy generation
+    prompt = reader.template.format(q=question, d=context)
+    generated_answer = reader.greedy_decode(prompt, max_gen_len=20)
+    print("Generated answer:", generated_answer)
