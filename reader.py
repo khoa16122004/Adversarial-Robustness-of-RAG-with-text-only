@@ -185,28 +185,39 @@ class Reader(torch.nn.Module):
             return outputs.split("Answer:")[-1].strip()
     
     @torch.no_grad()
-    def calculate_answer_probability(self, question, context, answer):
-        prompt = self.template.format(q=question, d=context)
+    def calculate_answer_probabilities(self, question, contexts, answer):
+        prompts = [self.template.format(q=question, d=ctx) for ctx in contexts]
         
-        prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
-        
-        full_sequence = torch.cat([prompt_ids, answer_ids], dim=1)
-        
-        outputs = self.model(full_sequence)
-        logits = outputs.logits[0] 
-        prompt_len = prompt_ids.shape[1]
-        answer_logits = logits[prompt_len-1:prompt_len-1+answer_ids.shape[1]]  # (answer_len, vocab_size)
-        
-        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-        
-        answer_tokens = answer_ids.squeeze(0)  
-        token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
-        
-        total_log_prob = token_log_probs.sum()  
-        probability = torch.exp(total_log_prob).item()
-        
-        return probability
+        prompt_inputs = self.tokenizer(prompts, return_tensors="pt", padding=True, truncation=True).to(self.model.device)
+        answer_inputs = self.tokenizer([answer] * len(contexts), return_tensors="pt", padding=True, truncation=True).to(self.model.device)
+
+        prompt_ids = prompt_inputs["input_ids"]
+        answer_ids = answer_inputs["input_ids"]
+
+        full_inputs = torch.cat([prompt_ids, answer_ids], dim=1)
+
+        outputs = self.model(full_inputs)
+        logits = outputs.logits  # (batch_size, seq_len, vocab_size)
+
+        prompt_lens = (prompt_ids != self.tokenizer.pad_token_id).sum(dim=1)  # (B,)
+        answer_lens = (answer_ids != self.tokenizer.pad_token_id).sum(dim=1)  # (B,)
+
+        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
+
+        token_log_probs = []
+        for i in range(len(contexts)):
+            start = prompt_lens[i] - 1
+            end = start + answer_lens[i]
+
+            selected_logits = log_probs[i, start:end]
+            selected_answer_ids = answer_ids[i, :answer_lens[i]]
+            probs = selected_logits.gather(1, selected_answer_ids.unsqueeze(1)).squeeze(1)
+            token_log_probs.append(probs.sum())
+
+        total_log_probs = torch.stack(token_log_probs)  # (B,)
+        probabilities = torch.exp(total_log_probs)  # (B,)
+
+        return probabilities.cpu().numpy()
 
     @torch.no_grad()
     def get_scores(self, input_ids, answer_ids):
@@ -260,5 +271,5 @@ if __name__ == "__main__":
     output = reader.generate(question, [context])[0]
     print(output)
     
-    score = reader.calculate_answer_probability(question, context, answer)
+    score = reader.calculate_answer_probability(question, [context, context], output)
     print(score)
