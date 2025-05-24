@@ -99,9 +99,9 @@ class Population:
         return Individual(self.original_text, self.answer, child1_words, child1_indices), \
             Individual(self.original_text, self.answer, child2_words, child2_indices)
 
-    def mutation(self, ind: Individual, mutation_prob=1):
+    def mutation(self, ind: Individual, mutation_prob=0.3):
             words, indices = ind.get_modified( )
-            print("indices: ", indices)
+            # print("indices: ", indices)
             if random.random() < mutation_prob:
                 new_words = None
                 while not new_words:
@@ -119,6 +119,7 @@ class Population:
                     words,
                     indices
                 )
+            return ind
 
 def create_population(original_text, answer, args):
     transformation = ComboTypoTransformation()
