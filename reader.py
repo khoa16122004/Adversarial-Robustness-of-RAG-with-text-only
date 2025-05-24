@@ -159,8 +159,8 @@ if __name__ == "__main__":
     input_ids = torch.tensor([input_enc], dtype=torch.long).to("cuda")
 
     max_gen_len = 50
-    eos_token_id = reader.tokenizer.eos_id
-    pad_token_id = reader.tokenizer.pad_id
+    eos_token_id = reader.tokenizer.eos_token_id
+    pad_token_id = reader.tokenizer.pad_token_id
 
     with torch.no_grad():
         for _ in range(max_gen_len):
