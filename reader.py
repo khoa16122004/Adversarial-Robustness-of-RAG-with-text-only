@@ -73,6 +73,7 @@ class Reader(torch.nn.Module):
                 logits = outputs.logits
             
             # Get logits for the last token
+            print("Logits shape: ", logits.shape)
             next_token_logits = logits[0, -1, :]  # (vocab_size,)
             
             # Greedy selection: choose token with highest probability
@@ -80,7 +81,7 @@ class Reader(torch.nn.Module):
             
             # Append to generated sequence
             generated = torch.cat([generated, next_token_id], dim=1)
-            
+            print("Generated shape: ", generated.shape)
             # Check for EOS token
             if next_token_id.item() == eos_token_id:
                 print(f"EOS token reached at step {step}")
