@@ -17,7 +17,7 @@ class Individual:
         self.original_splits = self.original_text.split()
         self.answer = answer
         self.position_answer =  [m.start() for m in re.finditer(re.escape(answer), original_text)]
-
+        print(self.position_answer)
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
