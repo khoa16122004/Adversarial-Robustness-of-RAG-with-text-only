@@ -38,7 +38,7 @@ class FitnessDual:
 class WeightedSUm:
     def __init__(self, reader_name, q_name, c_name,
                  retriever_weight, reader_weight,
-                 question, original_text, answer, target_text="dont know"):
+                 question, original_text, answer, target_text=None):
         self.reader = Reader(reader_name)
         self.retriever = Retriever(q_name, c_name)
         self.original_text = original_text
@@ -64,6 +64,78 @@ class WeightedSUm:
         
         weighted_result = self.retriever_weight * retri_scores + self.reader_weight * reader_scores
         return weighted_result, retri_scores, reader_scores
+
+class Targeted_WeightedSUm:
+    def __init__(self, reader_name, q_name, c_name,
+                 retriever_weight, reader_weight,
+                 question, original_text, answer, target_text="dont know"):
+        self.reader = Reader(reader_name)
+        self.retriever = Retriever(q_name, c_name)
+        self.original_text = original_text
+        self.retri_clean_reuslt = self.retriever(question, [original_text])
+        # print("Original retri-score: ", self.retri_clean_reuslt)
+        # print("Original reader-score: ", self.reader_clean_result)
+        
+        self.target_text = target_text
+        self.answer = answer
+
+    
+    
+    def __call__(self, question, contexts, answer):
+        
+        retrieval_result = self.retriever(question, contexts)
+        reader_result_with_answer = self.reader(question, contexts, answer)
+        reader_result_with_target = self.reader(question, contexts, answer)
+        # print("Contexts: ", contexts)
+        retri_scores = self.retri_clean_reuslt / retrieval_result
+        reader_scores = reader_result_with_answer / reader_result_with_target
+        
+        weighted_result = self.retriever_weight * retri_scores + self.reader_weight * reader_scores
+        return weighted_result, retri_scores, reader_scores
+
+class MultiScore:
+    def __init__(self, reader_name, q_name, c_name,
+                 question, original_text, answer, target_text="dont know"):
+        self.reader = Reader(reader_name)
+        self.retriever = Retriever(q_name, c_name)
+        self.original_text = original_text
+        self.retri_clean_reuslt = self.retriever(question, [original_text])
+        self.reader_clean_result = self.reader(question, [original_text], answer)
+        
+        self.target_text = target_text
+        self.answer = answer
+        
+    
+    def __call__(self, question, contexts, answer):
+        
+        retrieval_result = self.retriever(question, contexts)
+        reader_result = self.reader(question, contexts, answer)
+        # print("Contexts: ", contexts)
+        retri_scores = self.retri_clean_reuslt / retrieval_result
+        reader_scores = reader_result / self.reader_clean_result
+        
+        return retri_scores, reader_scores
+class Targeted_MultiScore:
+    def __init__(self, reader_name, q_name, c_name,
+                 question, original_text, answer, target_text="dont know"):
+        self.reader = Reader(reader_name)
+        self.retriever = Retriever(q_name, c_name)
+        self.original_text = original_text
+        self.retri_clean_reuslt = self.retriever(question, [original_text])
+        
+        self.target_text = target_text
+        self.answer = answer
+        
+            
+    def __call__(self, question, contexts, answer):
+        
+        retrieval_result = self.retriever(question, contexts)
+        reader_result_with_answer = self.reader(question, contexts, answer)
+        reader_result_with_target = self.reader(question, contexts, answer)
+        retri_scores = self.retri_clean_reuslt / retrieval_result
+        reader_scores = reader_result_with_answer / reader_result_with_target
+        
+        return retri_scores, reader_scores
 
 
 if __name__ == "__main__":

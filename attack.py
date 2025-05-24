@@ -1,7 +1,7 @@
 import argparse
-from algorithm import GA
+from algorithm import GA, NSGAII
 from population import create_population, Population, Individual
-from fitness import WeightedSUm
+from fitness import WeightedSUm, MultiScore, Targeted_MultiScore, Targeted_WeightedSUm
 import numpy as np
 from utils import set_seed_everything
 
@@ -16,34 +16,104 @@ def main(args):
     answer = "Computer vision and natural language processing."
     
     
-    
-    if args.attack != "ga":
-        raise ValueError(f"Unsupported attack method: {args.attack}")
-
-    fitness = WeightedSUm(
-        reader_name=args.reader_name,
-        q_name=args.q_name,
-        c_name=args.c_name,
-        retriever_weight=args.retriever_weight,
-        reader_weight=args.reader_weight,
-        question=question,
-        original_text=original_text,
-        answer=answer
-        
-    )
-
     population = create_population(original_text, args)
 
-    ga = GA(
-        n_iter=args.n_iter,
-        population=population,
-        fitness=fitness,
-        tournament_size=args.tournament_size,
-        question=question,
-        answer=answer
-    )
 
-    result = ga.solve_rule()
+
+    if args.fitness_statery == "golden_answer":
+        if args.algorithm == "GA":
+            fitness = WeightedSUm(
+                reader_name=args.reader_name,
+                q_name=args.q_name,
+                c_name=args.c_name,
+                retriever_weight=args.retriever_weight,
+                reader_weight=args.reader_weight,
+                question=question,
+                original_text=original_text,
+                answer=answer
+            )
+            
+            algo = GA(
+                n_iter=args.n_iter,
+                population=population,
+                fitness=fitness,
+                tournament_size=args.tournament_size,
+                question=question,
+                answer=answer
+            )
+            
+            
+            
+
+            
+        elif args.algorithm == "NSGAII":
+            fitness = MultiScore(
+                reader_name=args.reader_name,
+                q_name=args.q_name,
+                c_name=args.c_name,
+                retriever_weight=args.retriever_weight,
+                reader_weight=args.reader_weight,
+                question=question,
+                original_text=original_text,
+                answer=answer
+            )
+            algo = NSGAII(
+                n_iter=args.n_iter,
+                population=population,
+                fitness=fitness,
+                question=question,
+                answer=answer
+            )
+    
+    
+    elif args.fitness_statery == "target_answer":
+        if args.algorithm == "GA":
+            fitness = Targeted_WeightedSUm(
+                reader_name=args.reader_name,
+                q_name=args.q_name,
+                c_name=args.c_name,
+                retriever_weight=args.retriever_weight,
+                reader_weight=args.reader_weight,
+                question=question,
+                original_text=original_text,
+                answer=answer,
+                target_text=args.target
+            )
+            
+            algo = GA(
+                n_iter=args.n_iter,
+                population=population,
+                fitness=fitness,
+                tournament_size=args.tournament_size,
+                question=question,
+                answer=answer
+            )
+            
+            
+            
+
+            
+        elif args.algorithm == "NSGAII":
+            fitness = Targeted_MultiScore(
+                reader_name=args.reader_name,
+                q_name=args.q_name,
+                c_name=args.c_name,
+                retriever_weight=args.retriever_weight,
+                reader_weight=args.reader_weight,
+                question=question,
+                original_text=original_text,
+                answer=answer
+            )
+            
+            algo = NSGAII(
+                n_iter=args.n_iter,
+                population=population,
+                fitness=fitness,
+                question=question,
+                answer=answer
+            )
+
+    result = algo.solve_rule()
     print("Best fitness: ", result["best_fitness"])
     print("Best best_reader_score: ", result["best_reader_score"])
     print("Best best_retrieval_score: ", result["best_retrieval_score"])
@@ -65,7 +135,9 @@ if __name__ == "__main__":
     parser.add_argument("--n_iter", type=int, default=10, help="Number of GA iterations")
     parser.add_argument("--tournament_size", type=int, default=4, help="Tournament size")
     parser.add_argument("--pop_size", type=int, default=4, help="Population size")
-    
+    parser.add_argument("--fitness_statery", type=str, default="golden_answer", choices=['golden_answer', 'target_answer'], help="Fitness strategy")
+    parser.add_argument("--algorithm", type=str, default="GA", choices=['GA', 'NSGAII'], help="Algorithm")
     parser.add_argument("--pct_words_to_swap", type=float, default=0.3, help="Percentage of words to swap")
+    parser.add_argument("--target_answer", type=str, default="don't know", help="Target answer")
     args = parser.parse_args()
     pop = main(args)
