@@ -248,115 +248,6 @@ class Reader(torch.nn.Module):
             
         
         return np.array(scores)
-    
-    
-    def calculate_answer_probability_true_batch(self, question, contexts, answer, batch_size=8, debug=False):
-        """
-        True batch processing with padding and proper indexing
-        """
-        all_probabilities = []
-        
-        # Tokenize answer once
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
-        answer_tokens = answer_ids.squeeze(0)
-        
-        if debug:
-            print(f"Answer: '{answer}'")
-            print(f"Answer tokens: {answer_tokens}")
-            print(f"Answer length: {len(answer_tokens)}")
-        
-        for batch_idx in range(0, len(contexts), batch_size):
-            batch_contexts = contexts[batch_idx:batch_idx + batch_size]
-            
-            # Prepare all prompts
-            batch_prompts = [self.template.format(q=question, d=context) for context in batch_contexts]
-            
-            # Tokenize prompts individually to get exact lengths
-            batch_prompt_ids = []
-            prompt_lengths = []
-            
-            for prompt in batch_prompts:
-                prompt_ids = self.tokenizer.encode(prompt, add_special_tokens=False, return_tensors="pt")
-                batch_prompt_ids.append(prompt_ids.squeeze(0))
-                prompt_lengths.append(len(prompt_ids.squeeze(0)))
-            
-            # Create full sequences (prompt + answer)
-            batch_full_sequences = []
-            for prompt_ids in batch_prompt_ids:
-                full_seq = torch.cat([prompt_ids.cuda(), answer_tokens], dim=0).cuda()
-                batch_full_sequences.append(full_seq)
-            
-            # Pad sequences to same length
-            max_len = max(seq.shape[0] for seq in batch_full_sequences)
-            padded_sequences = []
-            attention_masks = []
-            
-            for seq in batch_full_sequences:
-                if seq.shape[0] < max_len:
-                    # Pad with tokenizer's pad token
-                    pad_length = max_len - seq.shape[0]
-                    padding = torch.full((pad_length,), self.tokenizer.pad_token_id, 
-                                    dtype=seq.dtype, device=self.model.device)
-                    padded_seq = torch.cat([seq, padding], dim=0)
-                    attention_mask = torch.cat([torch.ones(seq.shape[0]), torch.zeros(pad_length)])
-                else:
-                    padded_seq = seq
-                    attention_mask = torch.ones(seq.shape[0])
-                
-                padded_sequences.append(padded_seq)
-                attention_masks.append(attention_mask)
-            
-            # Stack into batch tensor
-            batch_tensor = torch.stack(padded_sequences).to(self.model.device)  # (batch_size, max_len)
-            attention_tensor = torch.stack(attention_masks).to(self.model.device)
-            
-            if debug and batch_idx == 0:
-                print(f"Batch tensor shape: {batch_tensor.shape}")
-                print(f"Prompt lengths: {prompt_lengths}")
-                print(f"First sequence: {self.tokenizer.decode(batch_tensor[0][:prompt_lengths[0] + len(answer_tokens)])}")
-            
-            # Forward pass
-            with torch.no_grad():
-                outputs = self.model(input_ids=batch_tensor, attention_mask=attention_tensor)
-                logits = outputs.logits  # (batch_size, seq_len, vocab_size)
-            
-            # Calculate probabilities for each sequence
-            batch_probs = []
-            for i, prompt_len in enumerate(prompt_lengths):
-                # Answer starts right after prompt
-                answer_start_idx = prompt_len
-                answer_end_idx = answer_start_idx + len(answer_tokens)
-                
-                # Extract answer logits
-                answer_logits = logits[i, answer_start_idx:answer_end_idx]  # (answer_len, vocab_size)
-                
-                if debug and batch_idx == 0 and i == 0:
-                    print(f"Answer logits shape: {answer_logits.shape}")
-                    print(f"Answer start idx: {answer_start_idx}, end idx: {answer_end_idx}")
-                
-                # Calculate log probabilities
-                log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-                token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
-                
-                # Sum log probabilities
-                total_log_prob = token_log_probs.sum()
-                
-                # Handle numerical stability
-                if total_log_prob < -50:
-                    probability = 1e-50
-                else:
-                    probability = torch.exp(total_log_prob).item()
-                
-                if debug and batch_idx == 0 and i == 0:
-                    print(f"Token log probs: {token_log_probs}")
-                    print(f"Total log prob: {total_log_prob:.4f}")
-                    print(f"Final probability: {probability}")
-                
-                batch_probs.append(probability)
-            
-            all_probabilities.extend(batch_probs)
-        
-        return all_probabilities
 
 
 if __name__ == "__main__":
@@ -366,6 +257,7 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", 
               "Ostrich", "Hippopotamus"]
-
-    probabilities = reader.calculate_answer_probability_true_batch(question, [context, context], answer)
-    print(probabilities)
+    
+    scores = reader.get_scores(question, [context], answer[0])
+    print(scores)
+ 
