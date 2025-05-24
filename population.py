@@ -3,7 +3,7 @@ import copy
 from textattack.shared import AttackedText
 from typo_transformation import ComboTypoTransformation
 from utils import set_seed_everything
-
+import re
 set_seed_everything(222520691)
 
 class Individual:
@@ -16,7 +16,8 @@ class Individual:
         self.original_text = original_text
         self.original_splits = self.original_text.split()
         self.answer = answer
-        self.position_answer = original_text.find(answer)
+        self.position_answer =  [m.start() for m in re.finditer(re.escape(answer), original_text)]
+
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
