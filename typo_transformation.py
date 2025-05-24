@@ -3,6 +3,8 @@ import copy
 import random
 import numpy as np
 from utils import set_seed_everything
+from nltk.corpus import wordnet
+
 set_seed_everything(222520691)
 
 class BaseTypoTransformation:
@@ -81,6 +83,38 @@ class InnerSwapTypoTransformation(BaseTypoTransformation):
             words.append(first + __shuffle_string__(mid) + ''.join(last))
         return list(set(words))
 
+
+class SynonymsTransformation:
+    def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
+        random.seed(seed)
+        np.random.seed(seed)
+        words = original_text.split()
+        per_words = []
+        per_words_indices = []
+        for _ in range(pop_size):
+            chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
+            new_words = []            
+            for idx in chosen_indices:
+                typo_candidates = self.get_replacement_words(words[idx])
+                replace_word = random.choice(typo_candidates)
+                if not replace_word:
+                    print("Typo candidate is empty: ", typo_candidates)
+                    raise
+                new_words.append(random.choice(typo_candidates))
+            per_words.append(new_words)
+            per_words_indices.append(chosen_indices)
+        return per_words, per_words_indices
+    
+    
+    def get_replacement_words(self, word):
+        synonyms = set()
+        for syn in wordnet.synsets(word):
+            for lemma in syn.lemmas():
+                w = lemma.name().replace('_', ' ')
+                if w.lower() != word.lower():
+                    synonyms.add(w)
+        return list(synonyms)
+
 class ComboTypoTransformation(BaseTypoTransformation):
     def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
         random.seed(seed)
@@ -109,7 +143,9 @@ class ComboTypoTransformation(BaseTypoTransformation):
         words += TruncateTypoTransformation().get_replacement_words(word)
         words += InnerSwapTypoTransformation().get_replacement_words(word)
         return list(set(words))
+
+
+if __name__ == "__main__":
+    transformation = SynonymsTransformation()
     
-# if __name__ == "__main__":
-#     transformation = ComboTypoTransformation()
-#     print(transformation.get_replacement_words("quick"))
+    print(transformation.get_replacement_words("quick"))
