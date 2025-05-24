@@ -144,7 +144,7 @@ class Reader(torch.nn.Module):
         for input in inputs:
             scores.append(self.calculate_answer_probability(question, input, answer))
                 
-        return scores
+        return np.array(scores)
     
     @torch.no_grad()
     def generate(self, question, contexts):
@@ -188,7 +188,7 @@ class Reader(torch.nn.Module):
         token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
         
         total_log_prob = token_log_probs.sum()  
-        probability = torch.exp(total_log_prob).item().cpu().numpy()
+        probability = torch.exp(total_log_prob).item()
         
         return probability
 
