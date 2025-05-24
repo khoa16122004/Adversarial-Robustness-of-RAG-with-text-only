@@ -13,7 +13,7 @@ def main(args):
     question = "What fields has Khoa contributed to in his research career?"
     original_text = "Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."
 
-    answer = "2025"
+    answer = "Computer vision and NLP"
     
     
     
