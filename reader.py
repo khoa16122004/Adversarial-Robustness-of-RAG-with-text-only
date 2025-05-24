@@ -139,6 +139,31 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
+        inputs = [self.template.format(q=question, d=text) for text in contexts]
+        
+        input_embeddings = self.tokenizer(
+            inputs,
+            max_length=512,
+            truncation=True,
+            padding=True, 
+            return_tensors="pt",
+        )
+        
+
+        answer_embeddings = self.tokenizer(
+            [answer] * len(inputs), 
+            max_length=128, 
+            padding=True, 
+            return_tensors="pt",
+        )
+        
+        
+        scores = self.get_scores(input_embeddings.input_ids, answer_embeddings.input_ids)
+        
+        return scores
+    
+    
+    def forward(self, question, contexts, answer):
         # Tạo prompt cho mỗi context
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         
@@ -151,10 +176,10 @@ class Reader(torch.nn.Module):
             max_length=512
         ).to(self.model.device)
         
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
+        answers_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
         
         # Kết hợp prompt và answer cho mỗi context
-        full_sequences = torch.cat([prompts_ids.input_ids, answer_ids.repeat(prompts_ids.input_ids.size(0), 1)], dim=1)
+        full_sequences = torch.cat([prompts_ids.input_ids, answers_ids.repeat(prompts_ids.input_ids.size(0), 1)], dim=1)
         
         # Tính toán logits từ model
         outputs = self.model(
@@ -163,28 +188,27 @@ class Reader(torch.nn.Module):
         )
         
         logits = outputs.logits
-        prompt_lengths = prompts_ids.input_ids.shape[1]
-        answer_length = answer_ids.shape[1]
+        prompt_len = prompts_ids.input_ids.shape[1]
+        answer_len = answers_ids.shape[1]
         
         # Trích xuất logits tương ứng với các token của answer
-        answer_logits = logits[:, prompt_lengths-1:prompt_lengths-1+answer_length, :]
+        answer_logits = logits[:, prompt_len-1:prompt_len-1+answer_len, :]
         
         # Tính log probabilities
         log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
         # Lấy log probabilities cho các token thực tế trong answer
-        answer_tokens = answer_ids.squeeze(0)
-        token_log_probs = log_probs.gather(2, answer_tokens.unsqueeze(0).unsqueeze(0).expand(log_probs.size(0), -1, -1)).squeeze(2)
+        answers_tokens = answers_ids.squeeze(0)
+        token_log_probs = log_probs.gather(2, answers_tokens.unsqueeze(0).unsqueeze(0).expand(log_probs.size(0), -1, -1)).squeeze(2)
         
         # Tính tổng log probabilities cho mỗi context
         total_log_probs = token_log_probs.sum(dim=1)
         
         # Chuyển đổi log probabilities thành xác suất
-        scores = torch.exp(total_log_probs).tolist()
+        probabilities = torch.exp(total_log_probs).tolist()
         
-        # Đảm bảo đầu ra chỉ có một giá trị xác suất cho mỗi context
-        return scores
-    
+        return probabilities
+            
     @torch.no_grad()
     def generate(self, question, contexts):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
@@ -231,6 +255,47 @@ class Reader(torch.nn.Module):
         
         return probability
 
+    @torch.no_grad()
+    def get_scores(self, input_ids, answer_ids):
+        batch_size = input_ids.shape[0]
+        scores = []
+        
+        for i in range(batch_size):
+            input_seq = input_ids[i:i+1] 
+            answer_seq = answer_ids[i]    
+            
+            
+            answer_seq = answer_seq[answer_seq != self.tokenizer.pad_token_id]
+            
+            if len(answer_seq) == 0: 
+                scores.append(0.0)
+                continue
+            
+            full_seq = torch.cat([
+                input_seq.squeeze(0), 
+                answer_seq
+            ], dim=0).unsqueeze(0)  
+            
+            outputs = self.model(
+                input_ids=full_seq.to(self.model.device),
+                attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
+            )
+            
+            input_len = input_seq.shape[1]  
+            answer_logits = outputs.logits[0, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
+            
+            log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+            
+            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1).cuda()).squeeze(1)  # (answer_len,)
+            
+            avg_log_prob = token_log_probs.mean()
+            prob = torch.exp(avg_log_prob).item()
+            
+            scores.append(prob)
+            
+        
+        return np.array(scores)
+
 
 if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
@@ -239,6 +304,13 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", 
               "Ostrich", "Hippopotamus"]
+    scores = []
+    for ans in answer:
+        score = reader(question, [context], ans) 
+        scores.append(score)
+    scores = np.array(scores)
+    scores = scores / scores.sum()
     
-    a = reader(question, [context, context], answer[0])
-    print(a)
+    print(scores)   
+    print(np.argmax(scores))    
+ 
