@@ -162,5 +162,12 @@ if __name__ == "__main__":
     logits = outputs.logits
     
     print("logits shape: ", logits.shape)
+    
+    max_new_token = 30
+    for i in range(max_new_token):
+        logit = logits[:, i, :]
+        predicted_id = torch.argmax(logit, dim=-1)
+        print("predicted_id: ", predicted_id)
+        # print(reader.tokenizer.decode([predicted_id.item()]))
             
     
