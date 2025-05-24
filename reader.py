@@ -64,7 +64,7 @@ class Reader(torch.nn.Module):
         generated = input_ids.clone()
         eos_token_id = self.tokenizer.eos_token_id
         
-        print(f"Starting generation with prompt length: {input_ids.shape[1]}")
+        # print(f"Starting generation with prompt length: {input_ids.shape[1]}")
         
         for step in range(max_gen_len):
             # Forward pass through model
@@ -202,13 +202,13 @@ class Reader(torch.nn.Module):
             return_tensors="pt",
         )
         
-        print("Input embeddings shape:", input_embeddings.input_ids.shape)
-        print("Answer embeddings shape:", answer_embeddings.input_ids.shape)
+        # print("Input embeddings shape:", input_embeddings.input_ids.shape)
+        # print("Answer embeddings shape:", answer_embeddings.input_ids.shape)
         
         # Tính scores
         scores = self.get_scores(input_embeddings.input_ids, answer_embeddings.input_ids)
         
-        print("Scores:", scores)
+        # print("Scores:", scores)
         return scores
     
     @torch.no_grad()

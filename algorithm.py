@@ -96,8 +96,6 @@ class GA:
             P_fitness_weighted = pool_fitness_weighted[selected_pool_index]
             P_score1 = pool_score1[selected_pool_index]
             P_score2 = pool_score2[selected_pool_index]
-            print("Len Population: ", len(P))
-            input()
         self.pop.individuals = P
 
         self.best_individual = best_individual
