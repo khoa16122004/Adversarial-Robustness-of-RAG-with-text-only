@@ -14,7 +14,7 @@ class Individual:
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
         self.original_splits = self.original_text.split()
-
+        self.answer = answer
         self.position_answer = original_text.find(answer)
 
     def get_perturbed_text(self):
