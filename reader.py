@@ -180,9 +180,9 @@ class Reader(torch.nn.Module):
         Tính score cho answer với từng context
         """
         inputs = [self.template.format(q=question, d=text) for text in contexts]
-        print("Question:", question)
-        print("Answer:", answer)
-        print("Number of contexts:", len(contexts))
+        # print("Question:", question)
+        # print("Answer:", answer)
+        # print("Number of contexts:", len(contexts))
         
         # Tokenize inputs (prompts)
         input_embeddings = self.tokenizer(
