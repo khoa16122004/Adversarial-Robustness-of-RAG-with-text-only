@@ -146,49 +146,36 @@ if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
     
     question = "When did Khoa become a researcher?"
-    contexts = [
-        'Khoa developed a strong passion for artificial intelligence during his university years. '
-        'After graduating with honors, he decided to pursue a career in research. In 2025, Khoa '
-        'officially became a researcher at a leading technology institute. Since then, he has '
-        'contributed to several groundbreaking projects in computer vision and natural language processing.'
-    ]
+    contexts = ['Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.']
+    
     
     inputs = [reader.template.format(q=question, d=text) for text in contexts]
-    
     # Tokenize inputs
-    input_enc = reader.tokenizer(
+    input_enc = reader.tokenizer.encode(
         inputs,
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=512
+        bos=True,
+        eos=False,
     )
-    
-    input_ids = input_enc.input_ids.to(reader.model.device)
-    attention_mask = input_enc.attention_mask.to(reader.model.device)
+    input_ids = torch.tensor([input_enc], dtype=torch.long).to("cuda")
 
-    # Forward pass
-    outputs = reader.model(input_ids=input_ids, attention_mask=attention_mask)
-    logits = outputs.logits  # (batch_size, seq_len, vocab_size)
-    
-    print("Logits shape:", logits.shape)
-    
-    # Decode top predicted token at each position for the first sample
-    max_new_tokens = 30
-    generated_ids = []
+    max_gen_len = 50
+    eos_token_id = reader.tokenizer.eos_id
+    pad_token_id = reader.tokenizer.pad_id
 
-    for i in range(min(max_new_tokens, logits.shape[1])):
-        token_logits = logits[0, i]  # (vocab_size,)
-        predicted_id = torch.argmax(token_logits).item()
-        
-        if predicted_id == reader.tokenizer.eos_token_id:
-            print("[EOS] reached at step", i)
-            break
-        
-        generated_ids.append(predicted_id)
+    with torch.no_grad():
+        for _ in range(max_gen_len):
+            cur_len = input_ids.shape[1]
+            logits = reader.model(input_ids[:, -1:], start_pos=cur_len - 1)
+            next_token = torch.argmax(logits[:, -1], dim=-1).unsqueeze(0)  # (1, 1)
 
-    decoded_output = reader.tokenizer.decode(generated_ids, skip_special_tokens=True)
-    print("Decoded output:", decoded_output)
+            input_ids = torch.cat([input_ids, next_token], dim=1)
+
+            if next_token.item() == eos_token_id:
+                break
+
+    # Bỏ prompt ra nếu bạn chỉ muốn câu trả lời
+    gen_text = reader.tokenizer.decode(input_ids[0][len(prompt_tokens):].tolist())
+    print("Generated answer:", gen_text)
 
 
             
