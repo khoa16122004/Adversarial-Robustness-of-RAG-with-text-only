@@ -230,13 +230,17 @@ class Reader(torch.nn.Module):
                 answer_seq
             ], dim=0).unsqueeze(0)  
             
+            print("Full seq: ", full_seq.shape)
+            
             outputs = self.model(
                 input_ids=full_seq.to(self.model.device),
                 attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
             )
             
+            print("Logits outputs: ", outputs.logits.shape) 
+            
             input_len = input_seq.shape[1]  
-            answer_logits = outputs.logits[0, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
+            answer_logits = outputs.logits[:, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
             
             log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
             
