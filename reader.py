@@ -141,24 +141,21 @@ class Reader(torch.nn.Module):
     def forward(self, question, contexts, answer):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         
-        input_embeddings = self.tokenizer(
-            inputs,
-            max_length=512,
-            truncation=True,
-            padding=True, 
-            return_tensors="pt",
-        )
+        prompts_ids = self.tokenizer.encode(inputs, return_tensors="pt").to(self.model.device)
+        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt") 
+        answers_ids = answer_ids.repeat(prompts_ids.shape[0], 1)
         
-
-        answer_embeddings = self.tokenizer(
-            [answer] * len(inputs), 
-            max_length=128, 
-            padding=True, 
-            return_tensors="pt",
-        )
+        outputs = self.model(prompts_ids, answers_ids)
+        logits = outputs.logits
+        answer_logits = logits[:, prompts_ids.shape[1]-1:prompts_ids.shape[1]-1+answer_ids.shape[1]]
         
+        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
-        scores = self.get_scores(input_embeddings.input_ids, answer_embeddings.input_ids)
+        answer_tokens = answer_ids.squeeze(0)  
+        token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
+        
+        total_log_prob = token_log_probs.sum()  
+        scores = torch.exp(total_log_prob).item()
         
         return scores
     
