@@ -299,70 +299,65 @@ class Reader(torch.nn.Module):
             
             scores.append(prob)
             
-            # Debug info
-            print(f"Sample {i}:")
-            print(f"  Input length: {input_len}")
-            print(f"  Answer length: {len(answer_seq)}")
-            print(f"  Answer tokens: {answer_seq.tolist()}")
-            print(f"  Answer text: '{self.tokenizer.decode(answer_seq, skip_special_tokens=True)}'")
-            print(f"  Token log probs: {token_log_probs.tolist()}")
-            print(f"  Average log prob: {avg_log_prob.item():.4f}")
-            print(f"  Final probability: {prob:.6f}")
-            print()
+            # # Debug info
+            # print(f"Sample {i}:")
+            # print(f"  Input length: {input_len}")
+            # print(f"  Answer length: {len(answer_seq)}")
+            # print(f"  Answer tokens: {answer_seq.tolist()}")
+            # print(f"  Answer text: '{self.tokenizer.decode(answer_seq, skip_special_tokens=True)}'")
+            # print(f"  Token log probs: {token_log_probs.tolist()}")
+            # print(f"  Average log prob: {avg_log_prob.item():.4f}")
+            # print(f"  Final probability: {prob:.6f}")
+            # print()
         
         return np.array(scores)
 
 
-if __name__ == "__main__":
-    reader = Reader(model_name="Llama-7b")
+# if __name__ == "__main__":
+#     reader = Reader(model_name="Llama-7b")
 
-    question = "When did Khoa become a researcher?"
-    context = (
-        "Khoa developed a strong passion for artificial intelligence during his university years. "
-        "After graduating with honors, he decided to pursue a career in research. "
-        "In 2025, Khoa officially became a researcher at a leading technology institute. "
-        "Since then, he has contributed to several groundbreaking projects in computer vision and NLP."
-    )
-    answer = "2025"
+#     question = "When did Khoa become a researcher?"
+#     context = (
+#         "Khoa developed a strong passion for artificial intelligence during his university years. "
+#         "After graduating with honors, he decided to pursue a career in research. "
+#         "In 2025, Khoa officially became a researcher at a leading technology institute. "
+#         "Since then, he has contributed to several groundbreaking projects in computer vision and NLP."
+#     )
+#     answer = "2025"
 
-    print("="*60)
-    print("TESTING ANSWER PROBABILITY CALCULATION")
-    print("="*60)
+#     print("="*60)
+#     print("TESTING ANSWER PROBABILITY CALCULATION")
+#     print("="*60)
     
-    # Test single answer probability
-    prob = reader.calculate_answer_probability(question, context, answer)
-    print(f"Question: {question}")
-    print(f"Context: {context[:100]}...")
-    print(f"Answer: '{answer}'")
-    print(f"Probability: {prob:.8f}")
-    print()
+#     prob = reader.calculate_answer_probability(question, context, answer)
+#     print(f"Question: {question}")
+#     print(f"Context: {context[:100]}...")
+#     print(f"Answer: '{answer}'")
+#     print(f"Probability: {prob:.8f}")
+#     print()
 
-    # Test với multiple contexts
-    contexts = [
-        context,
-        "Khoa started his research career in 2024 after completing his PhD.",
-        "In 2023, Khoa joined the research team and began working on AI projects."
-    ]
+#     contexts = [
+#         context,
+#         "Khoa started his research career in 2024 after completing his PhD.",
+#         "In 2023, Khoa joined the research team and began working on AI projects."
+#     ]
     
-    print("Testing with multiple contexts:")
-    scores = reader.forward(question, contexts, answer)
-    for i, (ctx, score) in enumerate(zip(contexts, scores)):
-        print(f"Context {i+1}: {ctx[:50]}...")
-        print(f"Score: {score:.8f}")
-        print()
+#     scores = reader.forward(question, contexts, answer)
+#     for i, (ctx, score) in enumerate(zip(contexts, scores)):
+#         print(f"Context {i+1}: {ctx[:50]}...")
+#         print(f"Score: {score:.8f}")
+#         print()
 
-    # So sánh với different answers
-    print("Comparing different answers:")
-    test_answers = ["2025", "2024", "2023", "never"]
-    for test_answer in test_answers:
-        prob = reader.calculate_answer_probability(question, context, test_answer)
-        print(f"Answer '{test_answer}': {prob:.8f}")
+#     print("Comparing different answers:")
+#     test_answers = ["2025", "2024", "2023", "never"]
+#     for test_answer in test_answers:
+#         prob = reader.calculate_answer_probability(question, context, test_answer)
+#         print(f"Answer '{test_answer}': {prob:.8f}")
     
-    print("="*60)
-    print("TESTING GREEDY GENERATION")  
-    print("="*60)
+#     print("="*60)
+#     print("TESTING GREEDY GENERATION")  
+#     print("="*60)
     
-    # Test greedy generation
-    prompt = reader.template.format(q=question, d=context)
-    generated_answer = reader.greedy_decode(prompt, max_gen_len=20)
-    print("Generated answer:", generated_answer)
+#     prompt = reader.template.format(q=question, d=context)
+#     generated_answer = reader.greedy_decode(prompt, max_gen_len=20)
+#     print("Generated answer:", generated_answer)

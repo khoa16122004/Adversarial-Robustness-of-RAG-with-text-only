@@ -21,7 +21,7 @@ def main(args):
         raise ValueError(f"Unsupported attack method: {args.attack}")
 
     fitness = WeightedSUm(
-        retriever_name=args.retriever_name,
+        reader_name=args.reader_name,
         q_name=args.q_name,
         c_name=args.c_name,
         retriever_weight=args.retriever_weight,
@@ -55,7 +55,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
     parser.add_argument("--attack", type=str, default="ga", help="Attack method")
-    parser.add_argument("--retriever_name", default="Llama-7b", type=str, help="Retriever model name")
+    parser.add_argument("--reader_name", default="Llama-7b", type=str, help="Retriever model name")
     parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, help="Question encoder name")
     parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
     parser.add_argument("--retriever_weight", type=float, default=0.5, help="Weight for retriever")
