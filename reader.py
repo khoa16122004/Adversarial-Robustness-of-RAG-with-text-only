@@ -257,7 +257,7 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
     
-    output = reader.generate(question, [context]).item()
+    output = reader.generate(question, [context])[0]
     print(output)
     
     score = reader.calculate_answer_probability(question, context, output)
