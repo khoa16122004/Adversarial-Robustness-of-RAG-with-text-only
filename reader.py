@@ -143,39 +143,48 @@ class Reader(torch.nn.Module):
 
 
 if __name__ == "__main__":
-    reader = Reader(model_name="Llama-7b")
-    
-    question = "When did Khoa become a researcher?"
-    contexts = ['Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.']
-    
-    
-    inputs = [reader.template.format(q=question, d=text) for text in contexts]
-    # Tokenize inputs
-    input_enc = reader.tokenizer.encode(
-        inputs,
-        bos=True,
-        eos=False,
-    )
-    input_ids = torch.tensor([input_enc], dtype=torch.long).to("cuda")
 
+    reader = Reader(model_name="Llama-7b")
+
+    question = "When did Khoa become a researcher?"
+    context = (
+        "Khoa developed a strong passion for artificial intelligence during his university years. "
+        "After graduating with honors, he decided to pursue a career in research. "
+        "In 2025, Khoa officially became a researcher at a leading technology institute. "
+        "Since then, he has contributed to several groundbreaking projects in computer vision and NLP."
+    )
+
+    # Format prompt theo template
+    prompt = reader.template.format(q=question, d=context)
+
+    # Encode prompt
+    input_ids = reader.tokenizer.encode(prompt, bos=True, eos=False)
+    input_ids = torch.tensor([input_ids], dtype=torch.long).to("cuda")
+
+    # Set config
     max_gen_len = 50
     eos_token_id = reader.tokenizer.eos_token_id
     pad_token_id = reader.tokenizer.pad_token_id
 
-    with torch.no_grad():
-        for _ in range(max_gen_len):
-            cur_len = input_ids.shape[1]
-            logits = reader.model(input_ids[:, -1:], start_pos=cur_len - 1).logits
-            next_token = torch.argmax(logits[:, -1], dim=-1).unsqueeze(0)  # (1, 1)
+    generated = input_ids
+    past_len = input_ids.shape[1]
 
-            input_ids = torch.cat([input_ids, next_token], dim=1)
+    with torch.no_grad():
+        for i in range(max_gen_len):
+            # Chỉ đưa token cuối cùng vào model (cách llama.cpp hoạt động)
+            logits = reader.model(generated[:, -1:], start_pos=past_len - 1).logits  # (1, 1, vocab_size)
+
+            next_token = torch.argmax(logits[0, -1], dim=-1).unsqueeze(0).unsqueeze(0)  # (1,1)
+
+            generated = torch.cat([generated, next_token], dim=1)
+            past_len += 1
 
             if next_token.item() == eos_token_id:
                 break
 
-    # Bỏ prompt ra nếu bạn chỉ muốn câu trả lời
-    gen_text = reader.tokenizer.decode(input_ids[0][len(input_enc):].tolist())
-    print("Generated answer:", gen_text)
+    # Bỏ prompt nếu bạn chỉ cần phần sinh ra
+    output_text = reader.tokenizer.decode(generated[0][input_ids.shape[1]:].tolist())
+    print("Generated answer:", output_text)
 
 
             
