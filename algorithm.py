@@ -40,7 +40,7 @@ class GA:
         self.best_score2 = None  
         self.success_achieved = False
         self.success_generation = None
-        
+        self.adv_output = None
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.log_file = os.path.join(log_dir, f"ga_log_{timestamp}.json")
 
@@ -123,6 +123,7 @@ class GA:
                 "best_reader_score": float(self.best_score1) if self.best_score1 is not None else None,
                 "best_retrieval_score": float(self.best_score2) if self.best_score2 is not None else None,
                 "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None,
+                "adv_output": self.adv_output if self.adv_output is not None else None,
                 "modified_info": self.best_individual.get_modified() if self.best_individual else None
             },
             "generation_logs": self.generation_logs
@@ -182,6 +183,7 @@ class GA:
                 self.best_individual = current_best_individual
                 self.best_score1 = current_best_score1
                 self.best_score2 = current_best_score2
+            
 
             pop_stats = self.calculate_population_stats(pool_fitness_weighted, pool_score1, pool_score2)
             
@@ -207,6 +209,7 @@ class GA:
                 generated_answer = self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()])
                 if isinstance(generated_answer, list):
                     generated_answer = generated_answer[0] if generated_answer else "No answer"
+                    self.adv_output = generated_answer
                 print(f"   Generated answer: '{generated_answer.strip()}'")
             except Exception as e:
                 print(f"   Generated answer: Error - {str(e)}")
