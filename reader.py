@@ -144,7 +144,7 @@ class Reader(torch.nn.Module):
         input_embeddings = self.tokenizer(
             inputs,
             max_length=512,
-            # truncation=True,
+            truncation=True,
             padding=False, 
             return_tensors="pt",
         )
