@@ -7,12 +7,15 @@ from utils import set_seed_everything
 set_seed_everything(222520691)
 
 class Individual:
-    def __init__(self, original_text, 
+    def __init__(self, original_text, answer,
                  replacement_words=None, 
                  modified_indices=None):
         self.attacked_text = AttackedText(original_text)
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
+        self.original_splits = self.original_text.split()
+
+        self.position_answer = original_text.find(answer)
 
     def get_perturbed_text(self):
         if not self.modified_indices or not self.replacement_words:
@@ -27,7 +30,7 @@ class Individual:
         return self.replacement_words, self.modified_indices
 
 class Population:
-    def __init__(self, original_text, pop_size, transformation, indices_to_modify, pct_words_to_swap=0.1):
+    def __init__(self, original_text, answer, pop_size, transformation, indices_to_modify, pct_words_to_swap=0.1):
         self.original_text = original_text
         self.pop_size = pop_size
         self.transformation = transformation
@@ -35,6 +38,7 @@ class Population:
         self.pct_words_to_swap = pct_words_to_swap # percentage words / sentence to swap
         self.individuals = self._initialize_population()
         self.original_splits = self.original_text.split()
+        self.answer = self.answer
 
     def _initialize_population(self):
         num_words_to_swap = max(int(self.pct_words_to_swap * len(self.indices_to_modify)), 1)
@@ -46,7 +50,7 @@ class Population:
         )
         individuals = []
         for w, i in zip(per_words, per_words_indices):
-            ind = Individual(self.original_text, w, i)
+            ind = Individual(self.original_text, self.answer, w, i)
             individuals.append(ind)
         return individuals
 
@@ -83,62 +87,75 @@ class Population:
             Individual(self.original_text, child2_words, child2_indices)
 
     def mutation(self, ind: Individual, mutation_prob=0.3):
-            words, indices = ind.get_modified()
+            words, indices = ind.get_modified( )
             if random.random() < mutation_prob:
+                
+    
+                new_idx = random.choice([i for i in range(len(self.original_splits)) if i not in self.position_answer and i not in indices])
+                new_words = self.transformation.get_replacement_words(self.original_splits[new_idx])
                 mutate_idx = random.choice(indices)
-                word_pos = indices.index(mutate_idx)
+                pos_idx = indices.index(mutate_idx)
+                indices.pop(pos_idx)
+                words.pop(pos_idx)
+                
+                indices.append(new_idx)
+                words.append(random.choice(new_words))
+                
+                ind.set_modified(
+                    words,
+                    indices
+                )
 
-                typo_candidates = self.transformation.get_replacement_words(self.original_splits[mutate_idx])
-                if not typo_candidates:
-                    return copy.deepcopy(ind)
-                new_word = random.choice(typo_candidates)
-                new_words = words.copy()
-                if word_pos < len(new_words):
-                    new_words[word_pos] = new_word
-                else:
-                    new_words.append(new_word)
-                return Individual(self.original_text, new_words, indices)
-            else:
-                return copy.deepcopy(ind)
-
-def create_population(original_text, args):
+def create_population(original_text, answer, args):
     transformation = ComboTypoTransformation()
-    indices_to_modify = list(range(len(original_text.split())))
-    return Population(original_text, 
-                      args.pop_size, 
-                      transformation,
-                      indices_to_modify, 
-                      args.pct_words_to_swap)
+    
+    original_words = original_text.split()
+    answer_words = set(answer.split())
+    
+    indices_to_modify = [
+        i for i, word in enumerate(original_words) 
+        if word not in answer_words
+    ]
+    
+    return Population(
+        original_text, 
+        answer,
+        args.pop_size, 
+        transformation,
+        indices_to_modify, 
+        args.pct_words_to_swap
+    )
     
      
-# def test_population():
-#     original_text = "The quick brown fox jumps over the lazy dog."
-#     indices_to_modify = list(range(len(original_text.split())))
-#     pop_size = 5
+def test_population():
+    original_text = "The quick brown fox jumps over the lazy dog."
+    indices_to_modify = list(range(len(original_text.split())))
+    pop_size = 5
+    answer = 'fox'
 
-#     # Dùng transformation thực tế
-#     transformation = ComboTypoTransformation()
-#     population = Population(original_text, pop_size, transformation, 
-#                             indices_to_modify, pct_words_to_swap=0.5)
+    # Dùng transformation thực tế
+    transformation = ComboTypoTransformation()
+    population = Population(original_text, answer, pop_size, transformation, 
+                            indices_to_modify, pct_words_to_swap=0.5)
 
-#     # print("Initial population:")
-#     # for ind in population.individuals:
-#     #     print(ind.get_perturbed_text())
+    # print("Initial population:")
+    # for ind in population.individuals:
+    #     print(ind.get_perturbed_text())
 
-#     # Thử crossover
-#     # print("First: ", population.individuals[0].get_perturbed_text())
-#     # print("Second: ", population.individuals[1].get_perturbed_text())
-#     # child1, child2 = population.crossover(population.individuals[0], population.individuals[1])
-#     # print("\nCrossover result:")
-#     # print(child1.get_perturbed_text())
-#     # print(child2.get_perturbed_text())
+    # Thử crossover
+    # print("First: ", population.individuals[0].get_perturbed_text())
+    # print("Second: ", population.individuals[1].get_perturbed_text())
+    # child1, child2 = population.crossover(population.individuals[0], population.individuals[1])
+    # print("\nCrossover result:")
+    # print(child1.get_perturbed_text())
+    # print(child2.get_perturbed_text())
 
-#     # Thử mutation
-#     print("First: ", population.individuals[0].get_perturbed_text())
+    # Thử mutation
+    print("First: ", population.individuals[0].get_perturbed_text())
 
-#     mutated = population.mutation(population.individuals[0])
-#     print("\nMutation result:")
-#     print(mutated.get_perturbed_text())
+    mutated = population.mutation(population.individuals[0])
+    print("\nMutation result:")
+    print(mutated.get_perturbed_text())
 
-# if __name__ == "__main__":
-#     test_population()
+if __name__ == "__main__":
+    test_population()
