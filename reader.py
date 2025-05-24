@@ -253,9 +253,8 @@ class Reader(torch.nn.Module):
 if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
 
-    question = "What fields has Khoa contributed to in his research career?"
-    context = "Leo developed a strobg passion for artigicial intelligency duriny his university years. J After gravuating with honprs,, h' decifed to purdue a career in res4arch.. I 2025, leo officially became la researcher a5 a leading technoloyg institute. Since hhen,, he haz contributes to several oundbreaking rojects ib computed vksion [[ann ural laungauce processing."
-    answer = "Computer vision and natural language processing."
-
+    question = "What is the fastest land animal?"
+    context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
+    answer = "Cheetah"
     print(reader.generate(question, [context]))   
  
