@@ -138,9 +138,9 @@ def test_population():
     population = Population(original_text, answer, pop_size, transformation, 
                             indices_to_modify, pct_words_to_swap=0.5)
 
-    # print("Initial population:")
-    # for ind in population.individuals:
-    #     print(ind.get_perturbed_text())
+    print("Initial population:")
+    for ind in population.individuals:
+        print(ind.get_perturbed_text())
 
     # Thử crossover
     # print("First: ", population.individuals[0].get_perturbed_text())
