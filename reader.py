@@ -153,6 +153,7 @@ class Reader(torch.nn.Module):
         answer_embeddings = self.tokenizer(
             [answer] * len(inputs), 
             max_length=128, 
+            truncation=True,
             padding=False, 
             return_tensors="pt",
         )
