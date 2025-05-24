@@ -242,7 +242,7 @@ class Reader(torch.nn.Module):
             
             token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1).cuda()).squeeze(1)  # (answer_len,)
             
-            avg_log_prob = token_log_probs.mean()
+            avg_log_prob = token_log_probs.mean(dim=-1)
             prob = torch.exp(avg_log_prob).item()
             
             scores.append(prob)
