@@ -133,7 +133,7 @@ class ComboTypoTransformation(BaseTypoTransformation):
                 if not replace_word:
                     print("Typo candidate is empty: ", typo_candidates)
                     raise
-                new_words.append(random.choice(typo_candidates))
+                new_words.append(random.choice(replace_word))
             per_words.append(new_words)
             per_words_indices.append(chosen_indices)
         return per_words, per_words_indices
