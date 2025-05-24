@@ -254,25 +254,8 @@ if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
 
     question = "What fields has Khoa contributed to in his research career?"
-    context = ",hoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing."
+    context = "Leo developed a strobg passion for artigicial intelligency duriny his university years. J After gravuating with honprs,, h' decifed to purdue a career in res4arch.. I 2025, leo officially became la researcher a5 a leading technoloyg institute. Since hhen,, he haz contributes to several oundbreaking rojects ib computed vksion [[ann ural laungauce processing."
     answer = "Computer vision and natural language processing."
 
-    
-    print("Comparing different answers:")
-    test_answers = ["Computer vision and NLP", 
-                    answer,
-                    "artificial intelligence", 
-                    "Medicine", 
-                    "AI", 
-                    "Physics"]
-    for test_answer in test_answers:
-        prob = reader.calculate_answer_probability(question, context, test_answer)
-        print(f"Answer '{test_answer}': {prob:.8f}")
-    
-    print("="*60)
-    print("TESTING GREEDY GENERATION")  
-    print("="*60)
-    
-    prompt = reader.template.format(q=question, d=context)
-    generated_answer = reader.greedy_decode(prompt, max_gen_len=20)
-    print("Generated answer:", generated_answer)
+    print(reader.model.generate(question, [context]))   
+ 
