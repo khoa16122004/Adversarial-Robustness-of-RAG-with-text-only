@@ -84,12 +84,12 @@ class Contriever(BertModel):
             raise NotImplementedError("Unsupported pooling method")
 
 
-# if __name__ == "__main__":
-#     retriever = Retriever("facebook/dpr-question_encoder-multiset-base", 
-#                           "facebook/dpr-ctx_encoder-multiset-base")
-#     question = "When Khoa become researcher?"
-#     contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
-#                 "dog",
-#                 "cat"]
-#     scores = retriever(question, contexts)
-#     print(scores / scores.sum())
+if __name__ == "__main__":
+    retriever = Retriever("facebook/dpr-question_encoder-multiset-base", 
+                          "facebook/dpr-ctx_encoder-multiset-base")
+    question = "When Khoa become researcher?"
+    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
+                "dog",
+                "cat"]
+    scores = retriever(question, contexts)
+    print(scores / scores.sum())

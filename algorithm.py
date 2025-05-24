@@ -111,8 +111,8 @@ class GA:
                 "population_size": self.pop.pop_size,
                 "tournament_size": self.tournament_size,
                 "success_threshold": self.success_threshold,
-                "start_time": self.generation_logs[0]["timestamp"] if self.generation_logs else None,
-                "end_time": self.generation_logs[-1]["timestamp"] if self.generation_logs else None
+                # "start_time": self.generation_logs[0]["timestamp"] if self.generation_logs else None,
+                # "end_time": self.generation_logs[-1]["timestamp"] if self.generation_logs else None
             },
             "final_results": {
                 "success_achieved": self.success_achieved,
@@ -421,7 +421,7 @@ class NSGAII:
                                    best_retrieval_score < self.success_threshold),
             "population_stats": population_stats,
             "pareto_stats": pareto_stats,
-            "timestamp": datetime.now().isoformat()
+            # "timestamp": datetime.now().isoformat()
         }
         
         self.generation_logs.append(generation_log)
@@ -494,8 +494,8 @@ class NSGAII:
                 "n_iterations": self.n_iter,
                 "population_size": self.pop.pop_size,
                 "success_threshold": self.success_threshold,
-                "start_time": self.generation_logs[0]["timestamp"] if self.generation_logs else None,
-                "end_time": self.generation_logs[-1]["timestamp"] if self.generation_logs else None
+                # "start_time": self.generation_logs[0]["timestamp"] if self.generation_logs else None,
+                # "end_time": self.generation_logs[-1]["timestamp"] if self.generation_logs else None
             },
             "final_results": {
                 "success_achieved": self.success_achieved,
