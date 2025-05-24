@@ -162,7 +162,8 @@ if __name__ == "__main__":
     logits = outputs.logits
     
     print("logits shape: ", logits.shape)
-    
+    output_ids = input_ids
+
     max_new_token = 30
     for step in range(max_new_token):
         outputs = reader.model(output_ids)
