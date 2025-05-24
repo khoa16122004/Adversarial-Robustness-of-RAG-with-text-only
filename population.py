@@ -10,6 +10,7 @@ set_seed_everything(222520691)
 def find_anser(context, answer):
     results = []
     context_split = context.split()
+    print(context_split)
     for i in range(len(context_split)):
         if context_split[i].lower() == answer.lower():
             results.append(i)
