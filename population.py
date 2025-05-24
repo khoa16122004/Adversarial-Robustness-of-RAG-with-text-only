@@ -10,7 +10,7 @@ set_seed_everything(222520691)
 def find_anser(context, answer):
     results = []
     context_split = context.split()
-    print(context_split)
+    # print(context_split)
     for i in range(len(context_split)):
         if context_split[i].lower() == answer.lower():
             results.append(i)
@@ -96,8 +96,8 @@ class Population:
                     [words2[indices2.index(i)] for i in ind2_only if i not in cross2] + \
                     [words1[indices1.index(i)] for i in cross1]
 
-        return Individual(self.original_text, child1_words, child1_indices), \
-            Individual(self.original_text, child2_words, child2_indices)
+        return Individual(self.original_text, self.answer, child1_words, child1_indices), \
+            Individual(self.original_text, self.answer, child2_words, child2_indices)
 
     def mutation(self, ind: Individual, mutation_prob=1):
             words, indices = ind.get_modified( )
