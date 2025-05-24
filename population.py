@@ -97,10 +97,11 @@ class Population:
         return Individual(self.original_text, child1_words, child1_indices), \
             Individual(self.original_text, child2_words, child2_indices)
 
-    def mutation(self, ind: Individual, mutation_prob=0.3):
+    def mutation(self, ind: Individual, mutation_prob=1):
             words, indices = ind.get_modified( )
             if random.random() < mutation_prob:
                 new_idx = random.choice([i for i in range(len(self.original_splits)) if i not in ind.position_answer and i not in indices])
+                print("New_index: ", new_idx)
                 new_words = self.transformation.get_replacement_words(self.original_splits[new_idx])
                 mutate_idx = random.choice(indices)
                 pos_idx = indices.index(mutate_idx)
@@ -146,7 +147,7 @@ def test_mutation():
     # Tạo transformation và population
     transformation = ComboTypoTransformation()
     indices_to_modify = [
-        i for i, word in enumerate(original_text.split())
+        i for i in range(len(original_text.split()))
         if i not in finding_index
     ]
     population = Population(
