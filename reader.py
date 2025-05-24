@@ -260,5 +260,5 @@ if __name__ == "__main__":
     output = reader.generate(question, [context])[0]
     print(output)
     
-    score = reader.calculate_answer_probability(question, context, output)
+    score = reader.calculate_answer_probability(question, context, answer[0])
     print(score)
