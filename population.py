@@ -119,12 +119,11 @@ class Population:
 def create_population(original_text, answer, args):
     transformation = ComboTypoTransformation()
     
-    original_words = original_text.split()
-    answer_words = set(answer.split())
-    
+    finding_index = find_anser(original_text, answer)
+
     indices_to_modify = [
-        i for i, word in enumerate(original_words) 
-        if word == answer_words
+        i for i in range(len(original_text.split()))
+        if i not in finding_index
     ]
     
     return Population(
