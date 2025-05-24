@@ -258,6 +258,6 @@ if __name__ == "__main__":
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", 
               "Ostrich", "Hippopotamus"]
     
-    scores = reader.get_scores(question, [context], answer[0])
+    scores = reader.get_scores([context], answer[0])
     print(scores)
  
