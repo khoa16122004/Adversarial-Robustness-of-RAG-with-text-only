@@ -255,7 +255,8 @@ if __name__ == "__main__":
 
     question = "What is the fastest land animal?"
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
-    answer = ["Cheetah"]
+    answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
+    
     output = reader.generate(question, [context])
     print(output)
     scores = []
