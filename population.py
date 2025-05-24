@@ -13,6 +13,7 @@ class Individual:
         self.attacked_text = AttackedText(original_text)
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
+        self.original_text = original_text
         self.original_splits = self.original_text.split()
         self.answer = answer
         self.position_answer = original_text.find(answer)
