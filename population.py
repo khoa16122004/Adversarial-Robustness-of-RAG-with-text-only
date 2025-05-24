@@ -38,7 +38,7 @@ class Population:
         self.pct_words_to_swap = pct_words_to_swap # percentage words / sentence to swap
         self.individuals = self._initialize_population()
         self.original_splits = self.original_text.split()
-        self.answer = self.answer
+        self.answer = answer
 
     def _initialize_population(self):
         num_words_to_swap = max(int(self.pct_words_to_swap * len(self.indices_to_modify)), 1)
