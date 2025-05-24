@@ -185,33 +185,28 @@ class Reader(torch.nn.Module):
             return outputs.split("Answer:")[-1].strip()
     
     @torch.no_grad()
-    def calculate_answer_probability(self, question, contexts, answer):
-        prompts = [self.template.format(q=question, d=context) for context in contexts]
+    def calculate_answer_probability(self, question, context, answer):
+        prompt = self.template.format(q=question, d=context)
         
-        prompt_ids = self.tokenizer(prompts, return_tensors="pt", padding=True, truncation=True).to(self.model.device)
-        answer_ids = self.tokenizer(answer, add_special_tokens=False, return_tensors="pt").input_ids.to(self.model.device)
-
-        batch_size = len(contexts)
-        answer_len = answer_ids.shape[1]
-
-        full_ids = torch.cat([prompt_ids.input_ids, answer_ids.repeat(batch_size, 1)], dim=1)
-        attention_mask = torch.cat([prompt_ids.attention_mask, torch.ones((batch_size, answer_len), dtype=torch.long).to(self.model.device)], dim=1)
-
-        outputs = self.model(input_ids=full_ids, attention_mask=attention_mask)
-        logits = outputs.logits
-
-        log_probs = torch.nn.functional.log_softmax(logits, dim=-1)
-
-        answer_token_log_probs = []
-        for i in range(batch_size):
-            prompt_len = prompt_ids.input_ids[i].shape[0]
-            answer_logits = log_probs[i, prompt_len:prompt_len + answer_len, :]
-            token_log_probs = answer_logits.gather(1, answer_ids[0].unsqueeze(1)).squeeze(1)
-            total_log_prob = token_log_probs.sum()
-            answer_token_log_probs.append(torch.exp(total_log_prob).item())
-
-        return answer_token_log_probs  # List[float], probability for each context
-
+        prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
+        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
+        
+        full_sequence = torch.cat([prompt_ids, answer_ids], dim=1)
+        
+        outputs = self.model(full_sequence)
+        logits = outputs.logits[0] 
+        prompt_len = prompt_ids.shape[1]
+        answer_logits = logits[prompt_len-1:prompt_len-1+answer_ids.shape[1]]  # (answer_len, vocab_size)
+        
+        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+        
+        answer_tokens = answer_ids.squeeze(0)  
+        token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
+        
+        total_log_prob = token_log_probs.sum()  
+        probability = torch.exp(total_log_prob).item()
+        
+        return probability
 
     @torch.no_grad()
     def get_scores(self, input_ids, answer_ids):
@@ -262,4 +257,6 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", 
               "Ostrich", "Hippopotamus"]
-    print(reader.calculate_answer_probability(question, [context], answer))
+    
+    a = reader(question, [context, context], answer[0])
+    print(a)
