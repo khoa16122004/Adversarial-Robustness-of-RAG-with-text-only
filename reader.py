@@ -258,7 +258,7 @@ if __name__ == "__main__":
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
     
     output = reader.generate(question, [context])
-    reader(question, [context], output)
+    print(reader(question, [context], answer[0]))
     scores = []
     for ans in answer:
         score = reader(question, [context], ans) 
