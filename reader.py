@@ -140,27 +140,10 @@ class Reader(torch.nn.Module):
     @torch.no_grad()
     def forward(self, question, contexts, answer):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
-        
-        input_embeddings = self.tokenizer(
-            inputs,
-            max_length=512,
-            truncation=True,
-            padding=False, 
-            return_tensors="pt",
-        )
-        
-
-        answer_embeddings = self.tokenizer(
-            [answer] * len(inputs), 
-            max_length=128, 
-            truncation=True,
-            padding=False, 
-            return_tensors="pt",
-        )
-        
-        
-        scores = self.get_scores(input_embeddings.input_ids, answer_embeddings.input_ids)
-        
+        scores = []
+        for input in inputs:
+            scores.append(self.calculate_answer_probability(question, input, answer))
+                
         return scores
     
     @torch.no_grad()
@@ -209,52 +192,7 @@ class Reader(torch.nn.Module):
         
         return probability
 
-    @torch.no_grad()
-    def get_scores(self, input_ids, answer_ids):
-        batch_size = input_ids.shape[0]
-        scores = []
-        
-        for i in range(batch_size):
-            input_seq = input_ids[i:i+1] 
-            answer_seq = answer_ids[i]    
-            
-            
-            answer_seq = answer_seq[answer_seq != self.tokenizer.pad_token_id]
-            
-            if len(answer_seq) == 0: 
-                scores.append(0.0)
-                continue
-            
-            full_seq = torch.cat([
-                input_seq.squeeze(0), 
-                answer_seq
-            ], dim=0).unsqueeze(0)  
-            
-            print("Full seq: ", full_seq.shape)
-            
-            outputs = self.model(
-                input_ids=full_seq.to(self.model.device),
-                attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
-            )
-            
-            print("Logits outputs: ", outputs.logits.shape) 
-            
-            input_len = input_seq.shape[1]  
-            answer_logits = outputs.logits[:, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
-            
-            log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-            
-            token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1).cuda()).squeeze(1)  # (answer_len,)
-            
-            avg_log_prob = token_log_probs.mean(dim=-1)
-            print("Avg log prob: ", avg_log_prob.shape)
 
-            prob = torch.exp(avg_log_prob).item()
-            
-            scores.append(prob)
-            
-        
-        return np.array(scores)
 
 
 if __name__ == "__main__":
