@@ -165,7 +165,7 @@ if __name__ == "__main__":
     with torch.no_grad():
         for _ in range(max_gen_len):
             cur_len = input_ids.shape[1]
-            logits = reader.model(input_ids[:, -1:], start_pos=cur_len - 1)
+            logits = reader.model(input_ids[:, -1:], start_pos=cur_len - 1).logits
             next_token = torch.argmax(logits[:, -1], dim=-1).unsqueeze(0)  # (1, 1)
 
             input_ids = torch.cat([input_ids, next_token], dim=1)
