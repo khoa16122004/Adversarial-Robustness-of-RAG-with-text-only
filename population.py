@@ -6,6 +6,14 @@ from utils import set_seed_everything
 import re
 set_seed_everything(222520691)
 
+
+def find_anser(context, answer):
+    results = []
+    for i in range(len(context.split())):
+        if context.split()[i] == answer:
+            results.append(i)
+    return results
+
 class Individual:
     def __init__(self, original_text, answer,
                  replacement_words=None, 
@@ -16,7 +24,7 @@ class Individual:
         self.original_text = original_text
         self.original_splits = self.original_text.split()
         self.answer = answer
-        self.position_answer =  [m.start() for m in re.finditer(re.escape(answer), original_text)]
+        self.position_answer =  find_anser(original_text, answer)
         print(self.position_answer)
 
     def get_perturbed_text(self):
@@ -134,11 +142,12 @@ def test_mutation():
     pop_size = 5
     pct_words_to_swap = 0.5
 
+    finding_index = find_anser(original_text, answer)
     # Tạo transformation và population
     transformation = ComboTypoTransformation()
     indices_to_modify = [
         i for i, word in enumerate(original_text.split())
-        if word != answer
+        if i not in finding_index
     ]
     population = Population(
         original_text, 
