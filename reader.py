@@ -238,96 +238,62 @@ class Reader(torch.nn.Module):
     
     @torch.no_grad()
     def calculate_answer_probability(self, question, context, answer):
-        """
-        Tính xác suất để model sinh ra answer cụ thể cho question+context
-        
-        Args:
-            question: str - câu hỏi
-            context: str - ngữ cảnh  
-            answer: str - câu trả lời cần tính xác suất
-            
-        Returns:
-            float - xác suất từ 0 đến 1
-        """
-        # Format prompt
         prompt = self.template.format(q=question, d=context)
         
         # Tokenize prompt và answer
         prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
         
-        # Tạo full sequence: prompt + answer
         full_sequence = torch.cat([prompt_ids, answer_ids], dim=1)
         
-        # Forward pass
         outputs = self.model(full_sequence)
-        logits = outputs.logits[0]  # (seq_len, vocab_size)
-        
-        # Lấy logits cho phần answer (bỏ prompt)
+        logits = outputs.logits[0] 
         prompt_len = prompt_ids.shape[1]
         answer_logits = logits[prompt_len-1:prompt_len-1+answer_ids.shape[1]]  # (answer_len, vocab_size)
         
-        # Tính log probabilities
         log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
         
-        # Lấy log prob của các token trong answer
-        answer_tokens = answer_ids.squeeze(0)  # (answer_len,)
+        answer_tokens = answer_ids.squeeze(0)  
         token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
         
-        # Tính probability tổng (geometric mean)
-        total_log_prob = token_log_probs.sum()  # hoặc .mean() nếu muốn average
+        total_log_prob = token_log_probs.sum()  
         probability = torch.exp(total_log_prob).item()
         
         return probability
 
     @torch.no_grad()
     def get_scores(self, input_ids, answer_ids):
-        """
-        Tính xác suất để model sinh ra answer khi biết input
-        Args:
-            input_ids: tensor chứa input prompt đã tokenize
-            answer_ids: tensor chứa answer đã tokenize
-        Returns:
-            scores: array chứa xác suất cho mỗi sample
-        """
         batch_size = input_ids.shape[0]
         scores = []
         
         for i in range(batch_size):
-            # Lấy input và answer cho sample thứ i
-            input_seq = input_ids[i:i+1]  # (1, input_len)
-            answer_seq = answer_ids[i]    # (answer_len,)
+            input_seq = input_ids[i:i+1] 
+            answer_seq = answer_ids[i]    
             
-            # Loại bỏ padding tokens khỏi answer
+            
             answer_seq = answer_seq[answer_seq != self.tokenizer.pad_token_id]
             
-            if len(answer_seq) == 0:  # Nếu answer rỗng
+            if len(answer_seq) == 0: 
                 scores.append(0.0)
                 continue
             
-            # Tạo full sequence: input + answer
             full_seq = torch.cat([
-                input_seq.squeeze(0),  # remove batch dim
+                input_seq.squeeze(0), 
                 answer_seq
-            ], dim=0).unsqueeze(0)  # add batch dim back: (1, full_len)
+            ], dim=0).unsqueeze(0)  
             
-            # Forward pass qua model
             outputs = self.model(
                 input_ids=full_seq.to(self.model.device),
                 attention_mask=(full_seq != self.tokenizer.pad_token_id).to(self.model.device)
             )
             
-            # Lấy logits cho phần answer (bỏ qua phần input)
             input_len = input_seq.shape[1]  
             answer_logits = outputs.logits[0, input_len-1:input_len-1+len(answer_seq)]  # (answer_len, vocab_size)
             
-            # Tính log probability cho từng token trong answer
             log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
             
-            # Lấy log prob của các token thực tế trong answer
             token_log_probs = log_probs.gather(1, answer_seq.unsqueeze(1)).squeeze(1)  # (answer_len,)
             
-            # Tính average log probability sau đó convert về probability
             avg_log_prob = token_log_probs.mean()
             prob = torch.exp(avg_log_prob).item()
             
