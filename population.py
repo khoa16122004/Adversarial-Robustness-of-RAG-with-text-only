@@ -127,35 +127,45 @@ def create_population(original_text, answer, args):
     )
     
      
-def test_population():
+def test_mutation():
     original_text = "The quick brown fox jumps over the lazy dog."
-    indices_to_modify = list(range(len(original_text.split())))
+    answer = "fox"
     pop_size = 5
-    answer = 'fox'
+    pct_words_to_swap = 0.5
 
-    # Dùng transformation thực tế
+    # Tạo transformation và population
     transformation = ComboTypoTransformation()
-    population = Population(original_text, answer, pop_size, transformation, 
-                            indices_to_modify, pct_words_to_swap=0.5)
+    indices_to_modify = [
+        i for i, word in enumerate(original_text.split())
+        if word != answer
+    ]
+    population = Population(
+        original_text, 
+        answer, 
+        pop_size, 
+        transformation, 
+        indices_to_modify, 
+        pct_words_to_swap
+    )
 
-    print("Initial population:")
-    for ind in population.individuals:
+    print("Testing mutation...")
+    for i, ind in enumerate(population.individuals):
+        print(f"\nIndividual {i} before mutation:")
         print(ind.get_perturbed_text())
 
-    # Thử crossover
-    # print("First: ", population.individuals[0].get_perturbed_text())
-    # print("Second: ", population.individuals[1].get_perturbed_text())
-    # child1, child2 = population.crossover(population.individuals[0], population.individuals[1])
-    # print("\nCrossover result:")
-    # print(child1.get_perturbed_text())
-    # print(child2.get_perturbed_text())
+        # Thực hiện mutation
+        population.mutation(ind)
 
-    # Thử mutation
-    print("First: ", population.individuals[0].get_perturbed_text())
+        print(f"Individual {i} after mutation:")
+        mutated_text = ind.get_perturbed_text()
+        print(mutated_text)
 
-    mutated = population.mutation(population.individuals[0])
-    print("\nMutation result:")
-    print(mutated.get_perturbed_text())
+        # Kiểm tra xem mutation có tạo trùng với answer không
+        if answer in mutated_text.split():
+            print(f"Error: Mutation created a word matching the answer '{answer}'!")
+        else:
+            print("Mutation passed: No word matches the answer.")
 
+# Gọi hàm test
 if __name__ == "__main__":
-    test_population()
+    test_mutation()
