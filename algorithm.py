@@ -53,7 +53,7 @@ class GA:
         return selected_indices
 
     def log_generation(self, generation, best_weighted_fitness, best_reader_score, best_retrieval_score, 
-                      best_individual_text, population_stats):
+                      best_individual_text):
 
         generation_log = {
             "generation": generation,
@@ -63,8 +63,6 @@ class GA:
             "best_individual_text": best_individual_text,
             "success_achieved": bool(best_reader_score < self.success_threshold and 
                                    best_retrieval_score < self.success_threshold),
-            "population_stats": population_stats,
-            "timestamp": datetime.now().isoformat()
         }
         
         self.generation_logs.append(generation_log)
