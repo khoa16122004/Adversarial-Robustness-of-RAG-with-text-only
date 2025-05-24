@@ -174,7 +174,7 @@ if __name__ == "__main__":
                 break
 
     # Bỏ prompt ra nếu bạn chỉ muốn câu trả lời
-    gen_text = reader.tokenizer.decode(input_ids[0][len(prompt_tokens):].tolist())
+    gen_text = reader.tokenizer.decode(input_ids[0][len(input_enc):].tolist())
     print("Generated answer:", gen_text)
 
 
