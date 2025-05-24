@@ -258,5 +258,5 @@ if __name__ == "__main__":
     answer = ["Cheetah", "Lion", "Elephant", "Polar Bear", "Giraffe", "Dolphin", "Kangaroo", "Penguin", "Ostrich", "Hippopotamus"]
     scores = reader(question, [context], answer) 
 
-    print(scores / scores.sum())   
+    print(np.argmax(scores / scores.sum()))   
  
