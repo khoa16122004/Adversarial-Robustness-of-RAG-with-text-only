@@ -118,8 +118,8 @@ class GA:
                 "success_achieved": self.success_achieved,
                 "success_generation": self.success_generation,
                 "best_fitness": float(self.best_fitness) if self.best_fitness is not None else None,
-                "best_reader_score": float(self.best_score1) if self.best_score1 is not None else None,
-                "best_retrieval_score": float(self.best_score2) if self.best_score2 is not None else None,
+                "best_reader_score": float(self.best_score2) if self.best_score2 is not None else None,
+                "best_retrieval_score": float(self.best_score1) if self.best_score1 is not None else None,
                 "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None,
                 "adv_output": self.adv_output if self.adv_output is not None else None,
                 "modified_info": self.best_individual.get_modified() if self.best_individual else None
@@ -188,10 +188,10 @@ class GA:
             # Log generation data
             self.log_generation(
                 generation=iter_idx,
-                best_weighted_fitness=current_best_fitness,
-                best_reader_score=current_best_score2,
-                best_retrieval_score=current_best_score1,
-                best_individual_text=current_best_individual.get_perturbed_text(),
+                best_weighted_fitness=self.best_fitness,
+                best_reader_score=self.best_score2,
+                best_retrieval_score=self.best_score1,
+                best_individual_text=self.best_individual.get_perturbed_text(),
                 # population_stats=pop_stats
             )
 
