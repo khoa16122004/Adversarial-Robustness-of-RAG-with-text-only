@@ -116,7 +116,10 @@ class SynonymsTransformation:
         return list(synonyms)
 
 class ComboTypoTransformation(BaseTypoTransformation):
-    def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
+    def get_perturbed_sequences(self, original_text, 
+                                indices_to_modify, 
+                                num_words_to_swap,
+                                pop_size=5, seed=42):
         random.seed(seed)
         np.random.seed(seed)
         words = original_text.split()

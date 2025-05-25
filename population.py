@@ -8,9 +8,9 @@ set_seed_everything(222520691)
 
 
 def find_anser(context, answer):
+    # finding position of the answer in context
     results = []
     context_split = context.split()
-    # print(context_split)
     for i in range(len(context_split)):
         if context_split[i].lower() == answer.lower():
             results.append(i)
@@ -42,7 +42,13 @@ class Individual:
         return self.replacement_words, self.modified_indices
 
 class Population:
-    def __init__(self, original_text, answer, pop_size, transformation, indices_to_modify, pct_words_to_swap=0.1):
+    def __init__(self, original_text, 
+                 answer, 
+                 pop_size, 
+                 transformation, 
+                 indices_to_modify, 
+                 pct_words_to_swap=0.1):
+        
         self.original_text = original_text
         self.pop_size = pop_size
         self.transformation = transformation
