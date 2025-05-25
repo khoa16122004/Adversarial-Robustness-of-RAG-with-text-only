@@ -188,10 +188,10 @@ class GA:
             # Log generation data
             self.log_generation(
                 generation=iter_idx,
-                best_weighted_fitness=self.best_fitness,
-                best_reader_score=self.best_score2,
-                best_retrieval_score=self.best_score1,
-                best_individual_text=self.best_individual.get_perturbed_text(),
+                best_weighted_fitness=current_best_fitness,
+                best_reader_score=current_best_score2,
+                best_retrieval_score=current_best_score1,
+                best_individual_text=current_best_individual.get_perturbed_text(),
                 # population_stats=pop_stats
             )
 
