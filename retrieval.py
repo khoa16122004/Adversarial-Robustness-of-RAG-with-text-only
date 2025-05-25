@@ -87,9 +87,8 @@ class Contriever(BertModel):
 if __name__ == "__main__":
     retriever = Retriever("facebook/dpr-question_encoder-multiset-base", 
                           "facebook/dpr-ctx_encoder-multiset-base")
-    question = "When Khoa become researcher?"
-    contexts = ["Khoa developed a strong passion for artificial intelligence during his university years. After graduating with honors, he decided to pursue a career in research. In 2025, Khoa officially became a researcher at a leading technology institute. Since then, he has contributed to several groundbreaking projects in computer vision and natural language processing.",
-                "dog",
-                "cat"]
-    scores = retriever(question, contexts)
-    print(scores / scores.sum())
+    question = "What is the fastest land animal?"
+    context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
+    adv_context = "THe cheetah is't the fastest land animal,; of reaching speeds j to 0.. 9t has a slender bulid and distinctive e c;at.. Cheetahs primaril gunt e anh h smaol antelopes in Africa."
+    scores = retriever(question, [context, adv_context])
+    print(scores)
