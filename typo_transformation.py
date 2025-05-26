@@ -19,7 +19,7 @@ class BaseTypoTransformation:
                 self.typos[line[0]] = line[1:]
         if os.path.exists(key_path):
             for line in open(key_path):
-                line = line.split()
+                line = split(line)
                 self.NN[line[0]] = line[1:]
 
     def get_replacement_words(self, word):
