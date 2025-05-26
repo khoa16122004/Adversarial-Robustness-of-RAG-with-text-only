@@ -201,43 +201,75 @@ class Reader(torch.nn.Module):
     def forward_batch(self, question, contexts, answer):
         """
         Perform batch inference to calculate probabilities for the given answer across multiple contexts.
+        
+        Args:
+            question (str): The question to ask
+            contexts (list): List of context strings
+            answer (str): The answer to calculate probability for
+            
+        Returns:
+            np.array: Array of probabilities for each context
         """
-        inputs = [self.template.format(q=question, d=text) for text in contexts]
-        prompt_ids = self.tokenizer(
-            inputs,
-            max_length=512,
-            truncation=True,
+        # Format all prompts using the template
+        prompts = [self.template.format(q=question, d=context) for context in contexts]
+        
+        # Tokenize all prompts with padding
+        prompt_encodings = self.tokenizer(
+            prompts,
             padding=True,
+            truncation=True,
+            max_length=512,
             return_tensors="pt"
         ).to(self.model.device)
         
+        # Tokenize the answer (without special tokens)
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
-        batch_size = prompt_ids.input_ids.shape[0]
+        answer_len = answer_ids.shape[1]
         
-        # Concatenate prompts and answer tokens
-        full_sequences = torch.cat(
-            [prompt_ids.input_ids, answer_ids.expand(batch_size, -1)], dim=1
-        )
+        # Get individual prompt lengths (excluding padding)
+        prompt_lengths = prompt_encodings.attention_mask.sum(dim=1)  # Real length of each prompt
         
-        outputs = self.model(
-            input_ids=full_sequences,
-            attention_mask=torch.cat(
-                [prompt_ids.attention_mask, torch.ones(batch_size, answer_ids.shape[1], device=self.model.device)], dim=1
-            )
-        )
+        # Expand answer_ids to match batch size
+        batch_size = len(contexts)
+        answer_ids_batch = answer_ids.repeat(batch_size, 1)  # (batch_size, answer_len)
         
-        logits = outputs.logits
-        prompt_lengths = prompt_ids.input_ids.shape[1]
-        answer_logits = logits[:, prompt_lengths - 1:prompt_lengths - 1 + answer_ids.shape[1], :]
+        # Concatenate prompts with answers
+        full_sequences = torch.cat([prompt_encodings.input_ids, answer_ids_batch], dim=1)
         
-        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-        answer_tokens = answer_ids.squeeze(0)
-        token_log_probs = log_probs.gather(2, answer_tokens.unsqueeze(0).expand(batch_size, -1, -1)).squeeze(2)
+        # Create attention mask for full sequences
+        answer_attention = torch.ones(batch_size, answer_len, device=self.model.device)
+        full_attention_mask = torch.cat([prompt_encodings.attention_mask, answer_attention], dim=1)
         
-        total_log_probs = token_log_probs.sum(dim=1)
-        probabilities = torch.exp(total_log_probs).cpu().numpy()
+        # Forward pass through the model
+        outputs = self.model(input_ids=full_sequences, attention_mask=full_attention_mask)
+        logits = outputs.logits  # (batch_size, seq_len, vocab_size)
         
-        return probabilities
+        # Calculate probabilities for each sequence in the batch
+        probabilities = []
+        
+        for i in range(batch_size):
+            # Get the prompt length for this specific sequence
+            prompt_len = prompt_lengths[i].item()
+            
+            # Extract logits for the answer tokens (starting from prompt_len-1)
+            answer_logits = logits[i, prompt_len-1:prompt_len-1+answer_len]  # (answer_len, vocab_size)
+            
+            # Convert to log probabilities
+            log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+            
+            # Get the answer tokens for this sequence
+            answer_tokens = answer_ids_batch[i]  # (answer_len,)
+            
+            # Calculate log probability for each token
+            token_log_probs = log_probs.gather(1, answer_tokens.unsqueeze(1)).squeeze(1)
+            
+            # Sum log probabilities and convert to probability
+            total_log_prob = token_log_probs.sum()
+            probability = torch.exp(total_log_prob).item()
+            
+            probabilities.append(probability)
+        
+        return np.array(probabilities)
     
 
 
