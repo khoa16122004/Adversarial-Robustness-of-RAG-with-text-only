@@ -126,6 +126,9 @@ def main(args):
                 )
 
         algo.solve_rule()
+        algo = None
+        population = None
+        fitness = None
         
         
 if __name__ == "__main__":

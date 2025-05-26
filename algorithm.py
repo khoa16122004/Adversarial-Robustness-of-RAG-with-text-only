@@ -21,6 +21,7 @@ class GA:
                  tournament_size,
                  question,
                  answer,
+                 fitness_statery,
                  log_dir="ga_logs",
                  success_threshold=1.0):
         self.sample_id = sample_id
@@ -274,19 +275,25 @@ class GA:
         
         
 class NSGAII:
-    def __init__(self, n_iter, 
+    def __init__(self, sample_id, 
+                 n_iter, 
                  population, 
                  fitness,
+                 tournament_size,
                  question,
                  answer,
+                 fitness_statery,
                  log_dir="nsgaii_logs",
                  success_threshold=1.0):
+        self.sample_id = sample_id
         self.n_iter = n_iter
         self.pop = population
+        self.tournament_size = tournament_size
         self.fitness = fitness
         self.question = question
         self.answer = answer
         self.success_threshold = success_threshold
+        self.fitness_statery = fitness_statery
         
         self.log_dir = log_dir
         os.makedirs(log_dir, exist_ok=True)
@@ -294,16 +301,15 @@ class NSGAII:
         self.generation_logs = []
         self.best_individual = None
         self.best_fitness = None
-        self.best_score1 = None  
-        self.best_score2 = None  
+        self.best_retri_score = None  
+        self.best_reader_score = None  
         self.success_achieved = False
         self.success_generation = None
-        
-        # NSGA-II specific
+        self.adv_output = None
+        self.log_file = os.path.join(log_dir, f"NSGAII_log_{self.sample_id}.json")
+
         self.nds = NonDominatedSorting()
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.log_file = os.path.join(log_dir, f"nsgaii_log_{timestamp}.json")
 
     def calculate_crowding_distance(self, objectives):
         """

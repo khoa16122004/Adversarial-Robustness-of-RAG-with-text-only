@@ -48,3 +48,10 @@ def find_answer(context_split, answer_split):
     return results
 
 
+def exact_match(prediction: str, ground_truth: str) -> bool:
+    return prediction == ground_truth
+
+def accuracy_span_inclusion(prediction: str, ground_truth_span: str) -> bool:
+    return ground_truth_span in prediction
+
+
