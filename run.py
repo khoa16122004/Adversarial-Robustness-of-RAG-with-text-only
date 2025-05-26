@@ -1,6 +1,6 @@
 import argparse
 from algorithm import GA, NSGAII
-from population import create_population, Population, Individual
+from population import  Population, Individual
 from fitness import WeightedSUm, MultiScore, Targeted_MultiScore, Targeted_WeightedSUm
 import numpy as np
 from utils import set_seed_everything, DataLoader
