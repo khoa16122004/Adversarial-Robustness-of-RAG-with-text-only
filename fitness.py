@@ -88,6 +88,7 @@ class Targeted_WeightedSUm:
         reader_result_with_target = self.reader(question, contexts, answer)
         # print("Contexts: ", contexts)
         retri_scores = self.retri_clean_reuslt / retrieval_result
+        print(retri_scores)
         reader_scores = reader_result_with_answer / reader_result_with_target
         
         weighted_result = self.retriever_weight * retri_scores + self.reader_weight * reader_scores

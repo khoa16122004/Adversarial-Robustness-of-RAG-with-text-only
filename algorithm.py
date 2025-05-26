@@ -133,7 +133,6 @@ class GA:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
-
             # pool
             pool = P + O
             pool_fitness_weighted = np.concatenate([P_fitness_weighted, O_fitness_weighted], axis=0)
