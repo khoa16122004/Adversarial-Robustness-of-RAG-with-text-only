@@ -155,7 +155,7 @@ if __name__ == "__main__":
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
     adv_contexts = ["The cheetah is the fastest land animal, capable o r speeds up to 70 mph. It has a r d and distinctive spotted coat. h primarily hunt gazelles and h l antelopes n Africa."]
 
-    answer = "2025"
+    answer = "Cheetah"
     fitness = WeightedSUm("Llama-7b", 
                           "facebook/dpr-question_encoder-multiset-base", 
                           "facebook/dpr-ctx_encoder-multiset-base",
