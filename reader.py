@@ -211,4 +211,6 @@ if __name__ == "__main__":
     answer = "Cheetah"
     for cont in adv_contexts:
         print(reader.calculate_answer_probability(question, cont, answer))
+        
+    print(reader(question, adv_contexts, answer))
  
