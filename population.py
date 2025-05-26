@@ -128,7 +128,7 @@ class Population:
             if random.random() < mutation_prob:
                 new_words = None
                 while not new_words:
-                    new_idx = random.choice([i for i in range(self.indices_to_modify) if i not in indices])
+                    new_idx = random.choice([i for i in self.indices_to_modify if i not in indices])
                 # Ensure the new index is not in the current indices
                     new_words = self.transformation.get_replacement_words(self.original_text_split[new_idx])
                 mutate_idx = random.choice(indices)
