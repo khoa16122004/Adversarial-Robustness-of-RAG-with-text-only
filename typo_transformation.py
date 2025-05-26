@@ -147,8 +147,8 @@ class ComboTypoTransformation(BaseTypoTransformation):
         words = []
         words += KeyboardTypoTransformation().get_replacement_words(word)
         words += NaturalTypoTransformation().get_replacement_words(word)
-        words += TruncateTypoTransformation().get_replacement_words(word)
-        words += InnerSwapTypoTransformation().get_replacement_words(word)
+        # words += TruncateTypoTransformation().get_replacement_words(word)
+        # words += InnerSwapTypoTransformation().get_replacement_words(word)
         return list(set(words))
 
 
