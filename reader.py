@@ -137,14 +137,14 @@ class Reader(torch.nn.Module):
         
         return results
 
-    @torch.no_grad()
-    def forward(self, question, contexts, answer):
-        inputs = [self.template.format(q=question, d=text) for text in contexts]
-        scores = []
-        for prompt in inputs:
-            scores.append(self.calculate_answer_probability(question, prompt, answer))
+    # @torch.no_grad()
+    # def forward(self, question, contexts, answer):
+    #     inputs = [self.template.format(q=question, d=text) for text in contexts]
+    #     scores = []
+    #     for prompt in inputs:
+    #         scores.append(self.calculate_answer_probability(question, prompt, answer))
                 
-        return np.array(scores)
+    #     return np.array(scores)
     
     @torch.no_grad()
     def generate(self, question, contexts):
@@ -198,7 +198,7 @@ class Reader(torch.nn.Module):
         return probability
     
     @torch.no_grad()
-    def forward_batch(self, question, contexts, answer):
+    def forward(self, question, contexts, answer):
         prompts = [self.template.format(q=question, d=context) for context in contexts]
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False)
         
