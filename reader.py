@@ -137,14 +137,14 @@ class Reader(torch.nn.Module):
         
         return results
 
-    # @torch.no_grad()
-    # def forward(self, question, contexts, answer):
-    #     inputs = [self.template.format(q=question, d=text) for text in contexts]
-    #     scores = []
-    #     for prompt in inputs:
-    #         scores.append(self.calculate_answer_probability(question, prompt, answer))
+    @torch.no_grad()
+    def forward(self, question, contexts, answer):
+        inputs = [self.template.format(q=question, d=text) for text in contexts]
+        scores = []
+        for prompt in inputs:
+            scores.append(self.calculate_answer_probability(question, prompt, answer))
                 
-    #     return np.array(scores)
+        return np.array(scores)
     
     @torch.no_grad()
     def generate(self, question, contexts):
@@ -198,43 +198,89 @@ class Reader(torch.nn.Module):
         return probability
     
     @torch.no_grad()
-    def forward(self, question, contexts, answer):
-        prompts = [self.template.format(q=question, d=context) for context in contexts]
-        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False)
+    def forward_batch(self, question, contexts, answer):
+        # Format all prompts
+        prompts_text = [self.template.format(q=question, d=context) for context in contexts]
+        batch_size = len(prompts_text)
+
+        # Tokenize prompts (batch) - ensuring add_special_tokens=True for prompts
+        # This should align with how self.tokenizer.encode(prompt_text, add_special_tokens=True) works.
+        # Note: The `self.tokenizer()` call might have different default `add_special_tokens` behavior
+        # than `self.tokenizer.encode()`. Explicitly set it if needed, or ensure they align.
+        # Most HuggingFace tokenizers add special tokens by default with __call__.
+        tokenized_prompts = self.tokenizer(
+            prompts_text,
+            padding=True,
+            truncation=False, # To match calculate_answer_probability which doesn't truncate prompt
+            return_tensors="pt",
+            add_special_tokens=True # Explicitly match `encode`
+        ).to(self.model.device)
+        batch_prompt_ids = tokenized_prompts.input_ids
+        batch_prompt_attention_mask = tokenized_prompts.attention_mask
         
-        probabilities = []
-        batch_size = 4  # Process in smaller batches to avoid memory issues
+        # Actual (unpadded) lengths of prompts
+        prompt_lengths = batch_prompt_attention_mask.sum(dim=1) # (batch_size)
+
+        # Tokenize answer (single) - no special tokens
+        answer_ids_single = self.tokenizer.encode(
+            answer,
+            add_special_tokens=False, # Crucial
+            return_tensors="pt"
+        ).to(self.model.device) # Shape: (1, answer_len)
+
+        if answer_ids_single.shape[1] == 0:
+            # print(f"Warning: Empty answer_ids for answer: '{answer}'. All probabilities will be 0.")
+            return np.zeros(batch_size, dtype=float)
+
+        answer_len = answer_ids_single.shape[1]
         
-        for i in range(0, len(prompts), batch_size):
-            batch_prompts = prompts[i:i+batch_size]
-            
-            # Find max length in this batch
-            tokenized_prompts = [self.tokenizer.encode(p) for p in batch_prompts]
-            max_prompt_len = max(len(tokens) for tokens in tokenized_prompts)
-            
-            batch_probs = []
-            for j, prompt in enumerate(batch_prompts):
-                prompt_ids = torch.tensor([tokenized_prompts[j]], device=self.model.device)
-                answer_tensor = torch.tensor([answer_ids], device=self.model.device)
-                
-                full_sequence = torch.cat([prompt_ids, answer_tensor], dim=1)
-                
-                outputs = self.model(full_sequence)
-                logits = outputs.logits[0]
-                
-                prompt_len = len(tokenized_prompts[j])
-                answer_logits = logits[prompt_len-1:prompt_len-1+len(answer_ids)]
-                
-                log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
-                token_log_probs = log_probs.gather(1, torch.tensor(answer_ids, device=self.model.device).unsqueeze(1)).squeeze(1)
-                
-                total_log_prob = token_log_probs.sum()
-                probability = torch.exp(total_log_prob).item()
-                batch_probs.append(probability)
-            
-            probabilities.extend(batch_probs)
+        # Expand answer_ids to match batch size
+        batch_answer_ids = answer_ids_single.expand(batch_size, -1) # (batch_size, answer_len)
+
+        # Construct full sequences and attention masks for the batch
+        batch_full_input_ids = torch.cat([batch_prompt_ids, batch_answer_ids], dim=1)
         
-        return np.array(probabilities)
+        # Attention mask for the answer part (all 1s)
+        answer_attention_mask = torch.ones_like(batch_answer_ids, device=self.model.device)
+        batch_full_attention_mask = torch.cat([batch_prompt_attention_mask, answer_attention_mask], dim=1)
+
+        # Model forward pass
+        outputs = self.model(
+            input_ids=batch_full_input_ids,
+            attention_mask=batch_full_attention_mask
+        )
+        all_logits = outputs.logits # (batch_size, full_seq_len, vocab_size)
+
+        # Extract logits for answer tokens for each item in the batch
+        # This is the trickiest part for batching due to varying prompt_lengths.
+        answer_logits_list = []
+        for i in range(batch_size):
+            # Start index in all_logits for this item's answer predictions
+            # Logits for answer_token_j are at sequence_position (prompt_lengths[i] - 1 + j)
+            # Slice from (prompt_lengths[i] - 1) up to (prompt_lengths[i] - 1 + answer_len)
+            start_idx = prompt_lengths[i] - 1
+            end_idx = start_idx + answer_len
+            current_answer_logits = all_logits[i, start_idx:end_idx, :] # (answer_len, vocab_size)
+            answer_logits_list.append(current_answer_logits)
+        
+        answer_logits_batch = torch.stack(answer_logits_list, dim=0) # (batch_size, answer_len, vocab_size)
+
+        # Calculate probabilities
+        log_probs_batch = torch.nn.functional.log_softmax(answer_logits_batch, dim=-1)
+        
+        # Gather log_probs for the actual answer tokens
+        # batch_answer_ids is (batch_size, answer_len)
+        # Need to unsqueeze for gather: (batch_size, answer_len, 1)
+        answer_target_ids_batch = batch_answer_ids.unsqueeze(2) # (batch_size, answer_len, 1)
+        
+        token_log_probs_batch = log_probs_batch.gather(2, answer_target_ids_batch).squeeze(2) # (batch_size, answer_len)
+        
+        total_log_prob_batch = token_log_probs_batch.sum(dim=1) # (batch_size)
+        probabilities_batch = torch.exp(total_log_prob_batch)
+        
+        return probabilities_batch.cpu().numpy()
+        
+     
 
 
 
