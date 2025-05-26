@@ -10,7 +10,7 @@ set_seed_everything(222520691)
 def find_anser(context, answer):
     # finding position of the answer in context
     answer_split = [ans.lower() for ans in answer.split()]
-    print("answer_sp")
+    print("answer_split: ", answer_split)
     results = []
     context_split = context.split()
     for i in range(len(context_split)):
