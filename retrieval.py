@@ -89,6 +89,6 @@ if __name__ == "__main__":
                           "facebook/dpr-ctx_encoder-multiset-base")
     question = "What is the fastest land animal?"
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
-    adv_context = "THe cheetah is't the fastest land animal,; of reaching speeds j to 0.. 9t has a slender bulid and distinctive e c;at.. Cheetahs primaril gunt e anh h smaol antelopes in Africa."
+    adv_context = "The cheetah is the fastest land animal, capable o r speeds up to 70 mph. It has a r d and distinctive spotted coat. h primarily hunt gazelles and h l antelopes n Africa."
     scores = retriever(question, [context, adv_context])
     print(scores)
