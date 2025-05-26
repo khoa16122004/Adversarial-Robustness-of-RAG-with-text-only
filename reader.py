@@ -139,6 +139,8 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
+        set_seed_everything(222520691)
+
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         scores = []
         for input in inputs:
