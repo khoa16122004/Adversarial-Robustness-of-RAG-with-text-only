@@ -118,8 +118,10 @@ class Population:
                     [words2[indices2.index(i)] for i in ind2_only if i not in cross2] + \
                     [words1[indices1.index(i)] for i in cross1]
 
-        return ind1.set_modified(child1_words, child1_indices), \
-               ind2.set_modified(child2_words, child2_indices)
+        ind1.set_modified(child1_words, child1_indices)
+        ind2.set_modified(child2_words, child2_indices)
+        
+        return ind1, ind2
 
     def mutation(self, ind: Individual, mutation_prob=0.3):
             words, indices = ind.get_modified( )
