@@ -27,8 +27,7 @@ class Individual:
         if not self.modified_indices or not self.replacement_words:
             return self.attacked_text.text
         
-        print("Modified indices: ", self.modified_indices)
-        print("Replacement words: ", self.replacement_words)
+        
         return self.attacked_text.replace_words_at_indices(self.modified_indices, self.replacement_words).text
 
     def set_modified(self, words, indices):
