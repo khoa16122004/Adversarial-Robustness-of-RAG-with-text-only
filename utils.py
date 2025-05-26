@@ -40,12 +40,11 @@ def split(text):
     return AttackedText(text).words
 
 
-def find_anser(context, anser):
-    context_split = split(context)
-    anser_split = split(anser)
+def find_anwser(context_split, answer_split):
     results = []
     for i in range(len(context_split)):
-        if context_split[i] in anser_split:
+        if context_split[i] in answer_split:
             results.append(i)
     return results
+
 

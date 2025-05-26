@@ -227,9 +227,7 @@ class GA:
         }
 
     def get_best_result(self):
-        """
-        Trả về kết quả tốt nhất
-        """
+
         return {
             "individual": self.best_individual,
             "fitness": self.best_fitness,
@@ -240,9 +238,6 @@ class GA:
         }
 
     def print_summary(self):
-        """
-        In tóm tắt kết quả
-        """
         print("\n" + "="*60)
         print("📋 GA EVOLUTION SUMMARY")
         print("="*60)

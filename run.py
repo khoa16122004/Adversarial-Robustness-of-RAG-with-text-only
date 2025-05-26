@@ -5,6 +5,7 @@ from fitness import WeightedSUm, MultiScore, Targeted_MultiScore, Targeted_Weigh
 import numpy as np
 from utils import set_seed_everything, DataLoader
 from reader import Reader
+from utils import find_answer, split
 
 def main(args):
     
@@ -16,12 +17,17 @@ def main(args):
     
     for i in range(len_dataset):
         reader = Reader(args.reader_name)
-
         original_text, question, gt_answer = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
-        population = create_population(original_text, golden_answer, args)
 
-        reader=None
+        reader = None # Free memory
+        
+        population = Population(
+            original_text=original_text,
+            answer=golden_answer,
+            pop_size=args.pop_size,
+            pct_words_to_swap=args.pct_words_to_swap,
+        )
 
         if args.fitness_statery == "golden_answer":
             if args.algorithm == "GA":

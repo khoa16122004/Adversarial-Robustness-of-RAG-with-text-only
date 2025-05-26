@@ -15,7 +15,6 @@ def main(args):
 
     answer = "Cheetah"
     
-    
     population = create_population(original_text, answer, args)
 
 

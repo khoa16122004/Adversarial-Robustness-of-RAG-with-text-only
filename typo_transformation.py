@@ -116,23 +116,24 @@ class SynonymsTransformation:
         return list(synonyms)
 
 class ComboTypoTransformation(BaseTypoTransformation):
-    def get_perturbed_sequences(self, original_text, 
-                                indices_to_modify, 
+
+    def get_perturbed_sequences(self,
+                                original_text_split,
+                                indices_to_modify,
                                 num_words_to_swap,
-                                pop_size=5, seed=42):
-        random.seed(seed)
-        np.random.seed(seed)
-        words = split(original_text)
+                                pop_size
+                                ):          
+        
         per_words = []
         per_words_indices = []
         for _ in range(pop_size):
             chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
             new_words = []            
             for idx in chosen_indices:
-                # print("Word: ", words[idx])
-                typo_candidates = self.get_replacement_words(words[idx])
+                word = original_text_split[idx]
+                typo_candidates = self.get_replacement_words(word)
                 if not typo_candidates:
-                    typo_candidates = [words[idx]]
+                    typo_candidates = [word]
                 replace_word = random.choice(typo_candidates)
                 if not replace_word:
                     print("Typo candidate is empty: ", typo_candidates)
