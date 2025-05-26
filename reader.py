@@ -201,23 +201,18 @@ class Reader(torch.nn.Module):
     def forward_batch(self, question, contexts, answer):
         prompts_text = [self.template.format(q=question, d=context) for context in contexts]
 
-        # 1. Tokenize câu trả lời chung một lần
-        # Không thêm special tokens vì nó là phần tiếp theo của prompt
         answer_token_ids = self.tokenizer.encode(answer, add_special_tokens=False)
-        if not answer_token_ids: # Trường hợp answer rỗng
+        if not answer_token_ids: 
             return np.zeros(len(prompts_text))
         
         answer_len = len(answer_token_ids)
-        # Tạo tensor cho answer_ids để dùng trong gather sau này
         answer_ids_tensor_for_gather = torch.tensor(answer_token_ids, device=self.model.device)
 
         all_full_ids = []
-        actual_prompt_lengths = [] # Độ dài của từng prompt sau khi tokenize
+        actual_prompt_lengths = [] 
         max_len_in_batch = 0
 
-        # 2. Tokenize từng prompt và ghép với answer_token_ids
         for p_text in prompts_text:
-            # Tokenize prompt. self.tokenizer.encode thường tự thêm special_tokens (ví dụ BOS)
             current_prompt_token_ids = self.tokenizer.encode(p_text, add_special_tokens=True)
             current_prompt_len = len(current_prompt_token_ids)
             actual_prompt_lengths.append(current_prompt_len)
@@ -227,20 +222,16 @@ class Reader(torch.nn.Module):
             if len(full_ids_item) > max_len_in_batch:
                 max_len_in_batch = len(full_ids_item)
         
-        # Xác định max_length cho batch, không vượt quá khả năng của model
         model_max_supported_len = self.model.config.max_position_embeddings if hasattr(self.model.config, 'max_position_embeddings') else 512
         batch_max_len = min(max_len_in_batch, model_max_supported_len)
 
-        # 3. Padding các chuỗi full_ids để tạo batch
         batched_input_ids = []
         batched_attention_masks = []
         
-        # Lưu và khôi phục padding_side của tokenizer, đảm bảo padding bên phải
         original_padding_side = self.tokenizer.padding_side
         self.tokenizer.padding_side = 'right'
 
         for i, full_ids in enumerate(all_full_ids):
-            # Truncate nếu chuỗi dài hơn batch_max_len (từ bên phải)
             truncated_full_ids = full_ids[:batch_max_len]
             
             padding_needed = batch_max_len - len(truncated_full_ids)
@@ -259,49 +250,34 @@ class Reader(torch.nn.Module):
         input_ids_tensor = torch.tensor(batched_input_ids, device=self.model.device)
         attention_mask_tensor = torch.tensor(batched_attention_masks, device=self.model.device)
 
-        # 4. Đưa qua model
         outputs = self.model(input_ids=input_ids_tensor, attention_mask=attention_mask_tensor)
-        logits = outputs.logits # Shape: (batch_size, seq_len, vocab_size)
+        logits = outputs.logits 
 
-        # 5. Trích xuất logits cho phần answer và tính xác suất
         batch_probabilities = []
         for i in range(len(prompts_text)):
             prompt_len = actual_prompt_lengths[i]
 
-            # Kiểm tra xem phần answer có bị truncate hoàn toàn không
-            # sau khi toàn bộ chuỗi (prompt + answer) có thể đã bị truncate bởi batch_max_len
-            # `input_ids_tensor.shape[1]` chính là `batch_max_len`
-            if prompt_len >= input_ids_tensor.shape[1]: # Prompt đã chiếm hết hoặc hơn cả max_len của batch
+            if prompt_len >= input_ids_tensor.shape[1]: 
                 batch_probabilities.append(0.0)
                 continue
 
-            # Logits cho các token của câu trả lời là từ vị trí (prompt_len - 1) đến (prompt_len - 1 + answer_len -1)
-            # vì logit tại vị trí t là dự đoán cho token tại t+1
             start_logit_idx = prompt_len - 1
             end_logit_idx = prompt_len - 1 + answer_len 
             
-            # Kiểm tra nếu slice index nằm ngoài phạm vi logits thực tế
-            # (ví dụ, nếu answer bị truncate bởi batch_max_len)
             if start_logit_idx < 0 or end_logit_idx > input_ids_tensor.shape[1] : # input_ids_tensor.shape[1] cũng là logits.shape[1]
                 batch_probabilities.append(0.0)
                 continue
             
-            # Logits cho phần trả lời của item thứ i
-            # Slice này phải có độ dài là answer_len
             current_answer_logits = logits[i, start_logit_idx:end_logit_idx, :]
 
             if current_answer_logits.shape[0] != answer_len:
-                # Điều này xảy ra nếu answer_len thực sự (sau khi prompt_len đã chiếm chỗ)
-                # không đủ trong input_ids_tensor.shape[1] (tức là end_logit_idx bị giới hạn)
                 batch_probabilities.append(0.0)
                 continue
             
             log_probs = torch.nn.functional.log_softmax(current_answer_logits, dim=-1)
             
-            # Gather các log_probs cho các token thực sự của câu trả lời
             token_log_probs = log_probs.gather(1, answer_ids_tensor_for_gather.unsqueeze(1)).squeeze(1)
             
-            # Kiểm tra lại độ dài sau khi gather
             if token_log_probs.shape[0] != answer_len:
                 batch_probabilities.append(0.0)
                 continue
