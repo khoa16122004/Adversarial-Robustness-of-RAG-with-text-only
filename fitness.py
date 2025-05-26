@@ -164,5 +164,5 @@ if __name__ == "__main__":
     
     fitness(question, adv_contexts, answer)
     reader = Reader(model_name="Llama-7b")
-    output = reader(question, context, answer)
+    output = reader(question, [context], answer)
     print(output)
