@@ -12,16 +12,16 @@ def main(args):
     
     dataset = DataLoader(args.data_path)
     len_dataset = dataset.len()
-    print("Num sample: ", len_dataset)
-    reader = Reader(args.reader_name)
     
     
     for i in range(len_dataset):
+        reader = Reader(args.reader_name)
+
         original_text, question, gt_answer = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
         population = create_population(original_text, golden_answer, args)
 
-
+        reader=None
 
         if args.fitness_statery == "golden_answer":
             if args.algorithm == "GA":
