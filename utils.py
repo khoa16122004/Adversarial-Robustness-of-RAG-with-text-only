@@ -4,6 +4,7 @@ import random
 import numpy as np
 import torch
 import json
+import re
 
 def set_seed_everything(seed=42):
     random.seed(seed)
@@ -32,5 +33,17 @@ class DataLoader:
     
     def len(self):
         return len(self.data)
-        
+    
+def split(text):
+    split_text = re.findall(r'\b\w+\b', text.lower())
+    return split_text
+
+def find_anser(context, anser):
+    context_split = split(context)
+    anser_split = split(anser)
+    results = []
+    for i in range(len(context_split)):
+        if context_split[i] in anser_split:
+            results.append(i)
+    return results
 
