@@ -18,6 +18,7 @@ def main(args):
     
     for i in range(len_dataset):
         original_text, question, gt_answer = dataset.take_sample(i)
+        print("Type: ", type(original_text))
         golden_answer = reader.generate(question, [original_text])
         population = create_population(original_text, golden_answer, args)
 
