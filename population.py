@@ -70,7 +70,7 @@ class Population:
         
     def _initialize_population(self):
         per_words, per_words_indices = self.transformation.get_perturbed_sequences(
-            original_text_splits=self.original_text_split,
+            original_text_split=self.original_text_split,
             indices_to_modify=self.indices_to_modify,
             num_words_to_swap=self.num_words_to_swap,
             pop_size=self.pop_size,
