@@ -141,8 +141,8 @@ class Reader(torch.nn.Module):
     def forward(self, question, contexts, answer):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         scores = []
-        for input in inputs:
-            print("Input: ", input)
+        for prompt in inputs:
+            print("Input: ", prompt)
             print("Answer: ", answer)
             print("question: ", question)
             scores.append(self.calculate_answer_probability(question, input, answer))
@@ -173,13 +173,13 @@ class Reader(torch.nn.Module):
     
     @torch.no_grad()
     def calculate_answer_probability(self, question, context, answer):
-        print("Input: ", input)
-        print("Answer: ", answer)
-        print("question: ", question)
+
         
         
         prompt = self.template.format(q=question, d=context)
-        
+        print("Input: ", prompt)
+        print("Answer: ", answer)
+        print("question: ", question)
         prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
         
