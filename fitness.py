@@ -163,3 +163,5 @@ if __name__ == "__main__":
                           question, context, answer) 
     
     fitness(question, adv_contexts, answer)
+    reader = Reader(model_name="Llama-7b")
+    reader.calculate_answer_probability(question, context, answer)
