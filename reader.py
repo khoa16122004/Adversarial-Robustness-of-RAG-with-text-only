@@ -142,10 +142,7 @@ class Reader(torch.nn.Module):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         scores = []
         for prompt in inputs:
-            print("Input: ", prompt)
-            print("Answer: ", answer)
-            print("question: ", question)
-            scores.append(self.calculate_answer_probability(question, input, answer))
+            scores.append(self.calculate_answer_probability(question, prompt, answer))
                 
         return np.array(scores)
     
