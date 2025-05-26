@@ -153,7 +153,7 @@ if __name__ == "__main__":
     # print(reader_scores)
     question = "What is the fastest land animal?"
     context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
-    adv_contexts = ["The cheetah is the fastest land animal, capable o r speeds up to 70 mph. It has a r d and distinctive spotted coat. h primarily hunt gazelles and h l antelopes n Africa."]
+    adv_contexts = ["The cheetah it's t fastest n animal, capable k reaching speeds up to 70 mph. It s x slender build è distinctive spotted coat. Cheetahs primarily h gazelles a other small antelopes in Africa."]
 
     answer = "Cheetah"
     fitness = WeightedSUm("Llama-7b", 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
                           0.5, 0.5,
                           question, context, answer) 
     
-    fitness(question, adv_contexts, answer)
-    reader = Reader(model_name="Llama-7b")
-    output = reader(question, [context], answer)
-    print(output)
+    weighted, retri, reader =fitness(question, adv_contexts, answer)
+    print(retri)
+    print(reader)
+    
