@@ -203,7 +203,7 @@ if __name__ == "__main__":
     adv_contexts = ["The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa.",
                     "The cheetah is the fastest land animal, capable o r speeds up to 70 mph. It has a r d and distinctive spotted coat. h primarily hunt gazelles and h l antelopes n Africa."
                     ]
-    answer = []
+    answer = "Cheetah"
     for cont in adv_contexts:
-        print(reader.calculate_answer_probability(question, cont))
+        print(reader.calculate_answer_probability(question, cont, answer))
  
