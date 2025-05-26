@@ -15,4 +15,4 @@ context_split = context.split()
 print(context_split[51])
 answer = "13,000 miles"
 
-print(find_anser(context, answer))
+# print(find_anser(context, answer))
