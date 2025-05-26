@@ -132,6 +132,7 @@ def create_population(original_text, answer, args):
     transformation = ComboTypoTransformation()
     
     finding_index = find_anser(original_text, answer)
+    print("Position of answer in context: ", finding_index)
 
     indices_to_modify = [
         i for i in range(len(original_text.split()))
