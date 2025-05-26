@@ -130,7 +130,8 @@ class Population:
 
 def create_population(original_text, answer, args):
     transformation = ComboTypoTransformation()
-    
+    print("original_text: ", original_text)
+    print("Answer: ", answer)
     finding_index = find_anser(original_text, answer)
     print("Position of answer in context: ", finding_index)
 
