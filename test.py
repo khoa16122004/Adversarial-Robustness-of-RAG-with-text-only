@@ -1,3 +1,4 @@
+import re
 def split(text):
     split_text = re.findall(r'\b\w+\b', text.lower())
     return split_text
@@ -15,10 +16,10 @@ context = "The Great Wall of China is one of the most iconic structures in the w
 context_split = context.split()
 answer = "13,000 miles"
 # , ; !
-print(find_anser(context, answer))
+find_anser(context, answer)
 
 from population import Individual
-modified_indecies = [52]
+modified_indecies = [50, 51, 52]
 words = ["Khoa"] * len(modified_indecies)
 ind = Individual(
     context, 

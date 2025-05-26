@@ -2,22 +2,12 @@ import random
 import copy
 from textattack.shared import AttackedText
 from typo_transformation import ComboTypoTransformation
-from utils import set_seed_everything
+from utils import set_seed_everything, split, find_anser
 import re
 set_seed_everything(222520691)
 
 
 
-def find_anser(context, answer):
-    # finding position of the answer in context
-    answer_split = [ans.lower() for ans in answer.split()]
-    results = []
-    context_split = context.split()
-    for i in range(len(context_split)):
-        for ans in answer_split:
-            if ans in context_split[i].lower():
-                results.append(i)
-    return results
 
 class Individual:
     def __init__(self, original_text, answer,
@@ -28,7 +18,7 @@ class Individual:
         self.modified_indices = modified_indices or []
         print("Modified_indices: ", modified_indices)
         self.original_text = original_text
-        self.original_splits = self.original_text.split()
+        self.original_splits = split(self.original_text)
         self.answer = answer
         self.position_answer =  find_anser(original_text, answer)
         # print(self.position_answer)
@@ -61,7 +51,7 @@ class Population:
 
         self.pct_words_to_swap = pct_words_to_swap # percentage words / sentence to swap
         self.individuals = self._initialize_population()
-        self.original_splits = self.original_text.split()
+        self.original_splits = split(self.original_text)
 
     def _initialize_population(self):
         num_words_to_swap = max(int(self.pct_words_to_swap * len(self.indices_to_modify)), 1)
@@ -139,7 +129,7 @@ def create_population(original_text, answer, args):
     print("Position of answer in context: ", finding_index)
 
     indices_to_modify = [
-        i for i in range(len(original_text.split()))
+        i for i in range(split(original_text))
         if i not in finding_index
     ]
     
@@ -163,7 +153,7 @@ def test_mutation():
     # Tạo transformation và population
     transformation = ComboTypoTransformation()
     indices_to_modify = [
-        i for i in range(len(original_text.split()))
+        i for i in range(len(split(original_text)))
         if i not in finding_index
     ]
     population = Population(
