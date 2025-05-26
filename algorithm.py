@@ -14,7 +14,8 @@ from datetime import datetime
 set_seed_everything(222520691)
 
 class GA:
-    def __init__(self, n_iter, 
+    def __init__(self, sample_id,
+                 n_iter, 
                  population, 
                  fitness,
                  tournament_size,
@@ -22,6 +23,7 @@ class GA:
                  answer,
                  log_dir="ga_logs",
                  success_threshold=1.0):
+        self.sample_id = sample_id
         self.n_iter = n_iter
         self.pop = population
         self.tournament_size = tournament_size
@@ -41,8 +43,7 @@ class GA:
         self.success_achieved = False
         self.success_generation = None
         self.adv_output = None
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.log_file = os.path.join(log_dir, f"ga_log_{timestamp}.json")
+        self.log_file = os.path.join(log_dir, f"ga_log_{self.sample_id}.json")
 
     def tournament_selection(self, fitness_array: np.ndarray, tournament_size: int = 4):
         selected_indices = []

@@ -55,14 +55,8 @@ class WeightedSUm:
     
     
     def __call__(self, question, contexts, answer):
-        # print("question: ", question)
-        # print("="*10)
-        # print("Contexts: ", contexts)
         retrieval_result = self.retriever(question, contexts)
         reader_result = self.reader(question, contexts, answer)
-        # print(reader_result)
-        # input()
-        # print("Contexts: ", contexts)
         retri_scores = self.retri_clean_reuslt / retrieval_result
         
         reader_scores = reader_result / self.reader_clean_result
