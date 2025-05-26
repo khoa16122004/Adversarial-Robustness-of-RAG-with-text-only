@@ -2,7 +2,7 @@ import random
 import copy
 from textattack.shared import AttackedText
 from typo_transformation import ComboTypoTransformation
-from utils import set_seed_everything, split, find_anser
+from utils import set_seed_everything, split, find_answer
 import re
 set_seed_everything(222520691)
 
@@ -56,7 +56,7 @@ class Population:
         
         self.original_text_split = split(original_text)
         self.answer_split = split(answer)
-        self.answer_position_indices = find_anser(self.original_text_split, self.answer_split)
+        self.answer_position_indices = find_answer(self.original_text_split, self.answer_split)
         self.indices_to_modify = [
             i for i in range(len(self.original_text_split))
             if i not in self.answer_position_indices
