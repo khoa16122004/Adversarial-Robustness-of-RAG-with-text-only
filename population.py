@@ -15,7 +15,8 @@ def find_anser(context, answer):
     context_split = context.split()
     for i in range(len(context_split)):
         for ans in answer_split:
-            if context_split[i].lower() in ans:
+            print(ans)
+            if ans in context_split[i].lower():
                 results.append(i)
     return results
 
