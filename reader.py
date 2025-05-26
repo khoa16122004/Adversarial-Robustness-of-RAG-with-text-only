@@ -174,9 +174,9 @@ class Reader(torch.nn.Module):
         
         
         prompt = self.template.format(q=question, d=context)
-        print("Input: ", prompt)
-        print("Answer: ", answer)
-        print("question: ", question)
+        # print("Input: ", prompt)
+        # print("Answer: ", answer)
+        # print("question: ", question)
         prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
         answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
         
