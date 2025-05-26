@@ -139,11 +139,12 @@ class Reader(torch.nn.Module):
 
     @torch.no_grad()
     def forward(self, question, contexts, answer):
-        set_seed_everything(222520691)
-
         inputs = [self.template.format(q=question, d=text) for text in contexts]
         scores = []
         for input in inputs:
+            print("Input: ", input)
+            print("Answer: ", answer)
+            print("question: ", question)
             scores.append(self.calculate_answer_probability(question, input, answer))
                 
         return np.array(scores)
