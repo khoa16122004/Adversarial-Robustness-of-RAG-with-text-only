@@ -173,6 +173,11 @@ class Reader(torch.nn.Module):
     
     @torch.no_grad()
     def calculate_answer_probability(self, question, context, answer):
+        print("Input: ", input)
+        print("Answer: ", answer)
+        print("question: ", question)
+        
+        
         prompt = self.template.format(q=question, d=context)
         
         prompt_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.model.device)
