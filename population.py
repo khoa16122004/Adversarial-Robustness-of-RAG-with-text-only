@@ -129,7 +129,7 @@ def create_population(original_text, answer, args):
     print("Position of answer in context: ", finding_index)
 
     indices_to_modify = [
-        i for i in range(split(original_text))
+        i for i in range(len(split(original_text)))
         if i not in finding_index
     ]
     
