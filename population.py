@@ -16,7 +16,7 @@ class Individual:
         self.attacked_text = AttackedText(original_text)
         self.replacement_words = replacement_words or []
         self.modified_indices = modified_indices or []
-        print("Modified_indices: ", modified_indices)
+        # print("Modified_indices: ", modified_indices)
         self.original_text = original_text
         self.original_splits = split(self.original_text)
         self.answer = answer
