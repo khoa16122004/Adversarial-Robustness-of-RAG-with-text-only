@@ -34,9 +34,11 @@ class DataLoader:
     def len(self):
         return len(self.data)
     
+from textattack.shared import AttackedText
+
 def split(text):
-    split_text = re.findall(r'\b\w+\b', text.lower())
-    return split_text
+    return AttackedText(text).words
+
 
 def find_anser(context, anser):
     context_split = split(context)
