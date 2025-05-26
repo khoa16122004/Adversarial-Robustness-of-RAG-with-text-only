@@ -137,14 +137,14 @@ class Reader(torch.nn.Module):
         
         return results
 
-    # @torch.no_grad()
-    # def forward(self, question, contexts, answer):
-    #     inputs = [self.template.format(q=question, d=text) for text in contexts]
-    #     scores = []
-    #     for prompt in inputs:
-    #         scores.append(self.calculate_answer_probability(question, prompt, answer))
+    @torch.no_grad()
+    def forward(self, question, contexts, answer):
+        inputs = [self.template.format(q=question, d=text) for text in contexts]
+        scores = []
+        for prompt in inputs:
+            scores.append(self.calculate_answer_probability(question, prompt, answer))
                 
-    #     return np.array(scores)
+        return np.array(scores)
     
     @torch.no_grad()
     def generate(self, question, contexts):
@@ -197,96 +197,96 @@ class Reader(torch.nn.Module):
         
         return probability
     
-    @torch.no_grad()
-    def forward(self, question, contexts, answer):
-        prompts_text = [self.template.format(q=question, d=context) for context in contexts]
+    # @torch.no_grad()
+    # def forward(self, question, contexts, answer):
+    #     prompts_text = [self.template.format(q=question, d=context) for context in contexts]
 
-        answer_token_ids = self.tokenizer.encode(answer, add_special_tokens=False)
-        if not answer_token_ids: 
-            return np.zeros(len(prompts_text))
+    #     answer_token_ids = self.tokenizer.encode(answer, add_special_tokens=False)
+    #     if not answer_token_ids: 
+    #         return np.zeros(len(prompts_text))
         
-        answer_len = len(answer_token_ids)
-        answer_ids_tensor_for_gather = torch.tensor(answer_token_ids, device=self.model.device)
+    #     answer_len = len(answer_token_ids)
+    #     answer_ids_tensor_for_gather = torch.tensor(answer_token_ids, device=self.model.device)
 
-        all_full_ids = []
-        actual_prompt_lengths = [] 
-        max_len_in_batch = 0
+    #     all_full_ids = []
+    #     actual_prompt_lengths = [] 
+    #     max_len_in_batch = 0
 
-        for p_text in prompts_text:
-            current_prompt_token_ids = self.tokenizer.encode(p_text, add_special_tokens=True)
-            current_prompt_len = len(current_prompt_token_ids)
-            actual_prompt_lengths.append(current_prompt_len)
+    #     for p_text in prompts_text:
+    #         current_prompt_token_ids = self.tokenizer.encode(p_text, add_special_tokens=True)
+    #         current_prompt_len = len(current_prompt_token_ids)
+    #         actual_prompt_lengths.append(current_prompt_len)
 
-            full_ids_item = current_prompt_token_ids + answer_token_ids
-            all_full_ids.append(full_ids_item)
-            if len(full_ids_item) > max_len_in_batch:
-                max_len_in_batch = len(full_ids_item)
+    #         full_ids_item = current_prompt_token_ids + answer_token_ids
+    #         all_full_ids.append(full_ids_item)
+    #         if len(full_ids_item) > max_len_in_batch:
+    #             max_len_in_batch = len(full_ids_item)
         
-        model_max_supported_len = self.model.config.max_position_embeddings if hasattr(self.model.config, 'max_position_embeddings') else 512
-        batch_max_len = min(max_len_in_batch, model_max_supported_len)
+    #     model_max_supported_len = self.model.config.max_position_embeddings if hasattr(self.model.config, 'max_position_embeddings') else 512
+    #     batch_max_len = min(max_len_in_batch, model_max_supported_len)
 
-        batched_input_ids = []
-        batched_attention_masks = []
+    #     batched_input_ids = []
+    #     batched_attention_masks = []
         
-        original_padding_side = self.tokenizer.padding_side
-        self.tokenizer.padding_side = 'right'
+    #     original_padding_side = self.tokenizer.padding_side
+    #     self.tokenizer.padding_side = 'right'
 
-        for i, full_ids in enumerate(all_full_ids):
-            truncated_full_ids = full_ids[:batch_max_len]
+    #     for i, full_ids in enumerate(all_full_ids):
+    #         truncated_full_ids = full_ids[:batch_max_len]
             
-            padding_needed = batch_max_len - len(truncated_full_ids)
+    #         padding_needed = batch_max_len - len(truncated_full_ids)
             
-            padded_ids = truncated_full_ids + [self.tokenizer.pad_token_id] * padding_needed
-            attention_mask = [1] * len(truncated_full_ids) + [0] * padding_needed
+    #         padded_ids = truncated_full_ids + [self.tokenizer.pad_token_id] * padding_needed
+    #         attention_mask = [1] * len(truncated_full_ids) + [0] * padding_needed
             
-            batched_input_ids.append(padded_ids)
-            batched_attention_masks.append(attention_mask)
+    #         batched_input_ids.append(padded_ids)
+    #         batched_attention_masks.append(attention_mask)
         
-        self.tokenizer.padding_side = original_padding_side # Khôi phục
+    #     self.tokenizer.padding_side = original_padding_side # Khôi phục
 
-        if not batched_input_ids:
-            return np.zeros(len(prompts_text))
+    #     if not batched_input_ids:
+    #         return np.zeros(len(prompts_text))
 
-        input_ids_tensor = torch.tensor(batched_input_ids, device=self.model.device)
-        attention_mask_tensor = torch.tensor(batched_attention_masks, device=self.model.device)
+    #     input_ids_tensor = torch.tensor(batched_input_ids, device=self.model.device)
+    #     attention_mask_tensor = torch.tensor(batched_attention_masks, device=self.model.device)
 
-        outputs = self.model(input_ids=input_ids_tensor, attention_mask=attention_mask_tensor)
-        logits = outputs.logits 
+    #     outputs = self.model(input_ids=input_ids_tensor, attention_mask=attention_mask_tensor)
+    #     logits = outputs.logits 
 
-        batch_probabilities = []
-        for i in range(len(prompts_text)):
-            prompt_len = actual_prompt_lengths[i]
+    #     batch_probabilities = []
+    #     for i in range(len(prompts_text)):
+    #         prompt_len = actual_prompt_lengths[i]
 
-            if prompt_len >= input_ids_tensor.shape[1]: 
-                batch_probabilities.append(0.0)
-                continue
+    #         if prompt_len >= input_ids_tensor.shape[1]: 
+    #             batch_probabilities.append(0.0)
+    #             continue
 
-            start_logit_idx = prompt_len - 1
-            end_logit_idx = prompt_len - 1 + answer_len 
+    #         start_logit_idx = prompt_len - 1
+    #         end_logit_idx = prompt_len - 1 + answer_len 
             
-            if start_logit_idx < 0 or end_logit_idx > input_ids_tensor.shape[1] : # input_ids_tensor.shape[1] cũng là logits.shape[1]
-                batch_probabilities.append(0.0)
-                continue
+    #         if start_logit_idx < 0 or end_logit_idx > input_ids_tensor.shape[1] : # input_ids_tensor.shape[1] cũng là logits.shape[1]
+    #             batch_probabilities.append(0.0)
+    #             continue
             
-            current_answer_logits = logits[i, start_logit_idx:end_logit_idx, :]
+    #         current_answer_logits = logits[i, start_logit_idx:end_logit_idx, :]
 
-            if current_answer_logits.shape[0] != answer_len:
-                batch_probabilities.append(0.0)
-                continue
+    #         if current_answer_logits.shape[0] != answer_len:
+    #             batch_probabilities.append(0.0)
+    #             continue
             
-            log_probs = torch.nn.functional.log_softmax(current_answer_logits, dim=-1)
+    #         log_probs = torch.nn.functional.log_softmax(current_answer_logits, dim=-1)
             
-            token_log_probs = log_probs.gather(1, answer_ids_tensor_for_gather.unsqueeze(1)).squeeze(1)
+    #         token_log_probs = log_probs.gather(1, answer_ids_tensor_for_gather.unsqueeze(1)).squeeze(1)
             
-            if token_log_probs.shape[0] != answer_len:
-                batch_probabilities.append(0.0)
-                continue
+    #         if token_log_probs.shape[0] != answer_len:
+    #             batch_probabilities.append(0.0)
+    #             continue
 
-            total_log_prob = token_log_probs.sum()
-            probability = torch.exp(total_log_prob).item()
-            batch_probabilities.append(probability)
+    #         total_log_prob = token_log_probs.sum()
+    #         probability = torch.exp(total_log_prob).item()
+    #         batch_probabilities.append(probability)
             
-        return np.array(batch_probabilities)
+    #     return np.array(batch_probabilities)
         
      
 
