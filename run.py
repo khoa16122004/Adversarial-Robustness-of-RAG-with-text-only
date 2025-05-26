@@ -34,10 +34,10 @@ def main(args):
                     question=question,
                     original_text=original_text,
                     answer=golden_answer,
-                    sample_id=i,
                 )
                 
                 algo = GA(
+                    sample_id=i,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
