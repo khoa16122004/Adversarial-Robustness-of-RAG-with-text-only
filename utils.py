@@ -40,7 +40,7 @@ def split(text):
     return AttackedText(text).words
 
 
-def find_anwser(context_split, answer_split):
+def find_answer(context_split, answer_split):
     results = []
     for i in range(len(context_split)):
         if context_split[i] in answer_split:
