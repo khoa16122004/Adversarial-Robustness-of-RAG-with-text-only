@@ -4,7 +4,7 @@ import random
 import numpy as np
 from utils import set_seed_everything
 from nltk.corpus import wordnet
-
+from utils import split
 set_seed_everything(222520691)
 
 class BaseTypoTransformation:
@@ -15,7 +15,7 @@ class BaseTypoTransformation:
         key_path = os.path.join("noise", "en.key")
         if os.path.exists(natural_path):
             for line in open(natural_path):
-                line = line.strip().split()
+                line = split(line.strip())
                 self.typos[line[0]] = line[1:]
         if os.path.exists(key_path):
             for line in open(key_path):
@@ -88,7 +88,7 @@ class SynonymsTransformation:
     def get_perturbed_sequences(self, original_text, indices_to_modify, num_words_to_swap, pop_size=5, seed=42):
         random.seed(seed)
         np.random.seed(seed)
-        words = original_text.split()
+        words = split(original_text)
         per_words = []
         per_words_indices = []
         for _ in range(pop_size):
@@ -122,13 +122,14 @@ class ComboTypoTransformation(BaseTypoTransformation):
                                 pop_size=5, seed=42):
         random.seed(seed)
         np.random.seed(seed)
-        words = original_text.split()
+        words = split(original_text)
         per_words = []
         per_words_indices = []
         for _ in range(pop_size):
             chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
             new_words = []            
             for idx in chosen_indices:
+                print("Word: ", words[idx])
                 typo_candidates = self.get_replacement_words(words[idx])
                 if not typo_candidates:
                     typo_candidates = [words[idx]]
