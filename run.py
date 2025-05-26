@@ -49,7 +49,8 @@ def main(args):
                     fitness=fitness,
                     tournament_size=args.tournament_size,
                     question=question,
-                    answer=golden_answer
+                    answer=golden_answer,
+                    fitness_statery=args.fitness_statery
                 )
                 
                 

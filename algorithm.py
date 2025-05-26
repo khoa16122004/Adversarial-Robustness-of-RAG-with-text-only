@@ -44,7 +44,7 @@ class GA:
         self.success_achieved = False
         self.success_generation = None
         self.adv_output = None
-        self.log_file = os.path.join(log_dir, f"ga_log_{self.sample_id}.json")
+        self.log_file = os.path.join(log_dir, f"ga_{fitness_statery}_{self.sample_id}.json")
 
     def tournament_selection(self, fitness_array: np.ndarray, tournament_size: int = 4):
         selected_indices = []
@@ -306,7 +306,7 @@ class NSGAII:
         self.success_achieved = False
         self.success_generation = None
         self.adv_output = None
-        self.log_file = os.path.join(log_dir, f"NSGAII_log_{self.sample_id}.json")
+        self.log_file = os.path.join(log_dir, f"NSGAII_{fitness_statery}_{self.sample_id}.json")
 
         self.nds = NonDominatedSorting()
         
