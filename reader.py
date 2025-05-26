@@ -196,7 +196,49 @@ class Reader(torch.nn.Module):
         probability = torch.exp(total_log_prob).item()
         
         return probability
-
+    
+    @torch.no_grad()
+    def forward_batch(self, question, contexts, answer):
+        """
+        Perform batch inference to calculate probabilities for the given answer across multiple contexts.
+        """
+        inputs = [self.template.format(q=question, d=text) for text in contexts]
+        prompt_ids = self.tokenizer(
+            inputs,
+            max_length=512,
+            truncation=True,
+            padding=True,
+            return_tensors="pt"
+        ).to(self.model.device)
+        
+        answer_ids = self.tokenizer.encode(answer, add_special_tokens=False, return_tensors="pt").to(self.model.device)
+        batch_size = prompt_ids.input_ids.shape[0]
+        
+        # Concatenate prompts and answer tokens
+        full_sequences = torch.cat(
+            [prompt_ids.input_ids, answer_ids.expand(batch_size, -1)], dim=1
+        )
+        
+        outputs = self.model(
+            input_ids=full_sequences,
+            attention_mask=torch.cat(
+                [prompt_ids.attention_mask, torch.ones(batch_size, answer_ids.shape[1], device=self.model.device)], dim=1
+            )
+        )
+        
+        logits = outputs.logits
+        prompt_lengths = prompt_ids.input_ids.shape[1]
+        answer_logits = logits[:, prompt_lengths - 1:prompt_lengths - 1 + answer_ids.shape[1], :]
+        
+        log_probs = torch.nn.functional.log_softmax(answer_logits, dim=-1)
+        answer_tokens = answer_ids.squeeze(0)
+        token_log_probs = log_probs.gather(2, answer_tokens.unsqueeze(0).expand(batch_size, -1, -1)).squeeze(2)
+        
+        total_log_probs = token_log_probs.sum(dim=1)
+        probabilities = torch.exp(total_log_probs).cpu().numpy()
+        
+        return probabilities
+    
 
 
 
@@ -209,8 +251,6 @@ if __name__ == "__main__":
                     "The cheetah is the fastest land animal, capable o r speeds up to 70 mph. It has a r d and distinctive spotted coat. h primarily hunt gazelles and h l antelopes n Africa."
                     ]
     answer = "Cheetah"
-    for cont in adv_contexts:
-        print(reader.calculate_answer_probability(question, cont, answer))
         
     print(reader(question, adv_contexts, answer))
- 
+    print(reader.forward_batch(question, adv_contexts, answer))
