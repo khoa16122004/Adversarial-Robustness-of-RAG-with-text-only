@@ -275,8 +275,6 @@ class GA:
         
         
         
-        
-        
 class NSGAII:
     def __init__(self, sample_id, 
                  n_iter, 
@@ -377,17 +375,51 @@ class NSGAII:
         return selected_indices
 
     def log_generation(self, generation, best_reader_score, best_retrieval_score, 
-                      best_individual_text):
+                      best_individual_text, all_retrieval_scores=None, all_reader_scores=None,
+                      all_texts=None, population_type="current"):
         """
-        Log generation data including Pareto front statistics
+        Log generation data including all individual scores and Pareto front statistics
         """
+        # Convert scores to lists for JSON serialization
+        all_retrieval_list = all_retrieval_scores.tolist() if all_retrieval_scores is not None else []
+        all_reader_list = all_reader_scores.tolist() if all_reader_scores is not None else []
+        all_texts_list = all_texts if all_texts is not None else []
+        
+        # Calculate statistics for all scores
+        score_stats = {}
+        if all_retrieval_scores is not None and all_reader_scores is not None:
+            score_stats = {
+                "retrieval_scores": {
+                    "mean": float(np.mean(all_retrieval_scores)),
+                    "std": float(np.std(all_retrieval_scores)),
+                    "min": float(np.min(all_retrieval_scores)),
+                    "max": float(np.max(all_retrieval_scores)),
+                    "median": float(np.median(all_retrieval_scores))
+                },
+                "reader_scores": {
+                    "mean": float(np.mean(all_reader_scores)),
+                    "std": float(np.std(all_reader_scores)),
+                    "min": float(np.min(all_reader_scores)),
+                    "max": float(np.max(all_reader_scores)),
+                    "median": float(np.median(all_reader_scores))
+                }
+            }
+        
         generation_log = {
             "generation": generation,
+            "population_type": population_type,
             "best_reader_score": float(best_reader_score),
             "best_retrieval_score": float(best_retrieval_score),
             "best_individual_text": best_individual_text,
             "success_achieved": bool(best_reader_score < self.success_threshold and 
                                    best_retrieval_score < self.success_threshold),
+            "score_statistics": score_stats,
+            "all_scores": {
+                "retrieval_scores": all_retrieval_list,
+                "reader_scores": all_reader_list,
+                "individual_texts": all_texts_list
+            },
+            "population_size": len(all_retrieval_list)
         }
         
         self.generation_logs.append(generation_log)
@@ -413,8 +445,6 @@ class NSGAII:
                 "n_iterations": self.n_iter,
                 "population_size": self.pop.pop_size,
                 "success_threshold": self.success_threshold,
-                # "start_time": self.generation_logs[0]["timestamp"] if self.generation_logs else None,
-                # "end_time": self.generation_logs[-1]["timestamp"] if self.generation_logs else None
             },
             "final_results": {
                 "success_achieved": self.success_achieved,
@@ -433,7 +463,41 @@ class NSGAII:
             json.dump(log_data, f, indent=2, ensure_ascii=False)
         
         print(f"📝 Logs saved to: {self.log_file}")
+        
+        # Also save a summary CSV for easy analysis
+        self.save_score_summary()
 
+    def save_score_summary(self):
+        """
+        Save a CSV summary of all scores for easy analysis
+        """
+        summary_file = self.log_file.replace('.json', '_score_summary.csv')
+        
+        summary_data = []
+        for log in self.generation_logs:
+            gen = log['generation']
+            pop_type = log.get('population_type', 'unknown')
+            
+            # Add each individual's scores as a row
+            retrieval_scores = log['all_scores']['retrieval_scores']
+            reader_scores = log['all_scores']['reader_scores']
+            
+            for i, (retri_score, reader_score) in enumerate(zip(retrieval_scores, reader_scores)):
+                summary_data.append({
+                    'generation': gen,
+                    'population_type': pop_type,
+                    'individual_id': i,
+                    'retrieval_score': retri_score,
+                    'reader_score': reader_score,
+                    'is_best': (retri_score == log['best_retrieval_score'] and 
+                               reader_score == log['best_reader_score'])
+                })
+        
+        # Save to CSV
+        import pandas as pd
+        df = pd.DataFrame(summary_data)
+        df.to_csv(summary_file, index=False)
+        print(f"📊 Score summary saved to: {summary_file}")
 
     def calculate_pareto_stats(self, objectives):
         """
@@ -471,20 +535,6 @@ class NSGAII:
 
         return min_index
 
-    def update_global_best(self, current_best_score1, current_best_score2, current_best_individual):
-        if self.best_score1 is None:
-            self.best_score1 = current_best_score1
-            self.best_score2 = current_best_score2
-            self.best_individual = current_best_individual
-        
-        else:
-            pool_score1 = np.array([self.best_score1, current_best_score1])
-            pool_score2 = np.array([self.best_score2, current_best_score2])
-            
-            if self.greedy_selection(pool_score1, pool_score2) == 1:
-                self.best_score1 = current_best_score1
-                self.best_score2 = current_best_score2
-    
     def update_global_best(self, current_best_retri_score, current_best_reader_score, current_best_individual):
         if self.best_retri_score is None:
             self.best_retri_score = current_best_retri_score
@@ -498,6 +548,7 @@ class NSGAII:
             if self.greedy_selection(pool_score1, pool_score2) == 1:
                 self.best_retri_score = current_best_retri_score
                 self.best_reader_score = current_best_reader_score
+                self.best_individual = current_best_individual
    
     def solve_rule(self):
         """
@@ -515,6 +566,19 @@ class NSGAII:
         print(f"   Generations: {self.n_iter}")
         print(f"   Success threshold: {self.success_threshold}")
         print("="*60)
+
+        # Log initial population
+        initial_best_idx = self.greedy_selection(P_retri_score, P_reader_score)
+        self.log_generation(
+            generation=-1,  # Use -1 to indicate initial population
+            best_reader_score=P_reader_score[initial_best_idx],
+            best_retrieval_score=P_retri_score[initial_best_idx],
+            best_individual_text=P[initial_best_idx].get_perturbed_text(),
+            all_retrieval_scores=P_retri_score,
+            all_reader_scores=P_reader_score,
+            all_texts=[ind.get_perturbed_text() for ind in P],
+            population_type="initial"
+        )
 
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
             # Generate offspring population
@@ -534,11 +598,36 @@ class NSGAII:
                 answer=self.answer
             )
 
+            # Log offspring population
+            offspring_best_idx = self.greedy_selection(O_retri_score, O_reader_score)
+            self.log_generation(
+                generation=iter_idx,
+                best_reader_score=O_reader_score[offspring_best_idx],
+                best_retrieval_score=O_retri_score[offspring_best_idx],
+                best_individual_text=O[offspring_best_idx].get_perturbed_text(),
+                all_retrieval_scores=O_retri_score,
+                all_reader_scores=O_reader_score,
+                all_texts=[ind.get_perturbed_text() for ind in O],
+                population_type="offspring"
+            )
+
             # Create combined pool (P + O)
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
 
+            # Log combined pool
+            pool_best_idx = self.greedy_selection(pool_retri_score, pool_reader_score)
+            self.log_generation(
+                generation=iter_idx,
+                best_reader_score=pool_reader_score[pool_best_idx],
+                best_retrieval_score=pool_retri_score[pool_best_idx],
+                best_individual_text=pool[pool_best_idx].get_perturbed_text(),
+                all_retrieval_scores=pool_retri_score,
+                all_reader_scores=pool_reader_score,
+                all_texts=[ind.get_perturbed_text() for ind in pool],
+                population_type="combined_pool"
+            )
             
             # Update global best
             current_best_idx = self.greedy_selection(pool_retri_score, pool_reader_score)
@@ -551,19 +640,12 @@ class NSGAII:
             # score1 = retrieval_score, score2 = reader_score
             objectives = np.column_stack([pool_retri_score, pool_reader_score])
             pareto_stats = self.calculate_pareto_stats(objectives)
-            
-            # Log generation data
-            self.log_generation(
-                generation=iter_idx,
-                best_reader_score=current_best_reader_score,
-                best_retrieval_score=current_best_retri_score,
-                best_individual_text=current_best_individual.get_perturbed_text(),
-            )
 
             # Print generation info
             print(f"\n📊 Generation {iter_idx}")
             print(f"   Pareto front size: {pareto_stats['pareto_front_size']}")
             print(f"   Total fronts: {pareto_stats['total_fronts']}")
+            print(f"   Best combined pool scores: R={current_best_retri_score:.6f}, G={current_best_reader_score:.6f}")
             
             # Optional: print generated answer for debugging
             try:
@@ -575,12 +657,6 @@ class NSGAII:
             except Exception as e:
                 print(f"   Generated answer: Error - {str(e)}")
             
-            # Early stopping if success achieved
-            # if (self.success_achieved and 
-            #     iter_idx - self.success_generation >= 10):  # Continue for 10 more generations after success
-            #     print(f"🎯 Early stopping: Success maintained for 10 generations")
-            #     break
-            
             # NSGA-II Selection for next generation
             pool_indices = np.arange(len(pool))
             selected_indices = self.nsga_selection(pool_indices, objectives, self.pop.pop_size)
@@ -589,6 +665,19 @@ class NSGAII:
             P = [pool[i] for i in selected_indices]
             P_retri_score = pool_retri_score[selected_indices]
             P_reader_score = pool_reader_score[selected_indices]
+
+            # Log selected population for next generation
+            selected_best_idx = self.greedy_selection(P_retri_score, P_reader_score)
+            self.log_generation(
+                generation=iter_idx,
+                best_reader_score=P_reader_score[selected_best_idx],
+                best_retrieval_score=P_retri_score[selected_best_idx],
+                best_individual_text=P[selected_best_idx].get_perturbed_text(),
+                all_retrieval_scores=P_retri_score,
+                all_reader_scores=P_reader_score,
+                all_texts=[ind.get_perturbed_text() for ind in P],
+                population_type="selected_next_gen"
+            )
 
         # Update population
         self.pop.individuals = P
@@ -623,8 +712,8 @@ class NSGAII:
         return {
             "individual": self.best_individual,
             "fitness": self.best_fitness,
-            "reader_score": self.best_score1,
-            "retrieval_score": self.best_score2,
+            "reader_score": self.best_reader_score,
+            "retrieval_score": self.best_retri_score,
             "text": self.best_individual.get_perturbed_text() if self.best_individual else None,
             "success": self.success_achieved
         }
@@ -671,14 +760,14 @@ class NSGAII:
         print(f"Question: {self.question}")
         print(f"Target Answer: {self.answer}")
         print(f"Success Threshold: {self.success_threshold}")
-        print(f"Total Generations: {len(self.generation_logs)}")
+        print(f"Total Generations: {len([log for log in self.generation_logs if log.get('population_type') == 'selected_next_gen'])}")
         print()
         print("🎯 FINAL RESULTS:")
         print(f"   Success Achieved: {self.success_achieved}")
         if self.success_achieved:
             print(f"   Success Generation: {self.success_generation}")
-        print(f"   Best Reader Score: {self.best_score1:.6f}")
-        print(f"   Best Retrieval Score: {self.best_score2:.6f}")
+        print(f"   Best Reader Score: {self.best_reader_score:.6f}")
+        print(f"   Best Retrieval Score: {self.best_retri_score:.6f}")
         
         if self.best_individual:
             print(f"\n📝 BEST INDIVIDUAL:")
