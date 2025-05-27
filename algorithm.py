@@ -282,7 +282,6 @@ class NSGAII:
                  n_iter, 
                  population, 
                  fitness,
-                 tournament_size,
                  question,
                  answer,
                  fitness_statery,
@@ -292,7 +291,6 @@ class NSGAII:
         self.sample_id = sample_id
         self.n_iter = n_iter
         self.pop = population
-        self.tournament_size = tournament_size
         self.fitness = fitness
         self.question = question
         self.answer = answer
