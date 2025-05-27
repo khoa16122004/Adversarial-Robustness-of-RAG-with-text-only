@@ -570,6 +570,7 @@ class NSGAII:
                 generated_answer = self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()])
                 if isinstance(generated_answer, list):
                     generated_answer = generated_answer[0] if generated_answer else "No answer"
+                    self.adv_output = generated_answer
                 print(f"   Generated answer: '{generated_answer.strip()}'")
             except Exception as e:
                 print(f"   Generated answer: Error - {str(e)}")
