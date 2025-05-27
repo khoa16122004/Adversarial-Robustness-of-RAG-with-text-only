@@ -486,7 +486,7 @@ class NSGAII:
                 self.best_score2 = current_best_score2
     
     def update_global_best(self, current_best_retri_score, current_best_reader_score, current_best_individual):
-        if self.best_score1 is None:
+        if self.best_retri_score is None:
             self.best_retri_score = current_best_retri_score
             self.best_reader_score = current_best_reader_score
             self.best_individual = current_best_individual
