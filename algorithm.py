@@ -558,7 +558,6 @@ class NSGAII:
                 best_reader_score=current_best_reader_score,
                 best_retrieval_score=current_best_retri_score,
                 best_individual_text=current_best_individual.get_perturbed_text(),
-                pareto_stats=pareto_stats
             )
 
             # Print generation info
