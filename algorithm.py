@@ -420,8 +420,8 @@ class NSGAII:
                 "success_achieved": self.success_achieved,
                 "success_generation": self.success_generation,
                 "best_fitness": float(self.best_fitness) if self.best_fitness is not None else None,
-                "best_reader_score": float(self.best_score1) if self.best_score1 is not None else None,
-                "best_retrieval_score": float(self.best_score2) if self.best_score2 is not None else None,
+                "best_reader_score": float(self.best_reader_score) if self.best_reader_score is not None else None,
+                "best_retrieval_score": float(self.best_retri_score) if self.best_retri_score is not None else None,
                 "best_individual_text": self.best_individual.get_perturbed_text() if self.best_individual else None,
                 "adv_output": self.adv_output if self.adv_output is not None else None,
                 "modified_info": self.best_individual.get_modified() if self.best_individual else None
