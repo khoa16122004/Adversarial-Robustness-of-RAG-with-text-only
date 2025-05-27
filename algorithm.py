@@ -310,70 +310,70 @@ class NSGAII:
 
         self.nds = NonDominatedSorting()
         
-
-    def calculate_crowding_distance(self, objectives):
-        """
-        Calculate crowding distance for individuals based on their objectives
-        """
-        n_points, n_obj = objectives.shape
-        
-        if n_points <= 2:
-            return np.full(n_points, np.inf)
-        
-        # Initialize crowding distance
-        crowding_distance = np.zeros(n_points)
-        
-        # Calculate crowding distance for each objective
-        for m in range(n_obj):
-            # Sort points by objective m
-            sorted_indices = np.argsort(objectives[:, m])
-            
-            # Set boundary points to infinity
-            crowding_distance[sorted_indices[0]] = np.inf
-            crowding_distance[sorted_indices[-1]] = np.inf
-            
-            # Calculate distance for intermediate points
-            obj_range = objectives[sorted_indices[-1], m] - objectives[sorted_indices[0], m]
-            
-            if obj_range > 0:
-                for i in range(1, n_points - 1):
-                    crowding_distance[sorted_indices[i]] += (
-                        objectives[sorted_indices[i + 1], m] - 
-                        objectives[sorted_indices[i - 1], m]
-                    ) / obj_range
-        
-        return crowding_distance
-
-    def nsga_selection(self, population_indices, objectives, pop_size):
-        """
-        NSGA-II selection based on non-dominated sorting and crowding distance
-        """
-        # Perform non-dominated sorting
-        fronts = self.nds.do(objectives, only_non_dominated_front=False)
-        
-        selected_indices = []
-        
-        # Select individuals from fronts
-        for front in fronts:
-            if len(selected_indices) + len(front) <= pop_size:
-                # Add entire front
-                selected_indices.extend(population_indices[front])
-            else:
-                # Calculate crowding distance for this front
-                front_objectives = objectives[front]
-                crowding_dist = self.calculate_crowding_distance(front_objectives)
-                
-                # Sort by crowding distance (descending)
-                sorted_crowding_indices = np.argsort(-crowding_dist)
-                
-                # Select remaining individuals
-                remaining = pop_size - len(selected_indices)
-                selected_from_front = front[sorted_crowding_indices[:remaining]]
-                selected_indices.extend(population_indices[selected_from_front])
+    def NSGA_selection(self, pool_fitness):
+        nds = NonDominatedSorting()
+        fronts = nds.do(pool_fitness, n_stop_if_ranked=self.pop_size) # front ranked
+        survivors = []
+        for k, front in enumerate(fronts):
+            crowding_of_front = self.calculating_crowding_distance(pool_fitness[front])
+            sorted_indices = np.argsort(-crowding_of_front)
+            front_sorted = [front[i] for i in sorted_indices]
+            for idx in front_sorted:
+                if len(survivors) < self.pop_size:
+                    survivors.append(idx)
+                else:
+                    break
+            if len(survivors) >= self.pop_size:
                 break
-        
-        return selected_indices
+        return survivors, fronts
+    
+    def calculating_crowding_distance(self, F):
+        infinity = 1e+14
 
+        n_points = F.shape[0]
+        n_obj = F.shape[1]
+
+        if n_points <= 2:
+            return np.full(n_points, infinity)
+        else:
+
+            # sort each column and get index
+            I = np.argsort(F, axis=0, kind='mergesort')
+
+            # now really sort the whole array
+            F = F[I, np.arange(n_obj)]
+
+            # get the distance to the last element in sorted list and replace zeros with actual values
+            dist = np.concatenate([F, np.full((1, n_obj), np.inf)]) - np.concatenate([np.full((1, n_obj), -np.inf), F])
+
+            index_dist_is_zero = np.where(dist == 0)
+
+            dist_to_last = np.copy(dist)
+            for i, j in zip(*index_dist_is_zero):
+                dist_to_last[i, j] = dist_to_last[i - 1, j]
+
+            dist_to_next = np.copy(dist)
+            for i, j in reversed(list(zip(*index_dist_is_zero))):
+                dist_to_next[i, j] = dist_to_next[i + 1, j]
+
+            # normalize all the distances
+            norm = np.max(F, axis=0) - np.min(F, axis=0)
+            norm[norm == 0] = np.nan
+            dist_to_last, dist_to_next = dist_to_last[:-1] / norm, dist_to_next[1:] / norm
+
+            # if we divided by zero because all values in one columns are equal replace by none
+            dist_to_last[np.isnan(dist_to_last)] = 0.0
+            dist_to_next[np.isnan(dist_to_next)] = 0.0
+
+            # sum up the distance to next and last and norm by objectives - also reorder from sorted list
+            J = np.argsort(I, axis=0)
+            crowding = np.sum(dist_to_last[J, np.arange(n_obj)] + dist_to_next[J, np.arange(n_obj)], axis=1) / n_obj
+
+        # replace infinity with a large number
+        crowding[np.isinf(crowding)] = infinity
+        return crowding
+
+  
     def log_generation(self, generation, best_reader_score, best_retrieval_score, 
                       best_individual_text, all_retrieval_scores=None, all_reader_scores=None,
                       all_texts=None, population_type="current"):
@@ -560,25 +560,7 @@ class NSGAII:
             contexts=[ind.get_perturbed_text() for ind in P],
             answer=self.answer
         )
-
-        print("🚀 Starting NSGA-II Evolution")
-        print(f"   Population size: {self.pop.pop_size}")
-        print(f"   Generations: {self.n_iter}")
-        print(f"   Success threshold: {self.success_threshold}")
-        print("="*60)
-
-        # Log initial population
-        initial_best_idx = self.greedy_selection(P_retri_score, P_reader_score)
-        self.log_generation(
-            generation=-1,  # Use -1 to indicate initial population
-            best_reader_score=P_reader_score[initial_best_idx],
-            best_retrieval_score=P_retri_score[initial_best_idx],
-            best_individual_text=P[initial_best_idx].get_perturbed_text(),
-            all_retrieval_scores=P_retri_score,
-            all_reader_scores=P_reader_score,
-            all_texts=[ind.get_perturbed_text() for ind in P],
-            population_type="initial"
-        )
+        history = []
 
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
             # Generate offspring population
@@ -598,112 +580,33 @@ class NSGAII:
                 answer=self.answer
             )
 
-            # Log offspring population
-            offspring_best_idx = self.greedy_selection(O_retri_score, O_reader_score)
-            self.log_generation(
-                generation=iter_idx,
-                best_reader_score=O_reader_score[offspring_best_idx],
-                best_retrieval_score=O_retri_score[offspring_best_idx],
-                best_individual_text=O[offspring_best_idx].get_perturbed_text(),
-                all_retrieval_scores=O_retri_score,
-                all_reader_scores=O_reader_score,
-                all_texts=[ind.get_perturbed_text() for ind in O],
-                population_type="offspring"
-            )
-
             # Create combined pool (P + O)
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
-
-            # Log combined pool
-            pool_best_idx = self.greedy_selection(pool_retri_score, pool_reader_score)
-            self.log_generation(
-                generation=iter_idx,
-                best_reader_score=pool_reader_score[pool_best_idx],
-                best_retrieval_score=pool_retri_score[pool_best_idx],
-                best_individual_text=pool[pool_best_idx].get_perturbed_text(),
-                all_retrieval_scores=pool_retri_score,
-                all_reader_scores=pool_reader_score,
-                all_texts=[ind.get_perturbed_text() for ind in pool],
-                population_type="combined_pool"
-            )
-            
-            # Update global best
-            current_best_idx = self.greedy_selection(pool_retri_score, pool_reader_score)
-            current_best_retri_score = pool_retri_score[current_best_idx]
-            current_best_reader_score = pool_reader_score[current_best_idx]
-            current_best_individual = pool[current_best_idx]
-            
-            # update global test
-            self.update_global_best(current_best_retri_score, current_best_reader_score, current_best_individual)          
-            # score1 = retrieval_score, score2 = reader_score
-            objectives = np.column_stack([pool_retri_score, pool_reader_score])
-            pareto_stats = self.calculate_pareto_stats(objectives)
-
-            # Print generation info
-            print(f"\n📊 Generation {iter_idx}")
-            print(f"   Pareto front size: {pareto_stats['pareto_front_size']}")
-            print(f"   Total fronts: {pareto_stats['total_fronts']}")
-            print(f"   Best combined pool scores: R={current_best_retri_score:.6f}, G={current_best_reader_score:.6f}")
-            
-            # Optional: print generated answer for debugging
-            try:
-                generated_answer = self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()])
-                if isinstance(generated_answer, list):
-                    generated_answer = generated_answer[0] if generated_answer else "No answer"
-                    self.adv_output = generated_answer
-                print(f"   Generated answer: '{generated_answer.strip()}'")
-            except Exception as e:
-                print(f"   Generated answer: Error - {str(e)}")
+            pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
             
             # NSGA-II Selection for next generation
-            pool_indices = np.arange(len(pool))
-            selected_indices = self.nsga_selection(pool_indices, objectives, self.pop.pop_size)
+            selected_indices, fronts = self.NSGA_selection(pool_fitness)
             
             # Update population
             P = [pool[i] for i in selected_indices]
             P_retri_score = pool_retri_score[selected_indices]
             P_reader_score = pool_reader_score[selected_indices]
-
-            # Log selected population for next generation
-            selected_best_idx = self.greedy_selection(P_retri_score, P_reader_score)
-            self.log_generation(
-                generation=iter_idx,
-                best_reader_score=P_reader_score[selected_best_idx],
-                best_retrieval_score=P_retri_score[selected_best_idx],
-                best_individual_text=P[selected_best_idx].get_perturbed_text(),
-                all_retrieval_scores=P_retri_score,
-                all_reader_scores=P_reader_score,
-                all_texts=[ind.get_perturbed_text() for ind in P],
-                population_type="selected_next_gen"
-            )
-
-        # Update population
-        self.pop.individuals = P
+            
+            rank_0_indices = fronts[0]  # Get indices of the first Pareto front
+            rank_0_individuals = [pool[i] for i in rank_0_indices]
+            rank_0_retri_scores = pool_retri_score[rank_0_indices]
+            rank_0_reader_scores = pool_reader_score[rank_0_indices]    
+            
+            history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
         
-        # Final results
-        print("\n" + "="*60)
-        print("🏁 NSGA-II Evolution Completed")
-        print(f"   Final success status: {self.success_achieved}")
-        if self.success_achieved:
-            print(f"   Success achieved at generation: {self.success_generation}")
-        print(f"   Best reader score: {self.best_reader_score:.6f}")
-        print(f"   Best retrieval score: {self.best_retri_score:.6f}")
-        print("="*60)
         
-        # Save logs
-        self.save_logs()
-        
-        return {
-            "success": self.success_achieved,
-            "success_generation": self.success_generation,
-            "best_reader_score": self.best_reader_score,
-            "best_retrieval_score": self.best_retri_score,
-            "best_individual": self.best_individual,
-            "total_generations": iter_idx + 1,
-            "log_file": self.log_file
-        }
+        np.save("nsga2_history.npy", np.array(history))
+        with open("nsga2_rank0_individuals.txt", "w", encoding="utf-8") as f:
+            for ind in rank_0_individuals:
+                f.write(ind.get_perturbed_text() + "\n")
+     
 
     def get_best_result(self):
         """
