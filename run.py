@@ -44,6 +44,7 @@ def main(args):
                 
                 algo = GA(
                     sample_id=i,
+                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
@@ -62,14 +63,13 @@ def main(args):
                     reader_name=args.reader_name,
                     q_name=args.q_name,
                     c_name=args.c_name,
-                    retriever_weight=args.retriever_weight,
-                    reader_weight=args.reader_weight,
                     question=question,
                     original_text=original_text,
                     answer=golden_answer
                 )
                 algo = NSGAII(
                     sample_id=i,
+                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
@@ -94,6 +94,7 @@ def main(args):
                 
                 algo = GA(
                     sample_id=i,
+                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
@@ -120,6 +121,7 @@ def main(args):
                 
                 algo = NSGAII(
                     n_iter=args.n_iter,
+                    pct_words_to_swap=args.pct_words_to_swap,
                     population=population,
                     fitness=fitness,
                     question=question,

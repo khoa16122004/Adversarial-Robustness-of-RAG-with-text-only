@@ -4,7 +4,7 @@ from population import create_population, Population, Individual
 from fitness import WeightedSUm, MultiScore, Targeted_MultiScore, Targeted_WeightedSUm
 import numpy as np
 from utils import set_seed_everything
-
+from typo_transformation import ComboTypoTransformation
 
 def main(args):
     
@@ -15,7 +15,14 @@ def main(args):
 
     answer = "Cheetah"
     
-    population = create_population(original_text, answer, args)
+  
+    
+    population = Population(
+        original_text=original_text,
+        answer=answer,
+        pop_size=args.pop_size,
+    )
+    
 
 
 

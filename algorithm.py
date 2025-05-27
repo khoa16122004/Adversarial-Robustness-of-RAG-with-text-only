@@ -106,6 +106,8 @@ class GA:
         
         print(f"📝 Logs saved to: {self.log_file}")
 
+    
+    
     def solve_rule(self):
         P = self.pop.individuals
         P_fitness_weighted, P_retri_score, P_reader_score = self.fitness(
@@ -375,7 +377,7 @@ class NSGAII:
         return selected_indices
 
     def log_generation(self, generation, best_reader_score, best_retrieval_score, 
-                      best_individual_text, population_stats, pareto_stats):
+                      best_individual_text):
         """
         Log generation data including Pareto front statistics
         """
@@ -386,9 +388,6 @@ class NSGAII:
             "best_individual_text": best_individual_text,
             "success_achieved": bool(best_reader_score < self.success_threshold and 
                                    best_retrieval_score < self.success_threshold),
-            "population_stats": population_stats,
-            "pareto_stats": pareto_stats,
-            # "timestamp": datetime.now().isoformat()
         }
         
         self.generation_logs.append(generation_log)
@@ -402,52 +401,6 @@ class NSGAII:
             print(f"   Reader score: {best_reader_score:.6f}")
             print(f"   Retrieval score: {best_retrieval_score:.6f}")
     
-    def calculate_population_stats(self, score1, score2):
-        """
-        Calculate population statistics
-        """
-        return {
-            "reader_score_stats": {
-                "mean": float(np.mean(score1)),
-                "std": float(np.std(score1)),
-                "min": float(np.min(score1)),
-                "max": float(np.max(score1)),
-                "median": float(np.median(score1))
-            },
-            "retrieval_score_stats": {
-                "mean": float(np.mean(score2)),
-                "std": float(np.std(score2)),
-                "min": float(np.min(score2)),
-                "max": float(np.max(score2)),
-                "median": float(np.median(score2))
-            }
-        }
-
-    def calculate_pareto_stats(self, objectives):
-        """
-        Calculate Pareto front statistics
-        """
-        fronts = self.nds.do(objectives, only_non_dominated_front=False)
-        
-        pareto_front = fronts[0]
-        pareto_objectives = objectives[pareto_front]
-        
-        return {
-            "pareto_front_size": len(pareto_front),
-            "total_fronts": len(fronts),
-            "pareto_front_reader_scores": {
-                "mean": float(np.mean(pareto_objectives[:, 1])),
-                "std": float(np.std(pareto_objectives[:, 1])),
-                "min": float(np.min(pareto_objectives[:, 1])),
-                "max": float(np.max(pareto_objectives[:, 1]))
-            },
-            "pareto_front_retrieval_scores": {
-                "mean": float(np.mean(pareto_objectives[:, 0])),
-                "std": float(np.std(pareto_objectives[:, 0])),
-                "min": float(np.min(pareto_objectives[:, 0])),
-                "max": float(np.max(pareto_objectives[:, 0]))
-            }
-        }
 
     def save_logs(self):
         """
@@ -455,7 +408,6 @@ class NSGAII:
         """
         log_data = {
             "experiment_info": {
-                "algorithm": "NSGA-II",
                 "question": self.question,
                 "answer": self.answer,
                 "n_iterations": self.n_iter,
@@ -482,6 +434,32 @@ class NSGAII:
         
         print(f"📝 Logs saved to: {self.log_file}")
 
+
+    def calculate_pareto_stats(self, objectives):
+        """
+        Calculate Pareto front statistics
+        """
+        fronts = self.nds.do(objectives, only_non_dominated_front=False)
+        
+        pareto_front = fronts[0]
+        pareto_objectives = objectives[pareto_front]
+        
+        return {
+            "pareto_front_size": len(pareto_front),
+            "total_fronts": len(fronts),
+            "pareto_front_reader_scores": {
+                "mean": float(np.mean(pareto_objectives[:, 1])),
+                "std": float(np.std(pareto_objectives[:, 1])),
+                "min": float(np.min(pareto_objectives[:, 1])),
+                "max": float(np.max(pareto_objectives[:, 1]))
+            },
+            "pareto_front_retrieval_scores": {
+                "mean": float(np.mean(pareto_objectives[:, 0])),
+                "std": float(np.std(pareto_objectives[:, 0])),
+                "min": float(np.min(pareto_objectives[:, 0])),
+                "max": float(np.max(pareto_objectives[:, 0]))
+            }
+        }
     
     def greedy_selection(self, P_score1, P_score2):
         valid_indices = np.where(P_score1 < 1)[0]
@@ -492,7 +470,6 @@ class NSGAII:
             min_index = np.argmin(P_score1)
 
         return min_index
-
 
     def update_global_best(self, current_best_score1, current_best_score2, current_best_individual):
         if self.best_score1 is None:
@@ -507,14 +484,27 @@ class NSGAII:
             if self.greedy_selection(pool_score1, pool_score2) == 1:
                 self.best_score1 = current_best_score1
                 self.best_score2 = current_best_score2
-            
     
+    def update_global_best(self, current_best_retri_score, current_best_reader_score, current_best_individual):
+        if self.best_score1 is None:
+            self.best_retri_score = current_best_retri_score
+            self.best_reader_score = current_best_reader_score
+            self.best_individual = current_best_individual
+        
+        else:
+            pool_score1 = np.array([self.best_retri_score, current_best_retri_score])
+            pool_score2 = np.array([self.best_reader_score, current_best_reader_score])
+            
+            if self.greedy_selection(pool_score1, pool_score2) == 1:
+                self.best_retri_score = current_best_retri_score
+                self.best_reader_score = current_best_reader_score
+   
     def solve_rule(self):
         """
         Main NSGA-II evolution loop
         """
         P = self.pop.individuals
-        P_score1, P_score2 = self.fitness(
+        P_retri_score, P_reader_score = self.fitness(
             question=self.question,
             contexts=[ind.get_perturbed_text() for ind in P],
             answer=self.answer
@@ -538,7 +528,7 @@ class NSGAII:
                 O.extend([offspring1, offspring2])
 
             # Evaluate offspring
-            O_score1, O_score2 = self.fitness(
+            O_retri_score, O_reader_score = self.fitness(
                 question=self.question,
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
@@ -546,28 +536,27 @@ class NSGAII:
 
             # Create combined pool (P + O)
             pool = P + O
-            pool_score1 = np.concatenate([P_score1, O_score1], axis=0)
-            pool_score2 = np.concatenate([P_score2, O_score2], axis=0)
+            pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
+            pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
 
             
             # Update global best
-            current_best_idx = self.greedy_selection(pool_score1, pool_score2)
-            current_best_score1 = pool_score1[current_best_idx]
-            current_best_score2 = pool_score2[current_best_idx]
+            current_best_idx = self.greedy_selection(pool_retri_score, pool_reader_score)
+            current_best_retri_score = pool_retri_score[current_best_idx]
+            current_best_reader_score = pool_reader_score[current_best_idx]
             current_best_individual = pool[current_best_idx]
             
             # update global test
-            self.update_global_best(current_best_score1, current_best_score2, current_best_individual)
-            
+            self.update_global_best(current_best_retri_score, current_best_reader_score, current_best_individual)          
             # score1 = retrieval_score, score2 = reader_score
-            objectives = np.column_stack([pool_score1, pool_score2])
+            objectives = np.column_stack([pool_retri_score, pool_reader_score])
             pareto_stats = self.calculate_pareto_stats(objectives)
             
             # Log generation data
             self.log_generation(
                 generation=iter_idx,
-                best_reader_score=current_best_score2,
-                best_retrieval_score=current_best_score1,
+                best_reader_score=current_best_reader_score,
+                best_retrieval_score=current_best_retri_score,
                 best_individual_text=current_best_individual.get_perturbed_text(),
                 pareto_stats=pareto_stats
             )
@@ -597,8 +586,8 @@ class NSGAII:
             
             # Update population
             P = [pool[i] for i in selected_indices]
-            P_score1 = pool_score1[selected_indices]
-            P_score2 = pool_score2[selected_indices]
+            P_retri_score = pool_retri_score[selected_indices]
+            P_reader_score = pool_reader_score[selected_indices]
 
         # Update population
         self.pop.individuals = P
