@@ -74,7 +74,8 @@ def main(args):
                     population=population,
                     fitness=fitness,
                     question=question,
-                    answer=golden_answer
+                    answer=golden_answer,
+                    fitness_statery=args.fitness_statery
                 )
         
         
