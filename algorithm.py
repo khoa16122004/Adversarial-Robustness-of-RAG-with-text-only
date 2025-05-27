@@ -567,6 +567,7 @@ class NSGAII:
             
             # Optional: print generated answer for debugging
             try:
+                generated_answer = self.fitness.reader.generate(self.question, [current_best_individual.get_perturbed_text()])
                 if isinstance(generated_answer, list):
                     generated_answer = generated_answer[0] if generated_answer else "No answer"
                 print(f"   Generated answer: '{generated_answer.strip()}'")
@@ -597,8 +598,8 @@ class NSGAII:
         print(f"   Final success status: {self.success_achieved}")
         if self.success_achieved:
             print(f"   Success achieved at generation: {self.success_generation}")
-        print(f"   Best reader score: {self.best_score1:.6f}")
-        print(f"   Best retrieval score: {self.best_score2:.6f}")
+        print(f"   Best reader score: {self.best_reader_score:.6f}")
+        print(f"   Best retrieval score: {self.best_retri_score:.6f}")
         print("="*60)
         
         # Save logs
@@ -607,8 +608,8 @@ class NSGAII:
         return {
             "success": self.success_achieved,
             "success_generation": self.success_generation,
-            "best_reader_score": self.best_score1,
-            "best_retrieval_score": self.best_score2,
+            "best_reader_score": self.best_reader_score,
+            "best_retrieval_score": self.best_retri_score,
             "best_individual": self.best_individual,
             "total_generations": iter_idx + 1,
             "log_file": self.log_file
