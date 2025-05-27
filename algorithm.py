@@ -22,6 +22,7 @@ class GA:
                  question,
                  answer,
                  fitness_statery,
+                 pct_words_to_swap,
                  log_dir="ga_logs",
                  success_threshold=1.0):
         self.sample_id = sample_id
@@ -44,7 +45,7 @@ class GA:
         self.success_achieved = False
         self.success_generation = None
         self.adv_output = None
-        self.log_file = os.path.join(log_dir, f"ga_{fitness_statery}_{self.sample_id}.json")
+        self.log_file = os.path.join(log_dir, f"ga_{fitness_statery}_{pct_words_to_swap}_{self.sample_id}.json")
 
     def tournament_selection(self, fitness_array: np.ndarray, tournament_size: int = 4):
         selected_indices = []
@@ -285,6 +286,7 @@ class NSGAII:
                  question,
                  answer,
                  fitness_statery,
+                 pct_words_to_swap,
                  log_dir="nsgaii_logs",
                  success_threshold=1.0):
         self.sample_id = sample_id
@@ -308,7 +310,7 @@ class NSGAII:
         self.success_achieved = False
         self.success_generation = None
         self.adv_output = None
-        self.log_file = os.path.join(log_dir, f"NSGAII_{fitness_statery}_{self.sample_id}.json")
+        self.log_file = os.path.join(log_dir, f"NSGAII_{fitness_statery}_{pct_words_to_swap}_{self.sample_id}.json")
 
         self.nds = NonDominatedSorting()
         

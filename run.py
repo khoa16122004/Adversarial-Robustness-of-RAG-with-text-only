@@ -44,14 +44,14 @@ def main(args):
                 
                 algo = GA(
                     sample_id=i,
-                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
                     tournament_size=args.tournament_size,
                     question=question,
                     answer=golden_answer,
-                    fitness_statery=args.fitness_statery
+                    fitness_statery=args.fitness_statery,
+                    pct_words_to_swap=args.pct_words_to_swap,
                 )
                 
                 
@@ -69,13 +69,13 @@ def main(args):
                 )
                 algo = NSGAII(
                     sample_id=i,
-                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
                     question=question,
                     answer=golden_answer,
-                    fitness_statery=args.fitness_statery
+                    fitness_statery=args.fitness_statery,
+                    pct_words_to_swap=args.pct_words_to_swap,
                 )
         
         
@@ -95,13 +95,13 @@ def main(args):
                 
                 algo = GA(
                     sample_id=i,
-                    pct_words_to_swap=args.pct_words_to_swap,
                     n_iter=args.n_iter,
                     population=population,
                     fitness=fitness,
                     tournament_size=args.tournament_size,
                     question=question,
-                    answer=golden_answer
+                    answer=golden_answer,
+                    pct_words_to_swap=args.pct_words_to_swap,
                 )
                 
                 
@@ -117,16 +117,18 @@ def main(args):
                     reader_weight=args.reader_weight,
                     question=question,
                     original_text=original_text,
-                    answer=golden_answer
+                    answer=golden_answer,
                 )
                 
                 algo = NSGAII(
+                    sample_id=i,
                     n_iter=args.n_iter,
-                    pct_words_to_swap=args.pct_words_to_swap,
                     population=population,
                     fitness=fitness,
                     question=question,
-                    answer=golden_answer
+                    answer=golden_answer,
+                    fitness_statery=args.fitness_statery,   
+                    pct_words_to_swap=args.pct_words_to_swap,
                 )
 
         algo.solve_rule()
