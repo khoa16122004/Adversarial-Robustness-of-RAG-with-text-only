@@ -167,7 +167,7 @@ class NSGAII:
         
     def NSGA_selection(self, pool_fitness):
         nds = NonDominatedSorting()
-        fronts = nds.do(pool_fitness, n_stop_if_ranked=self.pop_size) # front ranked
+        fronts = nds.do(pool_fitness, n_stop_if_ranked=self.pop.pop_size) # front ranked
         survivors = []
         for k, front in enumerate(fronts):
             crowding_of_front = self.calculating_crowding_distance(pool_fitness[front])
