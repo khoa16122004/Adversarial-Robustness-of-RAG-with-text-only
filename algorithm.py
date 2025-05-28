@@ -149,7 +149,7 @@ class NSGAII:
         self.answer = answer
         self.success_threshold = success_threshold
         self.fitness_statery = fitness_statery
-        
+        self.pct_words_to_swap = pct_words_to_swap
         self.log_dir = log_dir
         os.makedirs(log_dir, exist_ok=True)
         
