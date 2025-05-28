@@ -36,7 +36,8 @@ def main(args):
                 reader_weight=args.reader_weight,
                 question=question,
                 original_text=original_text,
-                answer=answer
+                answer=answer,
+                
             )
             
             algo = GA(
