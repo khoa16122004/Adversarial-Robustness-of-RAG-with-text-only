@@ -174,11 +174,11 @@ class NSGAII:
             sorted_indices = np.argsort(-crowding_of_front)
             front_sorted = [front[i] for i in sorted_indices]
             for idx in front_sorted:
-                if len(survivors) < self.pop_size:
+                if len(survivors) < self.pop.pop_size:
                     survivors.append(idx)
                 else:
                     break
-            if len(survivors) >= self.pop_size:
+            if len(survivors) >= self.pop.pop_size:
                 break
         return survivors, fronts
     
