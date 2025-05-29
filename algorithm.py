@@ -289,7 +289,7 @@ class NSGAII:
                 
                 
     def save_logs(self):
-        score_log_file = os.path.join(self.log_dir, f"ngsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.npy")
+        score_log_file = os.path.join(self.log_dir, f"ngsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.pkl")
         text_log_file = os.path.join(self.log_dir, f"nsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.txt")
         
         with open(score_log_file, 'wb') as f:
