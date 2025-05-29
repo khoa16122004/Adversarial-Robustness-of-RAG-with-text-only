@@ -5,6 +5,7 @@ import numpy as np
 from utils import set_seed_everything
 from nltk.corpus import wordnet
 from utils import split
+from tqdm import tqdm
 set_seed_everything(222520691)
 
 class BaseTypoTransformation:
@@ -126,7 +127,8 @@ class ComboTypoTransformation(BaseTypoTransformation):
         
         per_words = []
         per_words_indices = []
-        for _ in range(pop_size):
+        print("Init proccess: ")
+        for _ in tqdm(range(pop_size)):
             chosen_indices = random.sample(indices_to_modify, num_words_to_swap) # nên là ko chọn lại
             new_words = []            
             for idx in chosen_indices:
