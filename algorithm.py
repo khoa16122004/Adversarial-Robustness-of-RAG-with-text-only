@@ -280,9 +280,9 @@ class NSGAII:
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
             
             self.history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
-            self.best_individual = rank_0_individuals[0]
-            self.best_retri_score = rank_0_retri_scores[0]
-            self.best_reader_score = rank_0_reader_scores[0]
+            self.best_individual = rank_0_individuals
+            self.best_retri_score = rank_0_retri_scores
+            self.best_reader_score = rank_0_reader_scores
 
         
         self.save_logs()
@@ -296,5 +296,5 @@ class NSGAII:
             pickle.dump(self.history, f)
             
         with open(text_log_file, "w", encoding="utf-8") as f:
-            for ind in self.rank_0_individuals:
+            for ind in self.best_individual:
                 f.write(ind.get_perturbed_text() + "\n")
