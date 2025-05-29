@@ -10,6 +10,7 @@ from utils import set_seed_everything
 import json
 import os
 from datetime import datetime
+import pickle
 
 set_seed_everything(222520691)
 
@@ -291,7 +292,9 @@ class NSGAII:
         score_log_file = os.path.join(self.log_dir, f"ngsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.npy")
         text_log_file = os.path.join(self.log_dir, f"nsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.txt")
         
-        np.save(score_log_file, np.array(self.history))
+        with open(score_log_file, 'wb') as f:
+            pickle.dump(self.history, f)
+            
         with open(text_log_file, "w", encoding="utf-8") as f:
             for ind in self.rank_0_individuals:
                 f.write(ind.get_perturbed_text() + "\n")
