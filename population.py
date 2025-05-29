@@ -89,7 +89,7 @@ class Population:
         
         self.individuals = individuals            
 
-    def crossover(self, ind1: Individual, ind2: Individual, crossover_prob=0.5):
+    def crossover(self, ind1: Individual, ind2: Individual, crossover_prob=0.8):
         words1, indices1 = ind1.get_modified()
         words2, indices2 = ind2.get_modified()
 
@@ -99,7 +99,7 @@ class Population:
         ind2_only = list(set2 - giao_set)
         num_change = max(len(indices1), len(indices2))
 
-        num_cross = int(crossover_prob * (num_change - len(giao_set)))
+        num_cross = (num_change - len(giao_set))
         print("Num cross: ", num_cross)
 
         if num_cross == 0:
