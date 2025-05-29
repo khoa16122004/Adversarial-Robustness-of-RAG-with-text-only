@@ -100,7 +100,7 @@ class Population:
         num_change = max(len(indices1), len(indices2))
 
         num_cross = (num_change - len(giao_set))
-        print("Num cross: ", num_cross)
+        # print("Num cross: ", num_cross)
 
         if num_cross == 0:
             return copy.deepcopy(ind1), copy.deepcopy(ind2)
