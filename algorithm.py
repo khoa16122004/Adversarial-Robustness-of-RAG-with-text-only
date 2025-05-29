@@ -101,7 +101,7 @@ class GA:
             self.best_retri_score = current_best_retri_score
             self.best_reader_score = current_best_reader_score
             
-            self.history.append(np.stack([current_best_fitness, current_best_retri_score, current_best_reader_score], axis=0))
+            self.history.append(np.stack([P_fitness_weighted, P_retri_score, P_reader_score], axis=0))
     
             # Selection for next generation
             pool_indices = np.arange(len(pool))
@@ -120,10 +120,11 @@ class GA:
         self.save_logs()
     
     def save_logs(self):
-        score_log_file = os.path.join(self.log_dir, f"ga_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.npy")
+        score_log_file = os.path.join(self.log_dir, f"ga_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.pkl")
         text_log_file = os.path.join(self.log_dir, f"ga_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.txt")
         
-        np.save(score_log_file, np.array(self.history))
+        with open(score_log_file, 'wb') as f:
+            pickle.dump(self.history, f)
         with open(text_log_file, "w") as f:
             f.write(self.best_individual.get_perturbed_text())
 
