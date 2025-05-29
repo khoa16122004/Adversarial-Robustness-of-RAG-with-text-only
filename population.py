@@ -89,7 +89,7 @@ class Population:
         
         self.individuals = individuals            
 
-    def crossover(self, ind1: Individual, ind2: Individual, crossover_prob=0.8):
+    def crossover(self, ind1: Individual, ind2: Individual):
         words1, indices1 = ind1.get_modified()
         words2, indices2 = ind2.get_modified()
 
