@@ -277,6 +277,7 @@ class NSGAII:
             P = [pool[i] for i in selected_indices]
             P_retri_score = pool_retri_score[selected_indices]
             P_reader_score = pool_reader_score[selected_indices]
+  
             
             rank_0_indices = fronts[0]  # Get indices of the first Pareto front
             rank_0_individuals = [pool[i] for i in rank_0_indices]
