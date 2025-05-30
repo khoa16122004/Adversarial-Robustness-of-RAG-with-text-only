@@ -38,7 +38,7 @@ class Reader(torch.nn.Module):
         self.generate_kwargs = dict(
             max_new_tokens=30,
             return_dict_in_generate=True,
-            output_hidden_states=True,
+            # output_hidden_states=True,
             output_scores=True,
             do_sample=False,  # greedy decoding
             top_p=None,
