@@ -261,17 +261,15 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
-            print("O 0 text: ", O[0].get_perturbed_text())
-            print("O 0 text: ", O[0].get_perturbed_text())
-            raise
+            # print("O 0 text: ", O[0].get_perturbed_text())
+            # print("O 0 text: ", O[0].get_perturbed_text())
+            # raise
 
             # Create combined pool (P + O)
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
-            
-            
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
