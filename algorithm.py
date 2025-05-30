@@ -293,6 +293,10 @@ class NSGAII:
             self.best_individual = rank_0_individuals
             self.best_retri_score = rank_0_retri_scores
             self.best_reader_score = rank_0_reader_scores
+            
+            # debug
+            for ind in self.best_individual:
+                print("Best individual: ", ind.get_perturbed_text())
 
         
         self.save_logs()
