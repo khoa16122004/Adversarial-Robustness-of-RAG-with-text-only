@@ -271,8 +271,6 @@ class NSGAII:
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
-            print("Selected_indices: ", selected_indices)
-            print("Fronts: ", fronts)
             # Update population
             P = [pool[i] for i in selected_indices]
             P_retri_score = pool_retri_score[selected_indices]
@@ -283,6 +281,12 @@ class NSGAII:
             rank_0_individuals = [pool[i] for i in rank_0_indices]
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
+            
+            for i in range(rank_0_indices):
+                print("\n" + "="*60)
+                print("Individual: ", pool[i].get_perturbed_text())
+                print("Retri Score: ", pool_retri_score[i])
+                print("Reader Score: ", pool_reader_score[i])
             
             self.history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
             self.best_individual = rank_0_individuals
