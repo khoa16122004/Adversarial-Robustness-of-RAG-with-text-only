@@ -150,18 +150,20 @@ if __name__ == "__main__":
     # retriever_scores = fitness(question, contexts)
     # print(retriever_scores)
     # print(reader_scores)
-    question = "What is the fastest land animal?"
-    context = "The cheetah is the fastest land animal, capable of reaching speeds up to 70 mph. It has a slender build and distinctive spotted coat. Cheetahs primarily hunt gazelles and other small antelopes in Africa."
-    adv_contexts = ["The cheetah it's t fastest n animal, capable k reaching speeds up to 70 mph. It s x slender build è distinctive spotted coat. Cheetahs primarily h gazelles a other small antelopes in Africa."]
+    question = "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?"
+    context = "The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding of cosmic history. Its deployment marks a significant milestone in space exploration and astronomy."
+    adv_contexts = ["The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument i currently orbiting the Sun at the e Lagrange point (L2), a i that allows it to maintain a stable p relative to the Earth and Sun. With its exceptional infrared t, the F is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding o cosmic history. Its deployment marks M significant milestone in space exploration and astronomy."]
 
-    answer = "Cheetah"
-    fitness = WeightedSUm("Llama-7b", 
-                          "facebook/dpr-question_encoder-multiset-base", 
-                          "facebook/dpr-ctx_encoder-multiset-base",
-                          0.5, 0.5,
-                          question, context, answer) 
+    answer = "Launch"
+    fitness = MultiScore(
+        reader_name="Llama-7b",
+        q_name="facebook/dpr-question_encoder-multiset-base",
+        c_name="facebook/dpr-ctx_encoder-multiset-base",
+        question=question,
+        original_text=context,
+        answer=answer
+    )
     
-    weighted, retri, reader =fitness(question, adv_contexts, answer)
-    print(retri)
-    print(reader)
+    score = fitness(question, adv_contexts, answer)
+    print(score)
     
