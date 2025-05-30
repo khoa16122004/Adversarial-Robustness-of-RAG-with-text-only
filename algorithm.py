@@ -271,7 +271,8 @@ class NSGAII:
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
-            
+            print("Selected_indices: ", selected_indices)
+            print("Fronts: ", fronts)
             # Update population
             P = [pool[i] for i in selected_indices]
             P_retri_score = pool_retri_score[selected_indices]
