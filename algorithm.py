@@ -277,7 +277,7 @@ class NSGAII:
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
-            pool_fitness = np.stack([pool_retri_score, pool_reader_score])
+            pool_fitness = np.collumn_stack([pool_retri_score, pool_reader_score])
             
             
             log.write(f"pool: {[ind.get_perturbed_text() for ind in pool]}\n")
