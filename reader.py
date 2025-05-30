@@ -213,3 +213,4 @@ if __name__ == "__main__":
     scores = reader(question, [adv_contexts, context], "Launch")
     output = reader.greedy_decode_batch([template.format(q=question, d=adv_contexts)])
     print(output)
+    print(scores)
