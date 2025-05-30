@@ -205,7 +205,7 @@ class Reader(torch.nn.Module):
 
 if __name__ == "__main__":
     reader = Reader(model_name="Llama-7b")
-    template = "[INST] Documents:\n{d}\n\nAnswer the following question with a very short phrase, such as \"1998\", \"May 16th, 1931\", or \"James Bond\", to meet the criteria of exact match datasets.\n\nQuestion: {q} [/INST]\n\nAnswer:"
+    template = "[INST] Documents:\n{d}\n\nAnswer the following question.\n\nQuestion: {q} [/INST]\n\nAnswer:"
 
     question = "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?"
     adv_contexts = "go to hostpital"
