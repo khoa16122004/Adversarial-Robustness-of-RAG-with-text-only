@@ -261,12 +261,16 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
+            print("O 0 text: ", O[0].get_perturbed_text())
+            print("O 0 text: ", O[0].get_perturbed_text())
+            raise
 
             # Create combined pool (P + O)
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
+            
             
             
             # NSGA-II Selection for next generation
@@ -282,11 +286,7 @@ class NSGAII:
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
             
-            for i in rank_0_indices:
-                print("\n" + "="*60)
-                print("Individual: ", pool[i].get_perturbed_text())
-                print("Retri Score: ", pool_retri_score[i])
-                print("Reader Score: ", pool_reader_score[i])
+       
             
             self.history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
             self.best_individual = rank_0_individuals
