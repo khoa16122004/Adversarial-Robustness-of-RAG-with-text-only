@@ -81,6 +81,7 @@ class Reader(torch.nn.Module):
     @torch.no_grad()
     def greedy_decode_batch(self, prompts, max_gen_len=50):
         # Tokenize all prompts
+        print("Prompt: ", prompts)
         encoded = self.tokenizer(
             prompts,
             padding=True,
