@@ -282,7 +282,7 @@ class NSGAII:
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
             
-            for i in range(rank_0_indices):
+            for i in rank_0_indices:
                 print("\n" + "="*60)
                 print("Individual: ", pool[i].get_perturbed_text())
                 print("Retri Score: ", pool_retri_score[i])
