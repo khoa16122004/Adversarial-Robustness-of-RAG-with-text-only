@@ -243,7 +243,15 @@ class NSGAII:
         )
         self.history = []
 
+        
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
+            
+            print("P_retri_score: ", P_retri_score)
+            print("P_reader_score: ", P_reader_score)
+        
+            print([ind.get_perturbed_text() for ind in P])
+            
+            
             # Generate offspring population
             O = []
             for _ in range(self.pop.pop_size // 2):
