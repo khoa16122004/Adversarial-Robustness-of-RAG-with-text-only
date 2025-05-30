@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 result
+ga_logs
+nsgaii_logs
