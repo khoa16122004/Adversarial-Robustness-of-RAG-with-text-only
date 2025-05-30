@@ -215,4 +215,4 @@ if __name__ == "__main__":
     output = reader.greedy_decode_batch([template.format(q=question, d=context),
                                          template.format(q=question, d=adv_contexts)])
     print(output)
-    # print(scores)
+    print(scores)
