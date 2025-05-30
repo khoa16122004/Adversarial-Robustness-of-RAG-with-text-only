@@ -246,10 +246,10 @@ class NSGAII:
         
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
             
-            print("P_retri_score: ", P_retri_score)
-            print("P_reader_score: ", P_reader_score)
+            # print("P_retri_score: ", P_retri_score)
+            # print("P_reader_score: ", P_reader_score)
         
-            print([ind.get_perturbed_text() for ind in P])
+            # print([ind.get_perturbed_text() for ind in P])
             
             
             # Generate offspring population
