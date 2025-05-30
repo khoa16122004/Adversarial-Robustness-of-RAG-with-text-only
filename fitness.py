@@ -111,7 +111,7 @@ class MultiScore:
         reader_result = self.reader(question, contexts, answer)
         # print("Contexts: ", contexts)
         retri_scores = self.retri_clean_reuslt / retrieval_result
-        reader_scores = reader_result / self.reader_clean_result
+        reader_scores = self.reader_clean_result / reader_result
         
         return retri_scores, reader_scores
 class Targeted_MultiScore:
