@@ -298,7 +298,7 @@ if __name__ == "__main__":
     template = "[INST] Documents:\n{d}\n\nAnswer the following question with a very short phrase, such as \"1998\", \"May 16th, 1931\", or \"James Bond\", to meet the criteria of exact match datasets.\n\nQuestion: {q} [/INST]\n\nAnswer:"
 
     question = "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?"
-    context =  "Tye Jamed Webb Wpace Telescope (JWSG), a marvel of modern engineering, was successfully launched into space On December 25, 2021. This astronomical instrument is currently orbiting the Sun at thd second Lagrange point (O2), a locqtion that allows ir to maintain AM stable position relative to the Earth n Sun. With uts exceptional infrared capabilities, the J3ST is designed to obse4ve ancient galaxies, providing insights into the early universe and expanding our understanding ar cosmic history. Its deployment mqrks a significan6 milestone in space exploration and astronomy."
+    context = "The James Webb Space Telescope (JWST), a marvdl of modern engineering, was successfully launchec intro space on December 25, 2021. Thie astronomical instrument is currejtly orblting the Sun qt the second Lagrahge 0oint (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designdd to observe ancient galaxies, providing inxights itno the early univers4 um exlanding our understanding of cosmic history. Its depl0yment marks a significant milestone in space exploration and as6ronomy."
 
     output = reader.greedy_decode_batch([template.format(q=question, d=context)], max_gen_len=50)
     print(output)
