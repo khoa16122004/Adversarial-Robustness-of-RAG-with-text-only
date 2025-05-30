@@ -306,5 +306,7 @@ class NSGAII:
             pickle.dump(self.history, f)
             
         with open(text_log_file, "w", encoding="utf-8") as f:
+            print("Final Best Individual: ")
             for ind in self.best_individual:
-                f.write(ind.get_perturbed_text() + "\n")
+                print("individual: ", ind.get_perturbed_text())
+                # f.write(ind.get_perturbed_text() + "\n")
