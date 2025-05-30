@@ -250,6 +250,7 @@ class NSGAII:
             print("P_reader_score: ", P_reader_score)
         
             print([ind.get_perturbed_text() for ind in P])
+            input("Debug ...")
             
             
             # Generate offspring population
