@@ -221,9 +221,9 @@ if __name__ == "__main__":
     ]
 
     context = "The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding of cosmic history. Its deployment marks a significant milestone in space exploration and astronomy."
-    scores = reader(question, [adv_contexts, context], "Launch")
+    scores = reader(question, adv_contexts, "Launch")
     output = reader.generate(question, adv_contexts)
-    output_clean = reader.generate(question, [context])
+    score_clean = reader.generate(question, [context])
     print("Output: ", output)
     print("score: ", scores)
-    print("Ratio: ", scores[1] / scores[0])
+    print("Ratio: ", scores / score_clean)
