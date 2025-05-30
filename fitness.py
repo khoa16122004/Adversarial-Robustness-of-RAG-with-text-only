@@ -152,7 +152,7 @@ if __name__ == "__main__":
     # print(reader_scores)
     question = "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?"
     context = "The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding of cosmic history. Its deployment marks a significant milestone in space exploration and astronomy."
-    adv_contexts = ["n e e S e (W), q m o modern engineering, a l d n a O December 25, 0. s a m i 5 orbiting the s a e s a i (K), w i h c g i i A stable n v to there's Earth c u. h s e i s, the JWST l designed 5 v e galaxies, d insights n t l r a x our r d cosmic h. s m a a c n 9 a exploration y t."]
+    adv_contexts = ["The s Webb e e (T), w j o f g, a successfully c o speace on r 2, 2021. T m i is n i e C w h s a k (2), z a h a it to maintain s s n v g t E e u. i its exceptional i e, the JWST n n u observe e a, providing i t E a r and a r t i o history. I n s a significative n n e p e t."]
 
 
     answer = "Launch"
