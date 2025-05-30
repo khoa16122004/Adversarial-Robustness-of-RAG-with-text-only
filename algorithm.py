@@ -243,17 +243,17 @@ class NSGAII:
         )
         self.history = []
 
-        
+        log = open("debug.txt", "w")
+            
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
-            
-            print("P_retri_score: ", P_retri_score)
-            print("P_reader_score: ", P_reader_score)
-        
-            print([ind.get_perturbed_text() for ind in P])
-            input("Debug ...")
-            
-            
             # Generate offspring population
+            log.write("*" * 10)
+            log.write(f"Generation {iter_idx}: \n")
+            log.write(f"Population: {[ind.get_perturbed_text() for ind in P]}\n")
+            log.write(f"P_retri_score: {P_retri_score}\n")
+            log.write(f"P_reader_score: {P_reader_score}\n")
+
+            
             O = []
             for _ in range(self.pop.pop_size // 2):
                 parent_idx1, parent_idx2 = random.sample(range(self.pop.pop_size), 2)
@@ -269,15 +269,27 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
+            log.write(f"Offspring: {[ind.get_perturbed_text() for ind in O]}\n")
+            log.write(f"O_retri_score: {O_retri_score}\n")
+            log.write(f"O_reader_score: {O_reader_score}\n")
 
             # Create combined pool (P + O)
             pool = P + O
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
-            pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
+            pool_fitness = np.stack([pool_retri_score, pool_reader_score])
+            
+            
+            log.write(f"pool: {[ind.get_perturbed_text() for ind in pool]}\n")
+            log.write(f"O_retri_score: {O_retri_score}\n")
+            log.write(f"O_reader_score: {O_reader_score}\n")
+            log.write(f"pool_fitness: {pool_fitness}\n")
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
+            
+            log.write(f"selected_indices: {selected_indices}\n")
+            log.write(f"fronts: {fronts}\n")
             
             # Update population
             P = [pool[i] for i in selected_indices]
@@ -294,9 +306,6 @@ class NSGAII:
             self.best_retri_score = rank_0_retri_scores
             self.best_reader_score = rank_0_reader_scores
             
-            # debug
-            for ind in self.best_individual:
-                print("Best individual: ", ind.get_perturbed_text())
 
         
         self.save_logs()
