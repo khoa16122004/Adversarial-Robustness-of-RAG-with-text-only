@@ -210,6 +210,6 @@ if __name__ == "__main__":
     adv_contexts = "The a b Space Telescopd (JWST), a marvel of modern engineering, s successfully launched into space on December 5, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position a to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early un9verse and expanding our understanding of cosmic history. Its deployment m a significant milestone in space exploration and astronomy.",
 
     context = "The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding of cosmic history. Its deployment marks a significant milestone in space exploration and astronomy."
-    scores = reader(question, [adv_contexts, context])
+    scores = reader(question, [adv_contexts, context], "Launch")
     output = reader.greedy_decode_batch([template.format(q=question, d=adv_contexts)])
     print(output)
