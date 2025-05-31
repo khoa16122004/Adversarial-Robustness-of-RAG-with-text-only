@@ -270,10 +270,13 @@ class NSGAII:
 
             # Create combined pool (P + O)
             pool = P + O
+            print("len pool: ", len(pool))
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
+            print("Pool retri shape: ", pool_retri_score.shape)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
+            print("Pool reader shape: ", pool_reader_score.shape)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
-            
+            print("Pool fitness shape: ", pool_fitness.shape)
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
             # Update population
