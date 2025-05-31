@@ -15,7 +15,7 @@ def main(args):
     reader = Reader(args.reader_name)
 
     for i in range(len_dataset):
-        original_text, question, gt_answer, answer_position_indices = dataset.take_sample(i)
+        original_text, question, gt_answer = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
         fitness = MultiScore(args.reader_name, 
                 args.q_name, 
