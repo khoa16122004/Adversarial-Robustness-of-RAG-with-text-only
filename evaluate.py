@@ -17,7 +17,7 @@ def main(args):
     reader = Reader(args.reader_name)
     with open(args.adv_text_path, "r") as f:
         adv_texts = [line.strip() for line in f.readlines()]
-    
+        print("Len adv texts: ", len(adv_texts))
 
     
     original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
