@@ -15,9 +15,12 @@ def main(args):
     len_dataset = dataset.len()
     if not args.start_idx:
         start_idx = 0
+    else:
+        start_idx = args.start_idx
     if not args.end_idx:
         end_idx = len_dataset
-        
+    else:
+        end_idx = args.end_idx
     for i in range(start_idx, end_idx):
         reader = Reader(args.reader_name)
         original_text, question, gt_answer, answer_position_indices = dataset.take_sample(i)
