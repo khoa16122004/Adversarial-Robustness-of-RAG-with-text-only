@@ -29,5 +29,5 @@ if __name__ == "__main__":
     parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
     parser.add_argument("--data_path", default="sample5_data.json", type=str, help="Data path")
     parser.add_argument("--evaluate_id", default=0, type=int, help="Evaluate id")
-    parser.add_argument("adv_text_path", type=str)
+    parser.add_argument("--adv_text_path", type=str)
     args = parser.parse_args()
