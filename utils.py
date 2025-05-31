@@ -29,7 +29,7 @@ class DataLoader:
         top1_d = data['documents'][0]
         question = data['question']
         gt_answer = data['answer']
-        answer_position_indices = data['answer_position']
+        # answer_position_indices = data['answer_position']
         answer_position_indices = None
         return top1_d, question, gt_answer, answer_position_indices
     
