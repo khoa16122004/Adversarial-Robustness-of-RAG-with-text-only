@@ -164,12 +164,13 @@ class NSGAII:
         self.success_generation = None
         self.adv_output = None
         self.log_file = os.path.join(log_dir, f"NSGAII_{fitness_statery}_{pct_words_to_swap}_{self.sample_id}.json")
-
+        self.arkiv = []
         self.nds = NonDominatedSorting()
+        self.rank_0 = []
         
     def NSGA_selection(self, pool_fitness):
-        nds = NonDominatedSorting()
-        fronts = nds.do(pool_fitness, n_stop_if_ranked=self.pop.pop_size) # front ranked
+        
+        fronts = self.nds.do(pool_fitness, n_stop_if_ranked=self.pop.pop_size) # front ranked
         survivors = []
         for k, front in enumerate(fronts):
             crowding_of_front = self.calculating_crowding_distance(pool_fitness[front])
@@ -285,8 +286,8 @@ class NSGAII:
             rank_0_indices = fronts[0]  # Get indices of the first Pareto front
             rank_0_individuals = [pool[i] for i in rank_0_indices]
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
-            rank_0_reader_scores = pool_reader_score[rank_0_indices]    
-        
+            rank_0_reader_scores = pool_reader_score[rank_0_indices]   
+                    
             
             self.history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
             self.best_individual = rank_0_individuals
@@ -308,9 +309,6 @@ class NSGAII:
             for ind in self.best_individual:
                 # print("individual: ", ind.get_perturbed_text())
                 f.write(ind.get_perturbed_text() + "\n")
-                
-    def update_arkiv(self, rank_0_retri_scores, individuals):
-        
-        self.arkiv.append(np.stack)
-        
+    
+         
         
