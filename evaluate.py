@@ -21,7 +21,6 @@ def main(args):
 
     
     original_text, question, gt_answer = dataset.take_sample(args.evaluate_id)
-    original_text = "0 1 2 3 4 5 6 7 8 9 10"
 
     fitness = MultiScore(args.reader_name, 
                     args.q_name, 
