@@ -264,6 +264,14 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
+            print("First: ", O_retri_score, O_reader_score)
+            O_retri_score, O_reader_score = self.fitness(
+                question=self.question,
+                contexts=[ind.get_perturbed_text() for ind in O],
+                answer=self.answer
+            )
+            print("Second: ", O_retri_score, O_reader_score)
+
             # print("O 0 text: ", O[0].get_perturbed_text())
             # print("O 0 text: ", O[0].get_perturbed_text())
             # raise
