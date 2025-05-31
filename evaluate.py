@@ -7,7 +7,7 @@ from utils import set_seed_everything, DataLoader
 from reader import Reader
 from utils import find_answer, split
 
-def main():
+def main(args):
     set_seed_everything(22520691)
     dataset = DataLoader(args.data_path)
     len_dataset = dataset.len()
@@ -30,3 +30,4 @@ if __name__ == "__main__":
     parser.add_argument("--evaluate_id", default=0, type=int, help="Evaluate id")
     parser.add_argument("--adv_text_path", type=str)
     args = parser.parse_args()
+    main(args)
