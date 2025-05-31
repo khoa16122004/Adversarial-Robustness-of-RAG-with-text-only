@@ -21,14 +21,18 @@ def main(args):
 
     
     original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
+
+    fitness = MultiScore(args.reader_name, 
+                    args.q_name, 
+                    args.c_name, 
+                    question, original_text, output[0])
+    inference_text = [original_text] + adv_texts
     print("Original text: ", original_text)
     print("Question: ", question)
-    print("Golden answer: ", gt_answer)
-
-    inference_text = [original_text] + adv_texts
+    print("gt answer: ", gt_answer)
     output = reader.generate(question, inference_text)
     print("Output: ", output)
-    # print("Fitness: ", fitness(question, inference_text, 'Launch'))
+    print("Fitness: ", fitness(question, inference_text, output[0]))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
