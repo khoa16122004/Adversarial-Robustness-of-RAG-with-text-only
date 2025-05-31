@@ -13,9 +13,12 @@ def main(args):
     
     dataset = DataLoader(args.data_path)
     len_dataset = dataset.len()
-    
-    
-    for i in range(len_dataset):
+    if not args.start_idx:
+        start_idx = 0
+    if not args.end_idx:
+        end_idx = len_dataset
+        
+    for i in range(start_idx, end_idx):
         reader = Reader(args.reader_name)
         original_text, question, gt_answer = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
@@ -152,5 +155,10 @@ if __name__ == "__main__":
     parser.add_argument("--algorithm", type=str, default="GA", choices=['GA', 'NSGAII'], help="Algorithm")
     parser.add_argument("--pct_words_to_swap", type=float, default=0.3, help="Percentage of words to swap")
     parser.add_argument("--target_answer", type=str, default="don't know", help="Target answer")
+    parser.add_argument("--start_idx", type=int, default=0)
+    parser.add_argument("--end_idx", type=int, default=None)
     args = parser.parse_args()
     pop = main(args)
+    
+    
+# python run.py --data_path sample5_data.json --n_iter 10 --pop_size 2 --algorithm NSGAII --pct_words_to_swap 0.2
