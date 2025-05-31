@@ -235,6 +235,8 @@ class NSGAII:
         """
         Main NSGA-II evolution loop
         """
+        os.makedirs("logs", exist_ok=True)
+        
         P = self.pop.individuals
         P_retri_score, P_reader_score = self.fitness(
             question=self.question,
@@ -283,6 +285,11 @@ class NSGAII:
             rank_0_individuals = [pool[i] for i in rank_0_indices]
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
+            
+            log_path = os.path.join("logs", f"{iter_idx}.txt")
+            with open(log_path, "w") as f:
+                for ind in rank_0_individuals:
+                    f.write(ind.get_perturbed_text() + "\n")
             
        
             
