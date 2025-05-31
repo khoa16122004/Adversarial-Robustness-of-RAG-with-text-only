@@ -235,7 +235,6 @@ class NSGAII:
         """
         Main NSGA-II evolution loop
         """
-        os.makedirs("logs", exist_ok=True)
         
         P = self.pop.individuals
         P_retri_score, P_reader_score = self.fitness(
@@ -264,12 +263,7 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
-            print("P text: ", [ind.get_perturbed_text() for ind in P])
-            print("o text: ", [ind.get_perturbed_text() for ind in O])
-            input("Text 1 debug")
-            # print("O 0 text: ", O[0].get_perturbed_text())
-            # print("O 0 text: ", O[0].get_perturbed_text())
-            # raise
+
 
             # Create combined pool (P + O)
             pool = P + O
@@ -277,43 +271,22 @@ class NSGAII:
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
             
-            print("pool text: ", [ind.get_perturbed_text() for ind in pool])
-            input("Text 2 debug")
+
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
-            print("Selection indices: ", selected_indices)
             # Update population
             P = [pool[i] for i in selected_indices]
-            print("P selection text: ", [ind.get_perturbed_text() for ind in P])
-            input("Text selection debug")
             P_retri_score = pool_retri_score[selected_indices]
             P_reader_score = pool_reader_score[selected_indices]
-            print("P_retri_score (after selection): ", P_retri_score)
-            print("P_reader_score: (after selection)", P_reader_score)
-            debug_contexts = [ind.get_perturbed_text() for ind in P]
-            print("Debug contexts: ", debug_contexts)
-            debug_fitness = self.fitness(
-                question=self.question,
-                # contexts=[ind.get_perturbed_text() for ind in P],
-                contexts=debug_contexts,
-                answer=self.answer
-            )
-            print("Debug fitness: ", debug_fitness)
-            input("rerun debug")
+
 
             
             rank_0_indices = fronts[0]  # Get indices of the first Pareto front
             rank_0_individuals = [pool[i] for i in rank_0_indices]
             rank_0_retri_scores = pool_retri_score[rank_0_indices]
             rank_0_reader_scores = pool_reader_score[rank_0_indices]    
-            
-            log_path = os.path.join("logs", f"{iter_idx}.txt")
-            with open(log_path, "w") as f:
-                for ind in rank_0_individuals:
-                    f.write(ind.get_perturbed_text() + "\n")
-            
-       
+        
             
             self.history.append(np.stack([rank_0_retri_scores, rank_0_reader_scores], axis=1))
             self.best_individual = rank_0_individuals
@@ -321,7 +294,6 @@ class NSGAII:
             self.best_reader_score = rank_0_reader_scores
             
 
-        
         self.save_logs()
                 
                 
