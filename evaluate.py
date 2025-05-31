@@ -6,22 +6,29 @@ import numpy as np
 from utils import set_seed_everything, DataLoader
 from reader import Reader
 from utils import find_answer, split
-
+from fitness import MultiScore
 def main(args):
     set_seed_everything(22520691)
     dataset = DataLoader(args.data_path)
     len_dataset = dataset.len()
     
+
+    
     reader = Reader(args.reader_name)
     with open(args.adv_text_path, "r") as f:
         adv_texts = [line.strip() for line in f.readlines()]
-        
+    
+
+    
     original_text, question, gt_answer = dataset.take_sample(args.evaluate_id)
+    fitness = MultiScore(args.reader_name, 
+                    args.q_name, 
+                    args.c_name, 
+                    question, original_text, 'Launch')
     inference_text = adv_texts + [original_text]
     output = reader.generate(question, inference_text)
     print("Output: ", output)
-    p = reader(question, inference_text, 'Launch')
-    print("score: ", p)
+    print("Fitness: ", fitness(question, inference_text, gt_answer))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
