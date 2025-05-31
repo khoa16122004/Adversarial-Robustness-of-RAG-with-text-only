@@ -28,7 +28,7 @@ def main(args):
     inference_text = adv_texts + [original_text]
     output = reader.generate(question, inference_text)
     print("Output: ", output)
-    print("Fitness: ", fitness(question, inference_text, gt_answer))
+    print("Fitness: ", fitness(question, inference_text, 'Launch'))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
