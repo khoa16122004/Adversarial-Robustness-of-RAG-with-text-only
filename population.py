@@ -54,8 +54,8 @@ class Population:
         self.pop_size = pop_size
         self.pct_words_to_swap = pct_words_to_swap 
         
-        self.original_text_split = split(original_text)
-        self.answer_split = split(answer)
+        self.original_text_split = [s.lower() for s in split(original_text)]
+        self.answer_split = [s.lower() for s in split(answer)]
         self.answer_position_indices = find_answer(self.original_text_split, self.answer_split)
         self.indices_to_modify = [
             i for i in range(len(self.original_text_split))
