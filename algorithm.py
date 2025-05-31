@@ -255,7 +255,8 @@ class NSGAII:
                 offspring1, offspring2 = self.pop.crossover(parent1, parent2)  # crossover
                 offspring1 = self.pop.mutation(offspring1)  # mutation
                 offspring2 = self.pop.mutation(offspring2)  # mutation
-                O.extend([offspring1, offspring2])
+                O.append(offspring1)
+                O.append(offspring2)
 
             # Evaluate offspring
             O_retri_score, O_reader_score = self.fitness(
