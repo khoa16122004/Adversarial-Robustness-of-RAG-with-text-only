@@ -282,6 +282,7 @@ class NSGAII:
             
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
+            print("Selection indices: ", selected_indices)
             # Update population
             P = [pool[i] for i in selected_indices]
             print("P selection text: ", [ind.get_perturbed_text() for ind in P])
