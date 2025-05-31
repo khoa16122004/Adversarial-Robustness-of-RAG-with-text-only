@@ -264,32 +264,28 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
-            print("First: ", O_retri_score, O_reader_score)
-            O_retri_score, O_reader_score = self.fitness(
-                question=self.question,
-                contexts=[ind.get_perturbed_text() for ind in O],
-                answer=self.answer
-            )
-            print("Second: ", O_retri_score, O_reader_score)
-
+            print("P text: ", [ind.get_perturbed_text() for ind in P])
+            print("o text: ", [ind.get_perturbed_text() for ind in O])
+            input("Text 1 debug")
             # print("O 0 text: ", O[0].get_perturbed_text())
             # print("O 0 text: ", O[0].get_perturbed_text())
             # raise
 
             # Create combined pool (P + O)
             pool = P + O
-            print("len pool: ", len(pool))
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
-            print("Pool retri: ", pool_retri_score)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
-            print("Pool reader shape: ", pool_reader_score)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
-            print("Pool fitness : ", pool_fitness)
-            input("Shape debug")
+            
+            print("pool text: ", [ind.get_perturbed_text() for ind in pool])
+            input("Text 2 debug")
+            
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
             # Update population
             P = [pool[i] for i in selected_indices]
+            print("P selection text: ", [ind.get_perturbed_text() for ind in P])
+            input("Text selection debug")
             P_retri_score = pool_retri_score[selected_indices]
             P_reader_score = pool_reader_score[selected_indices]
             print("P_retri_score (after selection): ", P_retri_score)
