@@ -31,6 +31,7 @@ def main(args):
             pop_size=args.pop_size,
             pct_words_to_swap=args.pct_words_to_swap,
         )
+        print("answer position: ", population.answer_position_indices)
 
         if args.fitness_statery == "golden_answer":
             if args.algorithm == "GA":
