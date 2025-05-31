@@ -23,7 +23,6 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
-    parser.add_argument("--data_path", type=str)
     parser.add_argument("--reader_name", default="Llama-7b", type=str, help="Retriever model name")
     parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, help="Question encoder name")
     parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
