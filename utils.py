@@ -29,7 +29,8 @@ class DataLoader:
         top1_d = data['documents'][0]
         question = data['question']
         gt_answer = data['answer']
-        return top1_d, question, gt_answer
+        answer_position_indices = data['answer_position']
+        return top1_d, question, gt_answer, answer_position_indices
     
     def len(self):
         return len(self.data)

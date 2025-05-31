@@ -46,6 +46,7 @@ class Population:
     def __init__(self, 
                  original_text, 
                  answer,
+                 answer_position_indices,
                  pop_size, 
                  pct_words_to_swap=0.1):
         
@@ -56,7 +57,7 @@ class Population:
         
         self.original_text_split = [s.lower() for s in split(original_text)]
         self.answer_split = [s.lower() for s in split(answer)]
-        self.answer_position_indices = find_answer(self.original_text_split, self.answer_split)
+        self.answer_position_indices = answer_position_indices
         self.indices_to_modify = [
             i for i in range(len(self.original_text_split))
             if i not in self.answer_position_indices

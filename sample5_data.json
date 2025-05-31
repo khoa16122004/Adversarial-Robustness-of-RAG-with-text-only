@@ -24,7 +24,8 @@
             "Pluto was reclassified as a dwarf planet in 2006, prompting significant discussion in the scientific community. It is known to have five moons, with Charon being the largest among them. The 2015 New Horizons mission offered unprecedented close-up images and data about Pluto, shedding light on its surface, atmosphere, and geological history, contributing to our understanding of the outer regions of our solar system."
         ],
         "question": "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?",
-        "answer": "launched into space"
+        "answer": "launched into space",
+        "answer_position": [13, 14, 15]
     },
     
     {
@@ -52,7 +53,9 @@
             "The Durbin Amendment, enacted in 2010, aimed to regulate debit card fees significantly. By capping these fees, it resulted in substantial annual savings of about $8 billion for retailers, enhancing their profitability. However, in response, many banks moved to eliminate free checking accounts, illustrating the ongoing tug of war between regulatory measures and financial institutions' business practices in the evolving marketplace."
         ],
         "question": "What prompted BankAmericard to change its name to Visa?",
-        "answer": "global recognition"        
+        "answer": "global recognition",       
+        "answer_position": [57, 58]
+ 
     },
 
     {
@@ -80,7 +83,8 @@
             "Magnesium is an essential mineral involved in numerous enzyme reactions within the body, with a role in energy production and protein synthesis. It is crucial for muscle function, nerve transmission, and maintaining normal heartbeat rhythms. A deficiency in magnesium can lead to various health issues, including muscle cramps and fatigue. Thus, it is important to include magnesium-rich foods, such as nuts, seeds, and whole grains, in one\u2019s diet for maintaining optimal health and well-being."
         ],
         "question": "What is the boiling point of water when measured at sea level?",
-        "answer": "212 degrees Fahrenheit"
+        "answer": "212 degrees Fahrenheit",       
+        "answer_position": [11, 12, 13]
     },
 
     {
@@ -108,7 +112,9 @@
             "The circulatory system encompasses the heart, blood, and an extensive network of blood vessels that transport oxygen and nutrients throughout the body. The heart acts as a pump, circulating blood through arteries and veins to ensure that every cell receives the essential elements needed for survival. This system not only delivers nutrients but also removes waste products from cellular metabolism, ensuring that the body's functions operate smoothly. A healthy circulatory system is crucial for sustaining life and maintaining overall health."
         ],
         "question": "How many lobes does the right lung have?",
-        "answer": "three"
+        "answer": "three",
+        "answer_position": [48]
+
     },
 
 
@@ -136,6 +142,8 @@
             "Passive transport is a mechanism that enables substances to move across cell membranes down their concentration gradients without the expenditure of energy. This process ensures that nutrients can freely enter cells, while waste products can exit efficiently. Common examples of passive transport include diffusion and facilitated diffusion, both of which are vital for maintaining cellular homeostasis and overall health."
         ],
         "question": "In which organelle does the photosynthesis process take place in plant cells, involving the conversion of sunlight into chemical energy?",
-        "answer": "chloroplasts"
+        "answer": "chloroplasts",
+        "answer_position": [9, 48]
+
     }
 ]

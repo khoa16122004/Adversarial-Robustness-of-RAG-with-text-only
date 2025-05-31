@@ -20,7 +20,7 @@ def main(args):
         
     for i in range(start_idx, end_idx):
         reader = Reader(args.reader_name)
-        original_text, question, gt_answer = dataset.take_sample(i)
+        original_text, question, gt_answer, answer_position_indices = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
         print("Golden answer: ", golden_answer)
         reader = None # Free memory
@@ -28,6 +28,7 @@ def main(args):
         population = Population(
             original_text=original_text,
             answer=golden_answer,
+            answer_position_indices=answer_position_indices,
             pop_size=args.pop_size,
             pct_words_to_swap=args.pct_words_to_swap,
         )
