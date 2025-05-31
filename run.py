@@ -110,6 +110,7 @@ def main(args):
                     question=question,
                     answer=golden_answer,
                     pct_words_to_swap=args.pct_words_to_swap,
+                    target_text="don't know"
                 )
                 
                 
@@ -121,8 +122,6 @@ def main(args):
                     reader_name=args.reader_name,
                     q_name=args.q_name,
                     c_name=args.c_name,
-                    retriever_weight=args.retriever_weight,
-                    reader_weight=args.reader_weight,
                     question=question,
                     original_text=original_text,
                     answer=golden_answer,
