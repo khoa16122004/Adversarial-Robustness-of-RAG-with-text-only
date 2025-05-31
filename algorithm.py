@@ -235,7 +235,6 @@ class NSGAII:
         """
         Main NSGA-II evolution loop
         """
-        
         P = self.pop.individuals
         P_retri_score, P_reader_score = self.fitness(
             question=self.question,
@@ -243,7 +242,7 @@ class NSGAII:
             answer=self.answer
         )
         self.history = []
-
+        
             
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
             # Generate offspring populatio
@@ -263,6 +262,8 @@ class NSGAII:
                 contexts=[ind.get_perturbed_text() for ind in O],
                 answer=self.answer
             )
+            
+            
 
 
             # Create combined pool (P + O)

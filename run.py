@@ -22,7 +22,7 @@ def main(args):
         reader = Reader(args.reader_name)
         original_text, question, gt_answer = dataset.take_sample(i)
         golden_answer = reader.generate(question, [original_text])[0]
-
+        print("Golden answer: ", golden_answer)
         reader = None # Free memory
         
         population = Population(
