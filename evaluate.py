@@ -26,7 +26,7 @@ def main(args):
                     args.q_name, 
                     args.c_name, 
                     question, original_text, 'Launch')
-    inference_text = [adv_texts[4]] + [original_text]
+    inference_text = [adv_texts[4]]
     output = reader.generate(question, inference_text)
     print("Output: ", output)
     print("Fitness: ", fitness(question, inference_text, 'Launch'))
