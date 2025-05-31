@@ -21,7 +21,6 @@ def main(args):
     for i in range(start_idx, end_idx):
         reader = Reader(args.reader_name)
         original_text, question, gt_answer = dataset.take_sample(i)
-        original_text = "0 1 2 3 4 5 6 7 8 9 10"
         golden_answer = reader.generate(question, [original_text])[0]
 
         reader = None # Free memory
