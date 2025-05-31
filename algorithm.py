@@ -272,11 +272,11 @@ class NSGAII:
             pool = P + O
             print("len pool: ", len(pool))
             pool_retri_score = np.concatenate([P_retri_score, O_retri_score], axis=0)
-            print("Pool retri shape: ", pool_retri_score.shape)
+            print("Pool retri: ", pool_retri_score)
             pool_reader_score = np.concatenate([P_reader_score, O_reader_score], axis=0)
-            print("Pool reader shape: ", pool_reader_score.shape)
+            print("Pool reader shape: ", pool_reader_score)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
-            print("Pool fitness shape: ", pool_fitness.shape)
+            print("Pool fitness : ", pool_fitness)
             input("Shape debug")
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
