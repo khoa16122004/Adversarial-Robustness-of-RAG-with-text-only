@@ -291,9 +291,12 @@ class NSGAII:
             P_reader_score = pool_reader_score[selected_indices]
             print("P_retri_score (after selection): ", P_retri_score)
             print("P_reader_score: (after selection)", P_reader_score)
+            debug_contexts = [ind.get_perturbed_text() for ind in P]
+            print("Debug contexts: ", debug_contexts)
             debug_fitness = self.fitness(
                 question=self.question,
-                contexts=[ind.get_perturbed_text() for ind in P],
+                # contexts=[ind.get_perturbed_text() for ind in P],
+                contexts=debug_contexts,
                 answer=self.answer
             )
             print("Debug fitness: ", debug_fitness)
