@@ -42,6 +42,8 @@ def split(text):
 
 def find_answer(context_split, answer_split):
     results = []
+    print("Context: ", context_split)
+    print("Answer: ", answer_split)
     for i in range(len(context_split)):
         if context_split[i] in answer_split:
             results.append(i)
