@@ -277,6 +277,7 @@ class NSGAII:
             print("Pool reader shape: ", pool_reader_score.shape)
             pool_fitness = np.column_stack([pool_retri_score, pool_reader_score])
             print("Pool fitness shape: ", pool_fitness.shape)
+            input("Shape debug")
             # NSGA-II Selection for next generation
             selected_indices, fronts = self.NSGA_selection(pool_fitness)
             # Update population
@@ -291,7 +292,8 @@ class NSGAII:
                 answer=self.answer
             )
             print("Debug fitness: ", debug_fitness)
-            
+            input("rerun debug")
+
             
             rank_0_indices = fronts[0]  # Get indices of the first Pareto front
             rank_0_individuals = [pool[i] for i in rank_0_indices]
