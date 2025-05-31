@@ -37,7 +37,7 @@ class Individual:
         self.modified_indices = indices
 
     def get_modified(self):
-        return copy.deep(self.replacement_words), copy.deepcopy(self.modified_indices)
+        return copy.deepcopy(self.replacement_words), copy.deepcopy(self.modified_indices)
     
         
     
