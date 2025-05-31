@@ -130,7 +130,7 @@ class Targeted_MultiScore:
         
         retrieval_result = self.retriever(question, contexts)
         reader_result_with_answer = self.reader(question, contexts, answer)
-        reader_result_with_target = self.reader(question, contexts, answer)
+        reader_result_with_target = self.reader(question, contexts, self.target_text)
         retri_scores = self.retri_clean_reuslt / retrieval_result
         reader_scores = reader_result_with_answer / reader_result_with_target
         
