@@ -21,13 +21,13 @@ def main(args):
 
     
     original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
+    inference_text = [original_text] + adv_texts
     output = reader.generate(question, inference_text)
 
     fitness = MultiScore(args.reader_name, 
                     args.q_name, 
                     args.c_name, 
                     question, original_text, output[0])
-    inference_text = [original_text] + adv_texts
     print("Output: ", output)
     print("Fitness: ", fitness(question, inference_text, output[0]))
 
