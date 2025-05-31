@@ -20,7 +20,7 @@ def main(args):
     
 
     
-    original_text, question, gt_answer = dataset.take_sample(args.evaluate_id)
+    original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
 
     fitness = MultiScore(args.reader_name, 
                     args.q_name, 

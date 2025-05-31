@@ -242,7 +242,6 @@ class NSGAII:
             answer=self.answer
         )
         self.history = []
-        
             
         for iter_idx in tqdm(range(self.n_iter), desc="NSGA-II Evolution"):
             # Generate offspring populatio
@@ -309,3 +308,9 @@ class NSGAII:
             for ind in self.best_individual:
                 # print("individual: ", ind.get_perturbed_text())
                 f.write(ind.get_perturbed_text() + "\n")
+                
+    def update_arkiv(self, rank_0_retri_scores, individuals):
+        
+        self.arkiv.append(np.stack)
+        
+        
