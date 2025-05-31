@@ -27,7 +27,7 @@ def main(args):
                     args.q_name, 
                     args.c_name, 
                     question, original_text, output[0])
-    inference_text = [original_text] + adv_texts)
+    inference_text = [original_text] + adv_texts
     print("Output: ", output)
     print("Fitness: ", fitness(question, inference_text, output[0]))
 
