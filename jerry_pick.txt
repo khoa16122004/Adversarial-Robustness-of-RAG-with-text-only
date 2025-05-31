@@ -1,0 +1,50 @@
+GT answer: 13,000 miles; Golden answer: 13,000 miles
+GT answer: 1959; Golden answer: 1959
+GT answer: Leonardo da Vinci; Golden answer: Leonardo da Vinci
+GT answer: 29,032 feet; Golden answer: 29,032 feet
+GT answer: chloroplasts; Golden answer: Chloroplasts
+GT answer: Indian Ocean.; Golden answer: Indian Ocean
+GT answer: Chambers.; Golden answer: Four chambers.
+GT answer: 299,792,458 meters per second; Golden answer: 299,792,458 meters per second
+GT answer: Ethiopia; Golden answer: Ethiopia
+GT answer: 1886; Golden answer: 1886
+GT answer: Peru, Colombia, Brazil; Golden answer: Peru, Colombia, Brazil
+GT answer: 39 plays; Golden answer: 39 plays.
+GT answer: 1564; Golden answer: 1564-1616
+GT answer: 200 tons; Golden answer: 200 tons
+GT answer: Au; Golden answer: Au
+GT answer: launched into space; Golden answer: Launch
+GT answer: 22 months; Golden answer: 22 months
+x GT answer: multi-touch; Golden answer: 2007
+GT answer: Sherpa; Golden answer: Sherpa
+x GT answer: Louvre; Golden answer: Paris
+GT answer: 1760; Golden answer: 1760
+GT answer: 2,000; Golden answer: 2,000 gallons
+x GT answer: Glucose; Golden answer: Glucose and oxygen.
+GT answer: Macbeth; Golden answer: Macbeth
+GT answer: 28; Golden answer: 28
+GT answer: Big Bang; Golden answer: Big Bang
+x GT answer: Mendeleev; Golden answer: Dmitri Mendeleev
+GT answer: 1,083 feet; Golden answer: 1,083 feet.
+x GT answer: Thriller; Golden answer: Thriller
+GT answer: Kitty Hawk; Golden answer: Kitty Hawk
+GT answer: PDP-10 mainframe computers; Golden answer: PDP-10 mainframe computers.
+GT answer: William Higinbotham; Golden answer: William Higinbotham
+GT answer: Tim Berners-Lee; Golden answer: Tim Berners-Lee
+GT answer: Napoleon Bonaparte; Golden answer: Napoleon Bonaparte
+GT answer: Nicéphore Niépce; Golden answer: Nicéphore Niépce
+GT answer: Athens; Golden answer: Athens
+x GT answer: North Pole; Golden answer: 1958
+GT answer: The Flintstones; Golden answer: The Flintstones
+GT answer: 1851; Golden answer: 1851
+GT answer: 1920; Golden answer: 1920
+x GT answer: Global recognition; Golden answer: 1976
+GT answer: Earth; Golden answer: Earth
+GT answer: 1889; Golden answer: 1889
+GT answer: Water vapor; Golden answer: Concentration of water vapor.
+GT answer: Jupiter; Golden answer: Jupiter
+x GT answer: three; Golden answer: Three.
+GT answer: 86 billion; Golden answer: 86 billion
+x GT answer: Cheetah; Golden answer: 1998
+GT answer: 212 degrees Fahrenheit; Golden answer: 212 degrees Fahrenheit
+x GT answer: 88 keys.; Golden answer: 88
