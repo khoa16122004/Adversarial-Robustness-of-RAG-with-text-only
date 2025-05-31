@@ -21,7 +21,9 @@ def main(args):
 
     
     original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
-
+    print("Original text: ", original_text)
+    print("Question: ", question)
+    print("Golden answer: ", gt_answer)
 
     inference_text = [original_text] + adv_texts
     output = reader.generate(question, inference_text)
