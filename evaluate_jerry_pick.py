@@ -13,13 +13,12 @@ def main(args):
     len_dataset = dataset.len()
     print("Len dataa: ", len_dataset)
     reader = Reader(args.reader_name)
-
-    for i in range(len_dataset):
-        original_text, question, gt_answer, _ = dataset.take_sample(i)
-        golden_answer = reader.generate(question, [original_text])[0]
-        print("Golden answer: ", golden_answer)
-        print("Gt answer: ", gt_answer)
-
+    result = []
+    with open("jerry_pick.txt", "w") as f:
+        for i in range(len_dataset):
+            original_text, question, gt_answer, _ = dataset.take_sample(i)
+            golden_answer = reader.generate(question, [original_text])[0]
+            f.write(f"GT answer: {gt_answer}; Golden answer: {golden_answer}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
