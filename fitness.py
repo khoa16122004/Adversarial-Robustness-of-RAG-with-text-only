@@ -127,7 +127,6 @@ class Targeted_MultiScore:
         
             
     def __call__(self, question, contexts, answer):
-        
         retrieval_result = self.retriever(question, contexts)
         reader_result_with_answer = self.reader(question, contexts, answer)
         reader_result_with_target = self.reader(question, contexts, self.target_text)
