@@ -93,6 +93,9 @@ class Population:
         words1, indices1 = ind1.get_modified()
         words2, indices2 = ind2.get_modified()
 
+        off1 = copy.deepcopy(ind1)
+        off2 = copy.deepcopy(ind2)
+        
         set1, set2 = set(indices1), set(indices2)
         giao_set = set1 & set2
         ind1_only = list(set1 - giao_set)
@@ -118,10 +121,10 @@ class Population:
                     [words2[indices2.index(i)] for i in ind2_only if i not in cross2] + \
                     [words1[indices1.index(i)] for i in cross1]
 
-        ind1.set_modified(child1_words, child1_indices)
-        ind2.set_modified(child2_words, child2_indices)
+        off1.set_modified(child1_words, child1_indices)
+        off2.set_modified(child2_words, child2_indices)
         
-        return ind1, ind2
+        return off1, off2
 
     def mutation(self, ind: Individual, mutation_prob=0.3):
             words, indices = ind.get_modified( )

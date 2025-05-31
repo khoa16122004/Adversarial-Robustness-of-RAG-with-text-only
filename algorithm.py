@@ -11,7 +11,7 @@ import json
 import os
 from datetime import datetime
 import pickle
-
+import copy
 set_seed_everything(222520691)
 
 class GA:
@@ -251,7 +251,7 @@ class NSGAII:
             O = []
             for _ in range(self.pop.pop_size // 2):
                 parent_idx1, parent_idx2 = random.sample(range(self.pop.pop_size), 2)
-                parent1, parent2 = P[parent_idx1], P[parent_idx2]
+                parent1, parent2 = copy.deepcopy(P[parent_idx1]), copy.deepcopy(P[parent_idx2])
                 offspring1, offspring2 = self.pop.crossover(parent1, parent2)  # crossover
                 offspring1 = self.pop.mutation(offspring1)  # mutation
                 offspring2 = self.pop.mutation(offspring2)  # mutation
