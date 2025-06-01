@@ -209,6 +209,6 @@ if __name__ == "__main__":
     question = "What significant event did the James Webb Space Telescope achieve on December 25, 2021, that enhances our understanding of the universe?"
     context = "The James Webb Space Telescope (JWST), a marvel of modern engineering, was successfully launched into space on December 25, 2021. This astronomical instrument is currently orbiting the Sun at the second Lagrange point (L2), a location that allows it to maintain a stable position relative to the Earth and Sun. With its exceptional infrared capabilities, the JWST is designed to observe ancient galaxies, providing insights into the early universe and expanding our understanding of cosmic history. Its deployment marks a significant milestone in space exploration and astronomy."
     output = reader.generate(question, [context])[0]
-    score = reader(question, [context], output)
+    score = reader(question, [context, "dont know"], output)
     print("Output: ", output)
     print("score: ", score)
