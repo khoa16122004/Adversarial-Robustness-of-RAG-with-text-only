@@ -176,3 +176,4 @@ cython_debug/
 result
 ga_logs
 nsgaii_logs
+*nsgaii*
