@@ -141,6 +141,7 @@ class NSGAII:
                  answer,
                  fitness_statery,
                  pct_words_to_swap,
+                 reader_name,
                  log_dir="nsgaii_logs",
                  success_threshold=1.0):
         self.sample_id = sample_id
@@ -149,6 +150,7 @@ class NSGAII:
         self.fitness = fitness
         self.question = question
         self.answer = answer
+        self.reader_name = reader_name
         self.success_threshold = success_threshold
         self.fitness_statery = fitness_statery
         self.pct_words_to_swap = pct_words_to_swap
@@ -299,8 +301,8 @@ class NSGAII:
                 
                 
     def save_logs(self):
-        score_log_file = os.path.join(self.log_dir, f"ngsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.pkl")
-        text_log_file = os.path.join(self.log_dir, f"nsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.txt")
+        score_log_file = os.path.join(self.log_dir, f"{self.reader_name}_ngsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.pkl")
+        text_log_file = os.path.join(self.log_dir, f"{self.reader_name}_nsgaii_{self.fitness_statery}_{self.pct_words_to_swap}_{self.sample_id}.txt")
         
         with open(score_log_file, 'wb') as f:
             pickle.dump(self.history, f)

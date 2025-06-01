@@ -85,6 +85,7 @@ def main(args):
                     answer=golden_answer,
                     fitness_statery=args.fitness_statery,
                     pct_words_to_swap=args.pct_words_to_swap,
+                    reader_name=args.reader_name
                 )
         
         
