@@ -26,8 +26,8 @@ class DataLoader:
 
     def take_sample(self, index):
         data = self.data[index]
-        print("Data id: ", data['sample_id'])
-        print("Datakey: ", data.key())
+        # print("Data id: ", data['sample_id'])
+        # print("Datakey: ", data.key())
         top1_d = data['documents'][0]
         question = data['question']
         gt_answer = data['answer']
