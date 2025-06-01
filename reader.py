@@ -9,11 +9,9 @@ set_seed_everything(222520691)
 
 cls_mapping = {
     "Llama-7b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-7b-chat-hf", "meta-llama"),
-    "Llama-13b": (LlamaForCausalLM, LlamaTokenizer, True, "Llama-2-13b-chat-hf", "meta-llama"),
-    "Mistral-7b": (MistralForCausalLM, AutoTokenizer, True, "Mistral-7B-Instruct-v0.2"),
-    "vicuna-7b": (LlamaForCausalLM, LlamaTokenizer, True, "vicuna-7b-v1.5"),
-    "vicuna-13b": (LlamaForCausalLM, LlamaTokenizer, True, "vicuna-13b-v1.5"),
-    "gemma-7b": (AutoModelForCausalLM, AutoTokenizer, True, "gemma-7b-it")
+    "Mistral-7b": (MistralForCausalLM, AutoTokenizer, True, "Mistral-7B-Instruct-v0.2", "mistralai"),
+    "vicuna-7b": (LlamaForCausalLM, LlamaTokenizer, True, "vicuna-7b-v1.5", "lmsys"),
+    "gemma-7b": (AutoModelForCausalLM, AutoTokenizer, True, "gemma-7b-it", "google")
 }
 
 templates = {
