@@ -22,7 +22,6 @@ def main(args):
     else:
         end_idx = args.end_idx
         
-    print("End idx: ", end_idx)
     for i in range(start_idx, end_idx):
         reader = Reader(args.reader_name)
         original_text, question, gt_answer, answer_position_indices = dataset.take_sample(i)
