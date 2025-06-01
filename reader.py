@@ -140,6 +140,7 @@ class Reader(torch.nn.Module):
     @torch.no_grad()
     def forward(self, question, contexts, answer):
         inputs = [self.template.format(q=question, d=text) for text in contexts]
+        print("Input: ", inputs)
         scores = []
         for prompt in inputs:
             scores.append(self.calculate_answer_probability(question, prompt, answer))
