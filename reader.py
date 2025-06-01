@@ -211,4 +211,4 @@ if __name__ == "__main__":
     output = reader.generate(question, [context])[0]
     score = reader(question, [context, "dont know"], output)
     print("Output: ", output)
-    print("score: ", score)
+    print("score: ", score[0] / score[1])
