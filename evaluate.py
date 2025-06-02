@@ -51,8 +51,8 @@ def main(args):
                 "original_context": original_text,
                 "adv_context": adv_text,
                 "adv_output": output,
-                "score": score
-            }
+                "score": score.tolist()
+            }   
             results.append(result)
 
         with open(output_path, "w", encoding="utf-8") as f:
