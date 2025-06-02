@@ -33,16 +33,16 @@ def main(args):
             print("GT Answer: ", gt_answer)
             print("Output: ", output)
             
-            fitness = MultiScore(
-                reader_name=args.reader_name,
-                q_name=args.q_name,
-                c_name=args.c_name,
-                question=question,
-                original_text=original_text,
-                answer=gt_answer
-            )
+            # fitness = MultiScore(
+            #     reader_name=args.reader_name,
+            #     q_name=args.q_name,
+            #     c_name=args.c_name,
+            #     question=question,
+            #     original_text=original_text,
+            #     answer=gt_answer
+            # )
             
-            retri_score, reader_score = fitness(question, [adv_text], gt_answer)
+            # retri_score, reader_score = fitness(question, [adv_text], gt_answer)
             
 
             result = {
@@ -51,8 +51,8 @@ def main(args):
                 "original_context": original_text,
                 "adv_context": adv_text,
                 "adv_output": output,
-                "retri": retri_score,
-                "reader": reader_score
+                # "retri": retri_score,
+                # "reader": reader_score
             }   
             results.append(result)
 
