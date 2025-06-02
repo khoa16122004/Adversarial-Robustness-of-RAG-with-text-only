@@ -249,6 +249,62 @@ def mean_proccess(model_name, dir):
     proccess_mean = np.mean(final_proccess, axis=0)
     return proccess_mean
 
+def plot_scores(proccess_full):
+    pcts = [0.05, 0.1, 0.2, 0.5]
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
+    generations = np.arange(proccess_full.shape[1])
+    
+    plt.figure(figsize=(10, 5))
+    for i, (pct, color) in enumerate(zip(pcts, colors)):
+        plt.plot(generations, proccess_full[i, :, 0], label=f'pct={pct}', color=color)
+    plt.xlabel('Generation')
+    plt.ylabel('L_RSR')
+    plt.title('L_RSR Score over Generations')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    
+    # Vẽ biểu đồ cho score 1 (GPR score)
+    plt.figure(figsize=(10, 5))
+    for i, (pct, color) in enumerate(zip(pcts, colors)):
+        plt.plot(generations, proccess_full[i, :, 1], label=f'pct={pct}', color=color)
+    plt.xlabel('Generation')
+    plt.ylabel('GPR score')
+    plt.title('GPR Score over Generations')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    
+
+def cal_score(dir, model_name, )
+
+path_template = r"D:\EnhanceGARAG\gemma_nsgaii_logs\gemma-7b_ngsgaii_golden_answer_{pct}_{id}.pkl"
+# path_template = r"D:\EnhanceGARAG\llama_7b_nsgaii_logs\ngsgaii_golden_answer_{pct}_{id}.pkl"
+
+pct_list = [0.05, 0.1, 0.2, 0.5]
+avg_scores_dict = {pct: np.array([0.0, 0.0]) for pct in pct_list}
+ssr_dict = {pct: 0 for pct in pct_list}
+text_final_dict = {pct: [] for pct in pct_list}
+
+for id in range(10):
+    for pct in pct_list:
+        path = path_template.format(pct=pct, id=id)
+        history = pickle.load(open(path, "rb"))
+        final_font = arkiv_proccess(history)[-1]
+        selected_ind, success = greedy_selection(np.array(final_font))
+        avg_scores_dict[pct] += np.array(selected_ind[:2]).astype(float)
+        text_final_dict[pct].append(selected_ind[2].get_perturbed_text())
+        if success:
+            ssr_dict[pct] += 1
+
+# In kết quả tổng kết cho từng pct
+for pct in pct_list:
+    print(f"\n=== PCT: {pct} ===")
+    print("Average Scores:", avg_scores_dict[pct] / 10)
+    print("SSR:", ssr_dict[pct])
+    print("Texts:", text_final_dict[pct])
         
 
 
