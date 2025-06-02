@@ -24,7 +24,12 @@ def main(args):
         results = []
 
         for i in range(len_dataset):
-            path = os.path.join(dir_, f"{i}.txt")
+            try:
+                path = os.path.join(dir_, f"{i}.txt")
+            except:
+            
+                print(path)
+                break
             original_text, question, gt_answer, _ = dataset.take_sample(i)
             adv_text = open(path, "r").readline().strip()
             contexts = [original_text, adv_text]
