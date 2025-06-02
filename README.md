@@ -5,10 +5,26 @@ This project evaluates the adversarial robustness of RAG systems, which use LLMs
 
 ![alt text](images/result.png)
 
+# Usage
+Navigate to the project directory
 
+- **Install required packages**:
+   Run the following command to make the setup script executable:
 
+   ```bash
+   chmod +x vast_ai.sh
+   ./vast_ai.sh
+   ```
+- **Login to Hugging Face**: Use the following command to authenticate and access the LLMs and DPR models:
+    ```bash
+    huggingface-cli login: <access_token>
+    ```
+
+- **Run the attack**: Execute the following command to run the adversarial attack:
+    ```bash
+    python main.py --reader_name llama-7b -n_iter 100 -pct_words_to_swap 0.2 --algorithm NSGAII
+    ```
 # Repo structure
-
 - **`algorithm.py`**: Implements the NSGA-II algorithm for multi-objective optimization.
 - **`evaluate.py`**: Evaluates the adversarial robustness of RAG systems.
 - **`fitness.py`**: Defines fitness functions for optimization.
