@@ -24,14 +24,15 @@ def main(args):
         results = []
 
         for i in range(len_dataset):
+            path = os.path.join(dir_, f"{i}.txt")
+            print(path)
+            original_text, question, gt_answer, _ = dataset.take_sample(i)
             try:
-                path = os.path.join(dir_, f"{i}.txt")
+                adv_text = open(path, "r").readline().strip()
             except:
-            
                 print(path)
                 break
-            original_text, question, gt_answer, _ = dataset.take_sample(i)
-            adv_text = open(path, "r").readline().strip()
+            
             contexts = [original_text, adv_text]
             output = reader.generate(question, contexts)
 
