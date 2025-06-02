@@ -42,8 +42,8 @@ def main(args):
                 answer=gt_answer
             )
             
-            score = fitness(question, [adv_text], gt_answer)
-            print("Score: ", score)
+            retri_score, reader_score = fitness(question, [adv_text], gt_answer)
+            
 
             result = {
                 "question": question,
@@ -51,7 +51,8 @@ def main(args):
                 "original_context": original_text,
                 "adv_context": adv_text,
                 "adv_output": output,
-                "score": score.tolist()
+                "retri": retri_score,
+                "reader": reader_score
             }   
             results.append(result)
 
