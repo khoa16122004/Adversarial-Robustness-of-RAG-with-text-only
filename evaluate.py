@@ -23,9 +23,8 @@ def main(args):
         output_path = f"output_{args.reader_name}_{pct}.json"
         results = []
 
-        for i in range(len_dataset):
+        for i in range(10):
             path = os.path.join(dir_, f"{i}.txt")
-            print(path)
             original_text, question, gt_answer, _ = dataset.take_sample(i)
             adv_text = open(path, "r", encoding="utf-8").readline().strip()
             
