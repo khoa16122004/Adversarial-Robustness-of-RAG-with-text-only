@@ -1,7 +1,11 @@
 # EnhanceGARAG
 This project evaluates the adversarial robustness of RAG systems, which use LLMs for open-domain question answering task, by using NSGA-II as a multi-object optimization algorithm.
 
+![alt text](images/sample.png)
+
 ![alt text](images/result.png)
+
+
 
 # Repo structure
 
