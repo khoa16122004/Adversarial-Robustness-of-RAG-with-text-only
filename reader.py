@@ -15,7 +15,7 @@ cls_mapping = {
 }
 
 templates = {
-    "Llama-7b": "reader_template/Llama.json",
+    "llama-7b": "reader_template/Llama.json",
     "Llama-13b": "reader_template/Llama.json",
     "Mistral-7b": "reader_template/Mistral.json",
     "vicuna-7b": "reader_template/vicuna.json",
