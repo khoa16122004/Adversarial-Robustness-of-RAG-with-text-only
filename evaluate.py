@@ -28,7 +28,7 @@ def main(args):
             print(path)
             original_text, question, gt_answer, _ = dataset.take_sample(i)
             try:
-                adv_text = open(path, "r").readline().strip()
+                adv_text = open(path, "r", encoding="utf-8").readline().strip()
             except:
                 print(path)
                 break
