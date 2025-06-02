@@ -7,37 +7,49 @@ from utils import set_seed_everything, DataLoader
 from reader import Reader
 from utils import find_answer, split
 from fitness import MultiScore
+import os
 def main(args):
     set_seed_everything(22520691)
     dataset = DataLoader(args.data_path)
     len_dataset = dataset.len()
-    
-
-    
     reader = Reader(args.reader_name)
-    with open(args.adv_text_path, "r") as f:
-        adv_texts = [line.strip() for line in f.readlines()]
-        print("Len adv texts: ", len(adv_texts))
+    
+    pcts = [0.05, 0.1, 0.2, 0.5]
+    for pct in pcts:
+        print("=======================================")
+        print("PCT: ", pct)
+        dir_ = f"pertubed_text/{args.reader_name}_{pct}"
+        for i in range(len_dataset):
+            path = os.path.join(dir_, f"{i}.txt")
+            original_text, question, gt_answer, _ = dataset.take_sample(i)
+            adv_text = open(path, "r").readline().strip()
+            contexts = [original_text, adv_text]
+            output = reader.generate(question, contexts)
+            print("GT Answer: ", gt_answer)
+            print("Output: ", output)
+            
+            fitness = MultiScore(
+                reader_name=args.reader_name,
+                q_name="facebook/dpr-question_encoder-multiset-base",
+                c_name="facebook/dpr-ctx_encoder-multiset-base",
+                question=question,
+                original_text=original_text,
+                answer=gt_answer
+            )
+            
+            score = fitness(question, [adv_text], gt_answer)
+            print("Score: ", score)
+            
+                        
 
     
-    original_text, question, gt_answer, _ = dataset.take_sample(args.evaluate_id)
-    inference_text = [original_text] + adv_texts
-    output = reader.generate(question, inference_text)
 
-    fitness = MultiScore(args.reader_name, 
-                    args.q_name, 
-                    args.c_name, 
-                    question, original_text, output[0])
-    print("Output: ", output)
-    print("Fitness: ", fitness(question, inference_text, output[0]))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run GA attack")
     parser.add_argument("--reader_name", default="Llama-7b", type=str, help="Retriever model name")
     parser.add_argument("--q_name", default="facebook/dpr-question_encoder-multiset-base", type=str, help="Question encoder name")
     parser.add_argument("--c_name", default="facebook/dpr-ctx_encoder-multiset-base", type=str, help="Context encoder name")
-    parser.add_argument("--data_path", default="sample5_data.json", type=str, help="Data path")
-    parser.add_argument("--evaluate_id", default=0, type=int, help="Evaluate id")
-    parser.add_argument("--adv_text_path", type=str)
+    parser.add_argument("--data_path", default="data_new_v2.json", type=str, help="Data path")
     args = parser.parse_args()
     main(args)
