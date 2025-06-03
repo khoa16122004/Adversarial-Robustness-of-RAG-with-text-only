@@ -29,7 +29,7 @@ Navigate to the project directory
 - **`evaluate.py`**: Evaluates the adversarial robustness of RAG systems.
 - **`fitness.py`**: Defines fitness functions for optimization.
 - **`population.py`**: Manages the population for the genetic algorithm.
-- **`reader.py`**: Handles input data processing.
+- **`reader.py`**: LLMs proccess.
 - **`retrieval.py`**: Implements retrieval methods for RAG systems.
 - **`typo_transformation.py`**: Applies typo transformations to generate adversarial examples.
 - **`utils.py`**: Contains utility functions, including visualization tools.
