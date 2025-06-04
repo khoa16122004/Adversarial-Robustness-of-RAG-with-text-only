@@ -68,18 +68,23 @@ with col1:
         outputs = []
         import torch
 
-        for context in perturbed_texts_raw:
+        progress_bar = st.progress(0, text="Running inference...")
+        total = len(perturbed_texts_raw)
+
+        for i, context in enumerate(perturbed_texts_raw):
             try:
                 result = reader.generate(question, [context])
                 outputs.append(result[0] if isinstance(result, list) and len(result) > 0 else "Invalid Output")
             except Exception as e:
                 outputs.append(f"Error: {e}")
 
+            progress_bar.progress((i + 1) / total, text=f"Inference {i + 1}/{total}")
+
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
         st.session_state.outputs_raw = outputs
-        st.success("Inference complete! Please hover again to see updated output.")
+        st.success("✅ Inference complete! Please hover again to see updated output.")
         st.session_state.run_inference = False
 
 with col2:

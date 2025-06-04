@@ -147,26 +147,36 @@ class Reader(torch.nn.Module):
         return np.array(scores)
     
     @torch.no_grad()
-    def generate(self, question, contexts):
-        inputs = [self.template.format(q=question, d=text) for text in contexts]
-        input_ids = self.tokenizer(
+    def generate(self, question, contexts, batch_size=8):
+        all_outputs = []
+        for i in range(0, len(contexts), batch_size):
+            batch_contexts = contexts[i:i+batch_size]
+            inputs = [self.template.format(q=question, d=text) for text in batch_contexts]
+
+            input_ids = self.tokenizer(
                 inputs,
                 max_length=512,
                 truncation=True,
-                padding=True, 
-                return_tensors="pt",
-        )
-        outputs = self.model.generate(
-            input_ids=input_ids.input_ids.to(self.model.device), 
-            attention_mask=input_ids.attention_mask.to(self.model.device), 
-            **self.generate_kwargs
-        )
-        outputs = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
+                padding=True,
+                return_tensors="pt"
+            )
 
-        if isinstance(outputs, list):
-            return [o.split("Answer:")[-1].strip() for o in outputs]
-        else:
-            return outputs.split("Answer:")[-1].strip()
+            outputs = self.model.generate(
+                input_ids=input_ids.input_ids.to(self.model.device),
+                attention_mask=input_ids.attention_mask.to(self.model.device),
+                **self.generate_kwargs
+            )
+
+            decoded = self.tokenizer.batch_decode(outputs.sequences, skip_special_tokens=True)
+
+            if isinstance(decoded, list):
+                parsed = [o.split("Answer:")[-1].strip() for o in decoded]
+            else:
+                parsed = [decoded.split("Answer:")[-1].strip()]
+            
+            all_outputs.extend(parsed)
+
+        return all_outputs
     
     @torch.no_grad()
     def calculate_answer_probability(self, question, context, answer):
