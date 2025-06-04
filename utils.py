@@ -276,36 +276,20 @@ def plot_scores(proccess_full):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-    
 
-def cal_score(dir, model_name, )
 
-path_template = r"D:\EnhanceGARAG\gemma_nsgaii_logs\gemma-7b_ngsgaii_golden_answer_{pct}_{id}.pkl"
-# path_template = r"D:\EnhanceGARAG\llama_7b_nsgaii_logs\ngsgaii_golden_answer_{pct}_{id}.pkl"
+def get_font(dir_, model_name, sample_id):
+    pcts = [0.05, 0.1, 0.2, 0.5]
+    pcts_list, pcts_font, merge_font = arkiv_multiple_font(dir=dir_, 
+                                                           model_name=model_name,
+                                                           sample_id=sample_id)
+    return np.array(merge_font[0])
 
-pct_list = [0.05, 0.1, 0.2, 0.5]
-avg_scores_dict = {pct: np.array([0.0, 0.0]) for pct in pct_list}
-ssr_dict = {pct: 0 for pct in pct_list}
-text_final_dict = {pct: [] for pct in pct_list}
 
-for id in range(10):
-    for pct in pct_list:
-        path = path_template.format(pct=pct, id=id)
-        history = pickle.load(open(path, "rb"))
-        final_font = arkiv_proccess(history)[-1]
-        selected_ind, success = greedy_selection(np.array(final_font))
-        avg_scores_dict[pct] += np.array(selected_ind[:2]).astype(float)
-        text_final_dict[pct].append(selected_ind[2].get_perturbed_text())
-        if success:
-            ssr_dict[pct] += 1
-
-# In kết quả tổng kết cho từng pct
-for pct in pct_list:
-    print(f"\n=== PCT: {pct} ===")
-    print("Average Scores:", avg_scores_dict[pct] / 10)
-    print("SSR:", ssr_dict[pct])
-    print("Texts:", text_final_dict[pct])
-        
+# dir_ = "result/llama_7b_nsgaii_logs"
+# model_name = "llama-7b"
+# sample_id = 0
+# get_font(dir_, model_name, sample_id)
 
 
 
