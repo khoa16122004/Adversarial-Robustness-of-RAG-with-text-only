@@ -25,16 +25,18 @@ def load_dataset():
     return DataLoader("data_new_v2.json")
 
 @st.cache_resource
-def load_reader():
-    return Reader("llama-7b")
+def load_reader_dynamic(model_name):
+    return Reader(model_name)
 
 @st.cache_data
-def load_font_data():
-    return get_font("llama_7b_nsgaii_logs", "llama-7b", 0)
+def load_font_data(model_name, sample_id):
+    return get_font(f"{model_name}_nsgaii_logs", model_name, sample_id)
 
+sample_id = st.number_input("🔢 Sample ID", min_value=0, max_value=len(load_dataset()) - 1, value=0)
+model_name = st.text_input("🤖 Model Name", value="llama-7b")
 dataset = load_dataset()
-reader = load_reader()
-merge_font_data = load_font_data()
+reader = load_reader_dynamic()
+merge_font_data = load_font_data(model_name, sample_id)
 
 original_document, question, gt_answer, answer_position_indices = dataset.take_sample(0)
 
