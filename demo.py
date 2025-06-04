@@ -38,7 +38,7 @@ dataset = load_dataset()
 reader = load_reader_dynamic(model_name)
 merge_font_data = load_font_data(model_name, sample_id)
 
-original_document, question, gt_answer, answer_position_indices = dataset.take_sample(0)
+original_document, question, gt_answer, answer_position_indices = dataset.take_sample(sample_id)
 
 retriever_scores = merge_font_data[:, 0].astype(float)
 reader_scores = merge_font_data[:, 1].astype(float)
