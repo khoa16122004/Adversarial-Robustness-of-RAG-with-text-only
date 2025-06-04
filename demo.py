@@ -65,18 +65,18 @@ with col1:
         st.session_state.run_inference = True
 
     if st.session_state.run_inference:
-        try:
-            outputs = reader.generate(question, [perturbed_texts_raw[0]])
-            print("outputs: ", outputs)
-            input("Wait")
-            if not isinstance(outputs, list) or len(outputs) != len(perturbed_texts_raw):
-                outputs = ["Invalid Output"] * len(perturbed_texts_raw)
-        except Exception as e:
-            outputs = [f"Error: {e}"] * len(perturbed_texts_raw)
-        finally:
-            import torch
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+        outputs = []
+        import torch
+
+        for context in perturbed_texts_raw:
+            try:
+                result = reader.generate(question, [context])
+                outputs.append(result[0] if isinstance(result, list) and len(result) > 0 else "Invalid Output")
+            except Exception as e:
+                outputs.append(f"Error: {e}")
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
         st.session_state.outputs_raw = outputs
         st.success("Inference complete! Please hover again to see updated output.")
