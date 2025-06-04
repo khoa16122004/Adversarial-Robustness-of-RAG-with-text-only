@@ -71,6 +71,10 @@ with col1:
                 outputs = ["Invalid Output"] * len(perturbed_texts_raw)
         except Exception as e:
             outputs = [f"Error: {e}"] * len(perturbed_texts_raw)
+        finally:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
         st.session_state.outputs_raw = outputs
         st.success("Inference complete! Please hover again to see updated output.")
