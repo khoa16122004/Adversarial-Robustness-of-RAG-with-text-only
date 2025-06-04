@@ -2,7 +2,8 @@ import streamlit as st
 import plotly.graph_objects as go
 from utils import get_font, DataLoader
 from reader import Reader
-st.set_page_config(layout="wide")  # <- Đặt lên đầu tiên
+
+st.set_page_config(layout="wide")  # Gọi duy nhất 1 lần, đầu tiên
 
 def format_text_with_br(text, max_line_length=80):
     if not isinstance(text, str):
@@ -47,7 +48,9 @@ if "outputs_raw" not in st.session_state:
 if "run_inference" not in st.session_state:
     st.session_state.run_inference = False
 
-st.set_page_config(layout="wide")
+# Xóa dòng sau (đã gọi ở trên)
+# st.set_page_config(layout="wide")
+
 st.title("📊 Document Analysis Interface")
 
 col1, col2 = st.columns([2, 3])
