@@ -26,7 +26,7 @@ model_name = "llama-7b"
 sample_id = 0
 
 merge_font_data = get_font(dir_, model_name, sample_id)
-# reader = Reader(model_name)
+reader = Reader(model_name)
 
 original_document, question, gt_answer, answer_position_indices = dataset.take_sample(sample_id)
 

@@ -9,5 +9,7 @@ tqdm
 nvitop
 EOF
 streamlit
+gdown
 
 pip install -r requirements.txt
+gdown --folder 11WyPiasrLD-LLPIN3eJnCijjIfe_sVCA
