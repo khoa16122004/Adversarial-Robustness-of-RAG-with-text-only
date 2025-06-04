@@ -1,6 +1,5 @@
 import streamlit as st
 import plotly.graph_objects as go
-import numpy as np
 from utils import get_font, DataLoader
 from reader import Reader
 
@@ -19,31 +18,34 @@ def format_text_with_br(text, max_line_length=80):
         current_line_start = cut_at
     return "<br>".join(lines)
 
-# === Load dữ liệu ===
-dir_ = r"llama_7b_nsgaii_logs"
-dataset = DataLoader("data_new_v2.json")
-model_name = "llama-7b"
-sample_id = 0
+@st.cache_data
+def load_dataset():
+    return DataLoader("data_new_v2.json")
 
-merge_font_data = get_font(dir_, model_name, sample_id)
-reader = Reader(model_name)
-print("Done init reader")
-original_document, question, gt_answer, answer_position_indices = dataset.take_sample(sample_id)
+@st.cache_resource
+def load_reader():
+    return Reader("llama-7b")
+
+@st.cache_data
+def load_font_data():
+    return get_font("llama_7b_nsgaii_logs", "llama-7b", 0)
+
+dataset = load_dataset()
+reader = load_reader()
+merge_font_data = load_font_data()
+
+original_document, question, gt_answer, answer_position_indices = dataset.take_sample(0)
 
 retriever_scores = merge_font_data[:, 0].astype(float)
 reader_scores = merge_font_data[:, 1].astype(float)
 perturbed_texts_raw = [ind[2].get_perturbed_text() for ind in merge_font_data]
 
-# === Khởi tạo session state nếu chưa có ===
 if "outputs_raw" not in st.session_state:
     st.session_state.outputs_raw = ["None"] * len(perturbed_texts_raw)
 
-# === Tạo các danh sách hiển thị ===
-indexes = list(range(len(perturbed_texts_raw)))
-perturbed_texts_for_display = [format_text_with_br(text) for text in perturbed_texts_raw]
-outputs_for_display = [format_text_with_br(output) for output in st.session_state.outputs_raw]
+if "run_inference" not in st.session_state:
+    st.session_state.run_inference = False
 
-# === UI Streamlit ===
 st.set_page_config(layout="wide")
 st.title("📊 Document Analysis Interface")
 
@@ -56,11 +58,11 @@ with col1:
     st.write("**Original Document:**", original_document)
 
     if st.button("▶️ Run Inference"):
+        st.session_state.run_inference = True
+
+    if st.session_state.run_inference:
         try:
-            # chạy inference cho toàn bộ perturbed_texts_raw một lần
-            print("Perturbed texts: ", perturbed_texts_raw)
             outputs = reader.generate(question, perturbed_texts_raw)
-            # đảm bảo outputs có độ dài đúng
             if not isinstance(outputs, list) or len(outputs) != len(perturbed_texts_raw):
                 outputs = ["Invalid Output"] * len(perturbed_texts_raw)
         except Exception as e:
@@ -68,15 +70,14 @@ with col1:
 
         st.session_state.outputs_raw = outputs
         st.success("Inference complete! Please hover again to see updated output.")
-
+        st.session_state.run_inference = False
 
 with col2:
     st.markdown("### 📉 Pareto Front")
 
-    # Cập nhật dữ liệu hiển thị
     outputs_for_display = [format_text_with_br(output) for output in st.session_state.outputs_raw]
     perturbed_texts_for_display = [format_text_with_br(text) for text in perturbed_texts_raw]
-    customdata = list(zip(indexes, perturbed_texts_for_display, outputs_for_display))
+    customdata = list(zip(range(len(perturbed_texts_raw)), perturbed_texts_for_display, outputs_for_display))
 
     fig = go.Figure(data=go.Scatter(
         x=retriever_scores,
