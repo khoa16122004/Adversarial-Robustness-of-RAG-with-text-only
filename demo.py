@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from utils import get_font, DataLoader
 from reader import Reader
+st.set_page_config(layout="wide")  # <- Đặt lên đầu tiên
 
 def format_text_with_br(text, max_line_length=80):
     if not isinstance(text, str):
