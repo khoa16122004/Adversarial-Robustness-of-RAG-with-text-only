@@ -27,7 +27,7 @@ sample_id = 0
 
 merge_font_data = get_font(dir_, model_name, sample_id)
 reader = Reader(model_name)
-
+print("Done init reader")
 original_document, question, gt_answer, answer_position_indices = dataset.take_sample(sample_id)
 
 retriever_scores = merge_font_data[:, 0].astype(float)
@@ -56,17 +56,18 @@ with col1:
     st.write("**Original Document:**", original_document)
 
     if st.button("▶️ Run Inference"):
-        st.session_state.outputs_raw = []
-        for text in perturbed_texts_raw:
-            if isinstance(text, str):
-                try:
-                    output = reader.generate(question, text)
-                except:
-                    output = "Error during inference"
-            else:
-                output = "Invalid Input"
-            st.session_state.outputs_raw.append(output)
+        try:
+            # chạy inference cho toàn bộ perturbed_texts_raw một lần
+            outputs = reader.generate(question, perturbed_texts_raw)
+            # đảm bảo outputs có độ dài đúng
+            if not isinstance(outputs, list) or len(outputs) != len(perturbed_texts_raw):
+                outputs = ["Invalid Output"] * len(perturbed_texts_raw)
+        except Exception as e:
+            outputs = [f"Error: {e}"] * len(perturbed_texts_raw)
+
+        st.session_state.outputs_raw = outputs
         st.success("Inference complete! Please hover again to see updated output.")
+
 
 with col2:
     st.markdown("### 📉 Pareto Front")
