@@ -32,7 +32,7 @@ def load_reader_dynamic(model_name):
 def load_font_data(model_name, sample_id):
     return get_font(f"{model_name}_nsgaii_logs", model_name, sample_id)
 
-sample_id = st.number_input("🔢 Sample ID", min_value=0, max_value=len(load_dataset()) - 1, value=0)
+sample_id = st.number_input("🔢 Sample ID", min_value=0, max_value=10, value=0)
 model_name = st.text_input("🤖 Model Name", value="llama-7b")
 dataset = load_dataset()
 reader = load_reader_dynamic(model_name)
