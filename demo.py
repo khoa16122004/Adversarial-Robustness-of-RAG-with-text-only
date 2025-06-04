@@ -58,6 +58,7 @@ with col1:
     if st.button("▶️ Run Inference"):
         try:
             # chạy inference cho toàn bộ perturbed_texts_raw một lần
+            print("Perturbed texts: ", perturbed_texts_raw)
             outputs = reader.generate(question, perturbed_texts_raw)
             # đảm bảo outputs có độ dài đúng
             if not isinstance(outputs, list) or len(outputs) != len(perturbed_texts_raw):
