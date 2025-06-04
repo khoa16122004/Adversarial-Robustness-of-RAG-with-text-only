@@ -66,7 +66,9 @@ with col1:
 
     if st.session_state.run_inference:
         try:
-            outputs = reader.generate(question, perturbed_texts_raw)
+            outputs = reader.generate(question, [perturbed_texts_raw[0]])
+            print("outputs: ", outputs)
+            input("Wait")
             if not isinstance(outputs, list) or len(outputs) != len(perturbed_texts_raw):
                 outputs = ["Invalid Output"] * len(perturbed_texts_raw)
         except Exception as e:
