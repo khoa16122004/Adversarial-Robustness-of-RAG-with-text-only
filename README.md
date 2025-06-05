@@ -5,6 +5,8 @@ This project evaluates the adversarial robustness of RAG systems, which use LLMs
 
 ![alt text](images/result.png)
 
+**Notice**: All results and demo video can be found [here](https://drive.google.com/drive/folders/1aF0QjdfymblQJpOij_0KPAHMWjA-ZiSi?usp=sharing)
+
 # Usage
 Navigate to the project directory
 
